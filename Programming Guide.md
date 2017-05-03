@@ -59,6 +59,7 @@ public function test_command($command, $args = []) {
 
 ### ER Message Buffer Macros
 The following macros are short-hand to log messages during application execution. 
+
 | Macro     | Purpose                                  | Return Value |
 | --------- | ---------------------------------------- | ------------ |
 | fatal()   | Halt script execution, report message.   | null         |
