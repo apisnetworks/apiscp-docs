@@ -37,13 +37,36 @@ public function test_value($x) {
       return success('OK!');
 	}
 	if (is_string($x)) {
-      return warn('I guess that is OK!');
+      return warn('I guess that is OK!') || true;
 	}
-	return error('Bad value! `%s\'', $x);
+	return error("Bad value! `%s'", $x);
 }
 ```
 
 ER supports argument references as well utilizing [sprintf](http://php.net/manual/en/function.sprintf.php).
+
+```php
+public function test_command($command, $args = []) {
+  $status = Util_Process::exec($command, $args);
+  if (!$status['success']) {
+    /**
+     * $status returns an array with: success, stderr, stdout, return
+     */
+    return error("Failed to execute command. Code %(return)d. Output: %(stdout)s. Stderr: %(stderr)s", $status);
+  }
+}
+```
+
+### ER Message Buffer Macros
+The following macros are short-hand to log messages during application execution. 
+| Macro     | Purpose                                  | Return Value |
+| --------- | ---------------------------------------- | ------------ |
+| fatal()   | Halt script execution, report message.   | null         |
+| error()   | Routine encountered error and should return from routine. Recommended to always return. | false        |
+| warn()    | Routine encountered recoverable error.   | false        |
+| info()    | Additional information pertaining to routine. | true         |
+| success() | Action completed successfully.           | true         |
+| debug()   | Message that only emits when DEBUG set to 1 in config.ini | true         |
 
 ## Calling Programs
 
@@ -68,8 +91,34 @@ In addition to basic process execution, the following variations are implemented
 | Sudo         | Switch user. Automatically scope active session. | Slow. Must be run from backend.          | \$proc = new Util_Process_Sudo(); \$proc->setUser('nobody'); $proc->run("whoami"); |
 | Tee          | Copy output elsewhere                    | ???                                      | \$tee = new Util_Process_Tee(['tee' => ''/tmp/flapjacks'); \$proc = new Util_Process(); \$tee->setProcess(\$proc); \$proc->run("dmesg"); |
 
+### Allowing Exit Values
+
+UP treats all non-zero exit codes as errors. `success` is a shorthand way to check if the exit code, stored in `return` is zero or non-zero. To extend the range of successful values, 
+
 ## Extending Methods
 
 ### Permissions
 
 Modules comprise a variety methods and require specific access rights to protect access. A module can exist exist independent or surrogate an existing module. 
+
+
+
+## Creating Applications
+
+### Application Structure
+
+All apps are located under `apps/`. The "App ID" is the folder under which the application is located. A sample application named "test" is bundled with apnscp. A controller must be named after the App ID and end in ".php". The default view may be named after the App ID and end in ".tpl" or located as views/index.blade.php if using Blade. 
+
+### Controller/Model
+
+Controller/Model logic is located in *<app name>*.php and instantiated first. The class name must be named Page and placed in a namespace named after the app ID. An example app named "Test" is located under apps/test/.
+
+### Templates
+
+apnscp uses [Laravel Blade](https://laravel.com/docs/5.4/blade) bundled with Laravel 5.4 for templates or basic "include()" if the template is named *<app name>*.tpl
+
+
+
+### Configuring Role Apps
+
+Applications are privileged by role: admin, site, and user.

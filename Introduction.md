@@ -42,25 +42,33 @@ apnscp works best with at least 2 GB for services + caching. Additional features
 | birdhound | Recommended | CPU         | Monit monitoring profile + push notification |
 
 
-## Proactive vs Reactive Monitoring
+## Proactive and Reactive Monitoring
 
-apnscp implements real-time proactive monitoring and reactive monitoring to boost reliability. Proactive comes in the form of resource checks through ulimit, HTTP/1.0 opt-in, and cgroup resource accounting. Reactive comes with **rampart** and **birdhound**.
-
-Per-user resource limits are set within the FILESYSTEMTEMPLATE under `siteinfo/etc/security/apis.conf`. To adjust these limits create a new file alphabetically lower than "a", such as "bitchin.conf" - or whatever. Upon login these limits will override `apis.conf`.
-
-
-
-
+Birdhound is a configured Monit instance designed to afford both proactive and reactive monitoring. Rampart provides a denial-of-service sieve for reducing resource swells from misbehaving bots. apnscp includes disallowance of HTTP/1.0 protocol, by default, to reduce malware. All components work to keep your sites more secure by filtering out garbage. [tuned](https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Power_Management_Guide/Tuned.html) works proactively by retuning system variables as necessary. apnscp ships with the `virtual-guest` profile active.
 
 # Installation
 
-apnscp may be installed by first purchasing a license key through [apnscp.com](https://apnscp.com). 
+apnscp may be installed from the bootstrap utility. Once installed a 15-day trial begins. A license key may be purchased through [apnscp.com](https://apnscp.com). 
+
+Before installing, ensure the following conditions are met:
+
+- [ ] 1 GB RAM
+- [ ] [Forward-confirmed reverse DNS](https://en.wikipedia.org/wiki/Forward-confirmed_reverse_DNS), i.e. 64.22.68.1 <-> apnscp.com
+- [ ] CentOS 7.x or RedHat 7.x
+
+## Bootstrapping apnscp
+
+Run the command from terminal
 
 ```shell
 wget -O - https://apnscp.com/bootstrap.sh | bash
 ```
 
-apnscp may run integrated or in a Docker container. An integrated installation will adjust system files and result in a 7-9% throughput improvement over Docker. Docker is suitable for trying apnscp out.
+The bootstrapper will install itself, as well as request a SSL certificate from Let's Encrypt (FCRDNS requirement). Once setup, a password will be generated. Your admin username is "admin" and password listed at the end.
+
+## First Login
+
+Visit https://<domain>:2083 to login to the panel as "admin". This is the **Administrator** account that can add, delete, and suspend accounts. **Site Administrators** are administrators of accounts created by an Administrator and are conferred all the rights of a **Secondary User**, with the added benefit of adding on domain, creating databases, and limited sudo. Further service configuration profiles may be setup in the following sections.
 
 # Configuration
 apnscp configuration is managed through `conf/` within its installation directory, `/usr/local/apnscp` by default. Two files require configuration before usage:
@@ -142,13 +150,12 @@ Accounts may be suspended/unsuspended using `SuspendDomain QUALIFIER` where *QUA
 
 ```bash
 # Create a domain named domain1.com
-AddDomain -c billing,invoice=SITE-111 -c siteinfo,admin_user=admin1 -c siteinfo,domain=domain1.com 	
+AddVirtDomain -c billing,invoice=SITE-111 -c siteinfo,admin_user=admin1 -c siteinfo,domain=domain1.com 	
 # And another one named foobar.com
-AddDomain -c billing,parent_invoice=SITE-111 -c siteinfo,admin_user=admin2 -c siteinfo,domain=foobar.com
+AddVirtDomain -c billing,invoice=SITE-111 -c siteinfo,admin_user=admin2 -c siteinfo,domain=foobar.com
 
-SuspendDomain domain1.com
-# Delete any domain with the invoice SITE-111
-DeleteDomain SITE-111
+suspend.sh domain1.com
+
 ```
 
 
