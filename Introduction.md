@@ -24,43 +24,51 @@ Because machines vie for processing time among neighboring guests, performance c
 
 ## With root comes great responsibility
 
-Virtual hosting undoubtedly provides greater flexibility than traditional shared hosting environments; however it comes with a downside, you are now your own sysadmin. You know, a sysadmin - the guys who are often paid handsomely and whose decades of experience sometimes still falls short to address problems in computing. Sysadmins are unsung heroes often unheard of until something bad happens. Work in a large firm and hardly know your sysadmin? Congratulate him; he's doing an excellent job.
+Virtual hosting undoubtedly provides greater flexibility than traditional shared hosting environments; however it comes with a downside, you are now your own sysadmin. You know, a sysadmin - the guys you never hear about until *something* goes wrong. Even with their bountiful experience, sometimes they - speaking from personal experience - can encounter eclectic scenarios that not even they know how to address.  Sysadmins are the unsung heroes who enable business to flow. Work in a large firm and hardly know your sysadmin? Congratulate him; he's doing an excellent job.
 
-apnscp is not a replacement to a sysadmin nor can it carry out all of the tasks and troubleshooting a sysadmin can, but it does obviate many traditional roles with user management, system hardening, and preventing unwanted intruders. It's a platform we have built for over 15 years with an expectation that I or you can take a vacation and not worry about the integrity of your sites.
+apnscp is not a replacement to a sysadmin nor can it carry out all of the tasks and troubleshooting a sysadmin can, but it does obviate many traditional roles with user management, system hardening, and preventing unwanted intruders. It's a platform we have built for over 15 years with an expectation that I or you can take a vacation and not worry about a mishap shutting down service.
 
 # Features
 
 apnscp works best with at least 2 GB for services + caching. Additional features may be installed:
 
-| Service   | ?           | Bottleneck  | Description                              |
-| --------- | ----------- | ----------- | ---------------------------------------- |
-| apnscp    | Required    | -           | Control panel frontend/backend           |
-| mcache    | Optional    | Memory      | PHP opcode + session in-memory           |
-| vscanner  | Recommended | CPU         | Real-time upload filtering, well-known URI lockdown |
-| mscanner  | Optional    | Memory, CPU | Mail scanning, aggregate Bayesian DB     |
-| rampart   | Recommended | CPU         | Real-time brute-force deterrent, DoS filtering |
-| birdhound | Recommended | CPU         | Monit monitoring profile + push notification |
+| Service  | ?           | Bottleneck  | Description                              |
+| -------- | ----------- | ----------- | ---------------------------------------- |
+| apnscp   | Required    | -           | Control panel frontend/backend           |
+| mcache   | Recommended | Memory      | PHP opcode + session in-memory           |
+| vscanner | Optional    | CPU         | Real-time upload filtering, well-known URI lockdown |
+| mscanner | Optional    | Memory, CPU | Mail scanning, aggregate Bayesian DB     |
+| rampart  | Recommended | CPU         | Real-time brute-force deterrent, DoS filtering |
+| argos    | Recommended | CPU         | Monit monitoring profiles + push notification |
 
 
-## Proactive vs Reactive Monitoring
+## Proactive and Reactive Monitoring
 
-apnscp implements real-time proactive monitoring and reactive monitoring to boost reliability. Proactive comes in the form of resource checks through ulimit, HTTP/1.0 opt-in, and cgroup resource accounting. Reactive comes with **rampart** and **birdhound**.
-
-Per-user resource limits are set within the FILESYSTEMTEMPLATE under `siteinfo/etc/security/apis.conf`. To adjust these limits create a new file alphabetically lower than "a", such as "bitchin.conf" - or whatever. Upon login these limits will override `apis.conf`.
-
-
-
-
+Argos is a configured Monit instance designed to afford both proactive and reactive monitoring. Rampart provides a denial-of-service sieve for reducing resource swells from misbehaving bots. apnscp includes disallowance of HTTP/1.0 protocol, by default, to reduce malware. All components work to keep your sites more secure by filtering out garbage. [tuned](https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Power_Management_Guide/Tuned.html) works proactively by retuning system variables as necessary. apnscp ships with the `virtual-guest` profile active.
 
 # Installation
 
-apnscp may be installed by first purchasing a license key through [apnscp.com](https://apnscp.com). 
+apnscp may be installed from the bootstrap utility. Once installed a 15-day trial begins. A license key may be purchased through [apnscp.com](https://apnscp.com). 
+
+Before installing, ensure the following conditions are met:
+
+- [ ] 1 GB RAM (2 GB recommended)
+- [ ] [Forward-confirmed reverse DNS](https://en.wikipedia.org/wiki/Forward-confirmed_reverse_DNS), i.e. 64.22.68.1 <-> apnscp.com
+- [ ] CentOS 7.x or RedHat 7.x
+
+## Bootstrapping apnscp
+
+Run the command from terminal
 
 ```shell
 wget -O - https://apnscp.com/bootstrap.sh | bash
 ```
 
-apnscp may run integrated or in a Docker container. An integrated installation will adjust system files and result in a 7-9% throughput improvement over Docker. Docker is suitable for trying apnscp out.
+The bootstrapper will install itself, as well as request a SSL certificate from Let's Encrypt (FCRDNS requirement). Once setup, a password will be generated. Your admin username is "admin" and password listed at the end.
+
+## First Login
+
+Visit https://<domain>:2083 to login to the panel as "admin". This is the **Administrator** account that can add, delete, and suspend accounts. **Site Administrators** are administrators of accounts created by an Administrator and are conferred all the rights of a **Secondary User**, with the added benefit of adding on domain, creating databases, and limited sudo. Further service configuration profiles may be setup in the following sections.
 
 # Configuration
 apnscp configuration is managed through `conf/` within its installation directory, `/usr/local/apnscp` by default. Two files require configuration before usage:
@@ -85,46 +93,15 @@ Additional hostnames beyond the machine name (`uname -n`) can be configured by e
 
 Sites may be added using `AddDomain` or in simpler form, `add_site.sh`. Advanced usage of `AddDomain` is covered under **Managing Accounts**
 
-## Logging In
+# Logging In
 
 apnscp may be accessed via https://<server>:2083/ or via http://<server>/ - an automatic redirect will occur in this situation. apnscp may be accessed from an addon domain through the /cpadmin alias.
 
-# Customizing
-
-## Surrogates
-
-**Surrogates** are delegated modules that are loaded in lieu of modules that ship with apnscp. Surrogates are located in `lib/modules/surrogates` and are named after the module in which they delegate. A surrogate should extend the module for which it delegates, but doesn't have to. In such situations any method not explicitly implemented in the surrogate would not be visible to any calling method.
-
-> **Remember**: New surrogates are not loaded until the active session has been destroyed via logout or other means
-
-```php
-<?php
-	class Aliases_Module_Surrogate extends Aliases_Module {
-		/**
-		 * Extend nameserver checks to include whitelabel nameservers
-		 */
-		protected function domain_is_delegated($domain)
-		{
-			$myns = [
-			    'ns1.myhostingns.com',
-				'ns2.myhostingns.com',
-				'ns1.whitelabel.com',
-				'ns2.whitelabel.com'
-			];
-			$nameservers = $this->dns_get_authns_from_host($domain);
-			foreach($nameservers as $nameserver) {
-				if (in_array($nameserver, $myns)) {
-					return 1;
-				}
-			}
-			return parent::domain_is_delegated($domain);
-		}
-	}
-```
-## Managing Accounts
 ### Important Terms
 
 Before 
+
+# Command-Line Interface
 
 ### Adding Accounts
 
@@ -142,13 +119,12 @@ Accounts may be suspended/unsuspended using `SuspendDomain QUALIFIER` where *QUA
 
 ```bash
 # Create a domain named domain1.com
-AddDomain -c billing,invoice=SITE-111 -c siteinfo,admin_user=admin1 -c siteinfo,domain=domain1.com 	
+AddVirtDomain -c billing,invoice=SITE-111 -c siteinfo,admin_user=admin1 -c siteinfo,domain=domain1.com 	
 # And another one named foobar.com
-AddDomain -c billing,parent_invoice=SITE-111 -c siteinfo,admin_user=admin2 -c siteinfo,domain=foobar.com
+AddVirtDomain -c billing,invoice=SITE-111 -c siteinfo,admin_user=admin2 -c siteinfo,domain=foobar.com
 
-SuspendDomain domain1.com
-# Delete any domain with the invoice SITE-111
-DeleteDomain SITE-111
+suspend.sh domain1.com
+
 ```
 
 
@@ -174,11 +150,15 @@ Apache runs as an ISAPI module embedded into PHP instead of PHP-FPM to reduce re
 #### Configuring Fallbacks
 Additional fallbacks may be configured by duplicating httpd-fallback-common.conf
 
+# Features
+
 ## API Companion, Beacon
+
 [![Beacon](https://apisnetworks.com/images/beacon/beacon.png)](https://github.com/apisnetworks/beacon)
 Beacon is a scripting companion for apnscp that interfaces its API. Any user role may use it. Whatever apnscp exposes to a given role, Beacon too can interact with. Refer to the [Beacon repository](https://github.com/apisnetworks/beacon) to get started.
 
 ## Filesystem Template
+
 **Filesystem Template** ("FST") represents a collection of read-only layers shared among accounts named after each service enabled. The top-most layer that contains read-write client data is called the **Shadow Layer**. Services live in ``/home/virtual/FILESYSTEMTEMPLATE`` and are typically hardlinked against system libraries for consistency.
 
 ### Restricting Updates
@@ -203,7 +183,10 @@ A FST file may need to be physically separated from a system file when customizi
 ### Propagating Changes
 Once a file has been modified within the FST, it is necessary to recreate the composite filesystem. `service fsmount reload` will dump all filesystem caches and rebuild the layers. Users logged into their accounts via terminal will need to logout and log back in to see changes. 
 
+# Customizing
 
-License
-----
+See **Programming Guide**.
+
+# License
+
 Unless otherwise specified, all components of apnscp and its subcomponents are (c) 2017 Apis Networks. All rights reserved. For licensing inquiries, contact license@apisnetworks.com
