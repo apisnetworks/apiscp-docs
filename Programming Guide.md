@@ -95,16 +95,11 @@ public function test_command($command, $args = []) {
     /**
      * $status returns an array with: success, stderr, stdout, return
      */
-<<<<<<< HEAD
     return error("Failed to execute command. Code %d. Output: %s. Stderr: %s", $status['return'], $status['stdout'], $status['stderr']);
-=======
-    return error("Failed to execute command. Code %(return)d. Output: %(stdout)s. Stderr: %(stderr)s", $status);
->>>>>>> 9e7fb7dbdf021c9249de6c723aa8c7c8d5af3223
   }
 }
 ```
 
-<<<<<<< HEAD
 ### Registering Message Callbacks
 
 Register callbacks to `add_message_callback()`. For example, to dump stack on fatal errors on DAV during development (or AJAX) where unexpected output breaks protocol formatting:
@@ -140,19 +135,6 @@ The following macros are short-hand to log messages during application execution
 | deprecated()      | Routine is deprecated. Callee included in message. | true         |
 | deprecated_func() | Same as deprecated(), but include callee's caller | true         |
 | report()          | Send message with stack trace to **[core]** -> **bug_report** | bool         |
-=======
-### ER Message Buffer Macros
-The following macros are short-hand to log messages during application execution. 
-
-| Macro     | Purpose                                  | Return Value |
-| --------- | ---------------------------------------- | ------------ |
-| fatal()   | Halt script execution, report message.   | null         |
-| error()   | Routine encountered error and should return from routine. Recommended to always return. | false        |
-| warn()    | Routine encountered recoverable error.   | false        |
-| info()    | Additional information pertaining to routine. | true         |
-| success() | Action completed successfully.           | true         |
-| debug()   | Message that only emits when DEBUG set to 1 in config.ini | true         |
->>>>>>> 9e7fb7dbdf021c9249de6c723aa8c7c8d5af3223
 
 ## Calling Programs
 
@@ -179,7 +161,6 @@ In addition to basic process execution, the following variations are implemented
 
 ### Allowing Exit Values
 
-<<<<<<< HEAD
 UP treats all non-zero exit codes as errors. `success` is a shorthand way to check if the exit code, stored in `return` is zero or non-zero. To extend the range of successful values, supply an additional parameter, or stash it in the config parameter, with exit codes that can either be a regex or array of acceptable values.
 
 ```php
@@ -429,38 +410,7 @@ enabled = 1
 tpasswd = 
 cpasswd = 
 ```
-=======
-UP treats all non-zero exit codes as errors. `success` is a shorthand way to check if the exit code, stored in `return` is zero or non-zero. To extend the range of successful values, 
-
-## Extending Methods
->>>>>>> 9e7fb7dbdf021c9249de6c723aa8c7c8d5af3223
 
 ## Event-Driven Callbacks
 
-<<<<<<< HEAD
 apnscp features a lightweight global callback facility called Cardinal.
-=======
-Modules comprise a variety methods and require specific access rights to protect access. A module can exist exist independent or surrogate an existing module. 
-
-
-
-## Creating Applications
-
-### Application Structure
-
-All apps are located under `apps/`. The "App ID" is the folder under which the application is located. A sample application named "test" is bundled with apnscp. A controller must be named after the App ID and end in ".php". The default view may be named after the App ID and end in ".tpl" or located as views/index.blade.php if using Blade. 
-
-### Controller/Model
-
-Controller/Model logic is located in *<app name>*.php and instantiated first. The class name must be named Page and placed in a namespace named after the app ID. An example app named "Test" is located under apps/test/.
-
-### Templates
-
-apnscp uses [Laravel Blade](https://laravel.com/docs/5.4/blade) bundled with Laravel 5.4 for templates or basic "include()" if the template is named *<app name>*.tpl
-
-
-
-### Configuring Role Apps
-
-Applications are privileged by role: admin, site, and user.
->>>>>>> 9e7fb7dbdf021c9249de6c723aa8c7c8d5af3223

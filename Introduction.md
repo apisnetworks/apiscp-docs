@@ -44,11 +44,7 @@ apnscp works best with at least 2 GB for services + caching. Additional features
 
 ## Proactive and Reactive Monitoring
 
-<<<<<<< HEAD
 Argos is a configured Monit instance designed to afford both proactive and reactive monitoring. Rampart provides a denial-of-service sieve for reducing resource swells from misbehaving bots. apnscp includes disallowance of HTTP/1.0 protocol, by default, to reduce malware. All components work to keep your sites more secure by filtering out garbage. [tuned](https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Power_Management_Guide/Tuned.html) works proactively by retuning system variables as necessary. apnscp ships with the `virtual-guest` profile active.
-=======
-Birdhound is a configured Monit instance designed to afford both proactive and reactive monitoring. Rampart provides a denial-of-service sieve for reducing resource swells from misbehaving bots. apnscp includes disallowance of HTTP/1.0 protocol, by default, to reduce malware. All components work to keep your sites more secure by filtering out garbage. [tuned](https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Power_Management_Guide/Tuned.html) works proactively by retuning system variables as necessary. apnscp ships with the `virtual-guest` profile active.
->>>>>>> 9e7fb7dbdf021c9249de6c723aa8c7c8d5af3223
 
 # Installation
 
@@ -56,11 +52,7 @@ apnscp may be installed from the bootstrap utility. Once installed a 15-day tria
 
 Before installing, ensure the following conditions are met:
 
-<<<<<<< HEAD
 - [ ] 1 GB RAM (2 GB recommended)
-=======
-- [ ] 1 GB RAM
->>>>>>> 9e7fb7dbdf021c9249de6c723aa8c7c8d5af3223
 - [ ] [Forward-confirmed reverse DNS](https://en.wikipedia.org/wiki/Forward-confirmed_reverse_DNS), i.e. 64.22.68.1 <-> apnscp.com
 - [ ] CentOS 7.x or RedHat 7.x
 
