@@ -1,0 +1,22 @@
+.ap-pageheader, .ap-masthead {
+  padding-top: $spacer-y;
+  padding-bottom: $spacer-y;
+  @include gradient-directional($brand-primary, darken($brand-primary, 10%));
+  color: #fff;
+  margin-bottom: $spacer-y;
+}
+
+.ap-masthead {
+  text-align: center;
+  .lead {
+    font-size: 2em;
+  }
+
+}
+
+.ap-mastcmd {
+  padding: $spacer-y;
+  background: $gray-lightest;
+  margin-bottom: $spacer-y;
+  display: inline-block;
+}

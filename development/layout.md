@@ -1,4 +1,9 @@
-# apnscp Structure
+---
+layout: docs
+title: apnscp Structure
+group: development
+---
+
     .
     |-- apps
     |   `-- custom

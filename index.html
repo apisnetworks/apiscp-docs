@@ -1,0 +1,75 @@
+---
+layout: home
+---
+
+<main class="ap-masthead" id="content">
+  <div class="container">
+    <p class="lead">
+      apnscp is a modern full-stack control panel for modern web sites.
+    </p>
+    <p class="lead">
+      <a href="{{ site.baseurl }}/getting-started/" class="btn btn-primary btn-lg" onclick="ga('send', 'event', 'Jumbotron actions', 'Download', 'Download {{ site.current_version }}');">Download apnscp</a>
+    </p>
+    <p class="version">Currently v{{ site.current_version }}</p>
+  </div>
+</main>
+
+<div class="ap-featurette">
+  <div class="container">
+    <h2 class="ap-featurette-title">
+      Easy to get started.
+    </h2>
+    <p class="lead">
+      apnscp is a drop-in solution for CentOS 6 and 7. Download the installer and begin a 30-day free trial.
+    </p>
+    <span class="ap-mastcmd">
+      wget -O {{ site.bootstrap_url }} | bash
+    </span>
+
+
+    <hr class="half-rule mt-0">
+
+
+  </div>
+</div>
+
+<div class="ap-featurette">
+  <div class="container">
+    <h2 class="ap-featurette-title">Feature-rich for developers</h2>
+    <p class="lead">
+      apnscp allows you to do more than just host web sites.
+    </p>
+
+    <div class="row">
+      <div class="col-sm-4 mb-3">
+        <img src="{{ site.baseurl }}/assets/img/" alt="" class="img-fluid">
+        <h4>Node, Ruby, and Python</h4>
+        <p>
+            Use any-version Node, Ruby or Python for your projects. Each instance is
+            private to the account and managed automatically with Passenger.
+        </p>
+      </div>
+      <div class="col-sm-4 mb-3">
+        <img src="{{ site.baseurl }}/assets/img/" alt="" class="img-fluid">
+        <h4>Multi-Tenant Isolation</h4>
+        <p>
+          Work with multiple accounts without knowing you're working along side using account isolation.
+        </p>
+      </div>
+      <div class="col-sm-4 mb-3">
+        <img src="{{ site.baseurl }}/assets/img/" alt="" class="img-fluid">
+        <h4>Security is Standard</h4>
+        <p>
+          apnscp automatically filters out brute-force attacks without affecting performance.
+        </p>
+      </div>
+    </div>
+
+    <hr class="half-rule mt-0">
+
+    <p>
+
+    </p>
+    <a href="{{ site.repo }}" class="btn btn-bs">View the GitHub project</a>
+  </div>
+</div>

@@ -1,10 +1,15 @@
-# Programming Guide
+---
+layout: docs
+title: Programming Guide
+group: development
+---
 
-apnscp is designed to be flexible and fast. Because apnscp cannot exist without a broker (apnscpd) to transfer critical unprivileged code to privileged backend tasks, a critical choke also exists between this transfer (`$this->query('method', $args)`). Backend methods are designed to be thin. Make your frontend however you want, but inversely proportion complexity to backend calls as they bear the brunt of the logic and each backend roundtrip costs 0.1 ms when session resumption can be used. Without resumption each request is 6x slower.
-
-
+* ToC
+{:toc}
 
 # Basics
+
+apnscp is designed to be flexible and fast. Because apnscp cannot exist without a broker (apnscpd) to transfer critical unprivileged code to privileged backend tasks, a critical choke also exists between this transfer (`$this->query('method', $args)`). Backend methods are designed to be thin. Make your frontend however you want, but inversely proportion complexity to backend calls as they bear the brunt of the logic and each backend roundtrip costs 0.1 ms when session resumption can be used. Without resumption each request is 6x slower.
 
 ## Invocation Flow
 
@@ -12,32 +17,32 @@ apnscp is partitioned into 2 components: an unprivileged frontend (typically run
 
 `query()` bundles the parcel along with session identifier.
 
-```php
+```php?start_inline=1
 public function test_frontend() {
-  if (!IS_CLI) {
-    return $this->query("test_backend", "test");
-  }
-  return "Hello from frontend!";
+    if (!IS_CLI) {
+        return $this->query("test_backend", "test");
+    }
+    return "Hello from frontend!";
 }
 
 public function test_backend($arg1) {
-  return "Hello from backend! Got ${arg1}";
+    return "Hello from backend! Got ${arg1}";
 }
 ```
 
 Backend calls are wrapped into an `apnscpObject ` transported over a `DataStream` connection. `Module_Skeleton::query()` automatically instantiates a suitable `apnscpObject` query for use with `DataStream`. In special cases, this can be mocked up manually.
 
-```php
+```php?start_inline=1
 public function queryMulti() {
-  /**
-   * Send multiple backend commands at once, order guaranteed, 
-   * and store results
-   */
-  $ds = \DataStream::get();
-  $keys = ['siteinfo', 'mysql', 'pgsql'];
-  list ($cur, $new, $old) = $ds->multi("common_get_services", $keys)->
-    multi("common_get_new_services", $keys)->
-    multi("common_get_old_services", $keys)->send();
+    /**
+     * Send multiple backend commands at once, order guaranteed, 
+     * and store results
+     */
+    $ds = \DataStream::get();
+    $keys = ['siteinfo', 'mysql', 'pgsql'];
+    list ($cur, $new, $old) = $ds->multi("common_get_services", $keys)->
+        multi("common_get_new_services", $keys)->
+        multi("common_get_old_services", $keys)->send();
   
 }
 ```
@@ -46,7 +51,7 @@ public function queryMulti() {
 
 `apnscpObject::NO_WAIT` will send a command to backend without waiting on a response. This can be useful in situations in which data must be sent to backend, but status is immaterial. Alternatively, *NO_WAIT* can be used to return immediately provided the backend confers status by another process. An example would be exiting a 1-click install immediately and sending the response via email.
 
-```php
+```php?start_inline=1
 class Someapp_Module extends Module_Skeleton {
   public function install(): ?void {
       if (!IS_CLI) {
@@ -74,29 +79,29 @@ Exceptions convey stack. Stack conveyance adds overhead. Do not throw exceptions
 
 apnscp bundles a general-purpose [error library](https://github.com/apisnetworks/error-reporter) with a variety of macros to simplify life. `fatal()`, `error()`, `warn()`, `info()`, `success()`, `deprecated()`, and `debug()` log issues to the error ring. error(), warn(), info() will copy stack if in **[core]** -> **debug** is set in config.ini (see [Configuration](#Configuration)). **[core]** -> **bug_report** will send a copy of production errors to the listed address.
 
-```php
+```php?start_inline=1
 public function test_value($x) {
-	if (is_int($x)) {
-      return success('OK!');
-	}
-	if (is_string($x)) {
-      return warn('I guess that is OK!') || true;
-	}
-	return error("Bad value! `%s'", $x);
+    if (is_int($x)) {
+        return success('OK!');
+    }
+    if (is_string($x)) {
+        return warn('I guess that is OK!') || true;
+    }
+    return error("Bad value! `%s'", $x);
 }
 ```
 
 ER supports argument references as well utilizing [sprintf](http://php.net/manual/en/function.sprintf.php).
 
-```php
+```php?start_inline=1
 public function test_command($command, $args = []) {
-  $status = Util_Process::exec($command, $args);
-  if (!$status['success']) {
-    /**
-     * $status returns an array with: success, stderr, stdout, return
-     */
-    return error("Failed to execute command. Code %d. Output: %s. Stderr: %s", $status['return'], $status['stdout'], $status['stderr']);
-  }
+    $status = Util_Process::exec($command, $args);
+    if (!$status['success']) {
+        /**
+         * $status returns an array with: success, stderr, stdout, return
+         */
+        return error("Failed to execute command. Code %d. Output: %s. Stderr: %s", $status['return'], $status['stdout'], $status['stderr']);
+    }
 }
 ```
 
@@ -104,19 +109,19 @@ public function test_command($command, $args = []) {
 
 Register callbacks to `add_message_callback()`. For example, to dump stack on fatal errors on DAV during development (or AJAX) where unexpected output breaks protocol formatting:
 
-```php
+```php?start_inline=1
 Error_Reporter::set_verbose(0);
 Error_Reporter::add_message_callback(Error_Reporter::E_FATAL, new class implements Error_Reporter\MessageCallbackInterface {
-   	public function display(
-	    int $errno,
-	    string $errstr,
-	    ?string $errfile,
-	    ?int $errline,
-	    ?string $errcontext,
+    public function display(
+        int $errno,
+        string $errstr,
+        ?string $errfile,
+        ?int $errline,
+        ?string $errcontext,
         array $bt
     ) {
         dd($bt);	      
-   	}
+    }
 });
 ```
 
@@ -124,6 +129,7 @@ Error_Reporter::add_message_callback(Error_Reporter::E_FATAL, new class implemen
 
 The following macros are short-hand to log messages during application execution. 
 
+{: .table .table-striped}
 | Macro             | Purpose                                  | Return Value |
 | ----------------- | ---------------------------------------- | ------------ |
 | fatal()           | Halt script execution, report message.   | null         |
@@ -140,7 +146,7 @@ The following macros are short-hand to log messages during application execution
 
 apnscp provides a specialized library, [Util_Process](https://github.com/apisnetworks/util-process), for simplifying program execution. Arguments may be presented as sprintf arguments or by using name backreferences. You can even mix-and-match named and numeric backreferences (although highly discouraged and liable to result in 10,000v to the nipples!)
 
-```php
+```php?start_inline=1
 $ret = Util_Process::exec('echo %(one)s %(two)d %3$s', ['one' => 'one', 1 => 2, 3]);
 print $ret['output'];
 exit($ret['success']);
@@ -148,6 +154,7 @@ exit($ret['success']);
 
 In addition to basic process execution, the following variations are implemented:
 
+{: .table .table-striped}
 | Process Type | Purpose                                  | Caveats                                  | Usage                                    |
 | ------------ | ---------------------------------------- | ---------------------------------------- | ---------------------------------------- |
 | Process      | General process invocation               | Unsafe                                   | \$proc = new Util_Process(); \$proc->run("echo 'hello world!'"); |
@@ -163,7 +170,7 @@ In addition to basic process execution, the following variations are implemented
 
 UP treats all non-zero exit codes as errors. `success` is a shorthand way to check if the exit code, stored in `return` is zero or non-zero. To extend the range of successful values, supply an additional parameter, or stash it in the config parameter, with exit codes that can either be a regex or array of acceptable values.
 
-```php
+```php?start_inline=1
 $proc = new Util_Process();
 $proc->exec('false', [0,1]);
 $proc->exec('false', '/^[01]$/');
@@ -191,7 +198,7 @@ Surrogates *should* extend the module for which they are a surrogate; however, c
 
 To ensure an override surrogate is called when explicitly calling a class, use `apnscpFunctionInterceptor::autoload_class_from_module()`. For example,
 
-```php
+```php?start_inline=1
 /** 
  * reference either User_Module or User_Module_Surrogate depending 
  * upon implementation
@@ -204,31 +211,33 @@ echo $class, $class::MIN_UID;
 
 The following surrogate extends the list of nameservers ([dns] => hosting_ns in config.ini) that a domain may be delegated to pass the nameserver check. Note, this has no enforcement if [domains] => dns_check is set to "0" in config.ini.
 
-> **Remember**: New surrogates are not loaded until the active session has been destroyed via logout or other means
+{% callout warning %}
+**Remember**: New surrogates are not loaded until the active session has been destroyed via logout or other means
+{% endcallout %}
 
-```php
+```php?start_inline=1
 <?php
-	class Aliases_Module_Surrogate extends Aliases_Module {
-		/**
-		 * Extend nameserver checks to include whitelabel nameservers
-		 */
-		protected function domain_is_delegated($domain)
-		{
-			$myns = [
-			    'ns1.myhostingns.com',
-				'ns2.myhostingns.com',
-				'ns1.whitelabel.com',
-				'ns2.whitelabel.com'
-			];
-			$nameservers = $this->dns_get_authns_from_host($domain);
-			foreach($nameservers as $nameserver) {
-				if (in_array($nameserver, $myns)) {
-					return 1;
-				}
-			}
-			return parent::domain_is_delegated($domain);
-		}
-	}
+    class Aliases_Module_Surrogate extends Aliases_Module {
+        /**
+         * Extend nameserver checks to include whitelabel nameservers
+         */
+        protected function domain_is_delegated($domain)
+        {
+            $myns = [
+                'ns1.myhostingns.com',
+                'ns2.myhostingns.com',
+                'ns1.whitelabel.com',
+                'ns2.whitelabel.com'
+            ];
+            $nameservers = $this->dns_get_authns_from_host($domain);
+            foreach($nameservers as $nameserver) {
+                if (in_array($nameserver, $myns)) {
+                    return 1;
+                }
+            }
+            return parent::domain_is_delegated($domain);
+        }
+    }
 ```
 
 ## Permissions
@@ -239,6 +248,7 @@ Despite the misnomer, permissions are referred internally as "privileges". Note 
 
 Modules comprise a variety methods and require specific access rights to protect access. A module can exist independent or surrogate an existing module. Module rights are designated via the `$exportedFunctions` class variable. 
 
+{: .table .table-striped}
 | Privilege Type        | Role                                     |
 | --------------------- | ---------------------------------------- |
 | PRIVILEGE_NONE        | Revokes access to all roles and all scenarios |
@@ -257,28 +267,28 @@ For example, `PRIVILEGE_SERVER_EXEC|PRIVILEGE_SITE` requires the method call ori
 
 Likewise, once a module has been entered, permissions can optionally no longer apply.
 
-```php
+```php?start_inline=1
 class My_Module extends Module_Skeleton {
-  	public $exportedFunctions = [
-		'entry' => PRIVILEGE_SITE,
-      	'blocked' => PRIVILEGE_SITE|PRIVILEGE_SERVER_EXEC
-  	];
-  
-	public function entry() {    
-      	if (!$this->my_blocked()) {
-          error("failed to enter blocked module from frontend");
-      	}
-      	if (!$this->blocked()) {
-          error("this will never trigger");
-      	}
- 		return $this->query('my_blocked'); 
-	}  
-  	
-  	public function blocked() {
-      echo "Accessible from ", IS_CLI ? 'CLI' : 'UI';
-      echo "Caller: ", \Error_Reporter::get_caller();
-      return "Hello from backend!";
-  	}
+    public $exportedFunctions = [
+        'entry' => PRIVILEGE_SITE,
+        'blocked' => PRIVILEGE_SITE|PRIVILEGE_SERVER_EXEC
+    ];
+    
+    public function entry() {    
+        if (!$this->my_blocked()) {
+            error("failed to enter blocked module from frontend");
+        }
+        if (!$this->blocked()) {
+            error("this will never trigger");
+        }
+        return $this->query('my_blocked'); 
+    }  
+    
+    public function blocked() {
+        echo "Accessible from ", IS_CLI ? 'CLI' : 'UI';
+        echo "Caller: ", \Error_Reporter::get_caller();
+        return "Hello from backend!";
+    }
 }
 ```
 
@@ -300,7 +310,7 @@ apnscp uses [Laravel Blade](https://laravel.com/docs/5.4/blade) bundled with Lar
 
 Create a file named *<app name>*/*<app name>*/views/index.blade.php. This will be the initial page index for the app. $Page will be exposed along with a helper method, \$Page->view() to get an instance of \Illuminate\View. All Blade syntax will work, including extending with new directives:
 
-```php
+```php?start_inline=1
 /** pull from resources/views **/
 $blade = \Blade::factory();
 $blade->compiler()->directive('datetime', function ($expression) {
@@ -314,20 +324,20 @@ $blade->compiler()->directive('datetime', function ($expression) {
 
 Applications are privileged by role: admin, site, and user. Applications are configured initially via lib/html/templateconfig-<role>.php. Custom app overrides are introduced in conf/custom/templates/<role>.php. For example, to create a new category and add an app,
 
-```php
+```php?start_inline=1
 <?php
-	$templateClass->create_category(
-		"Addon Category",
-  		true, // always show
-  		"/images/custom/addonappicon.png", // icon indicator
-  		"myaddon" // category name
-	);
-	$templateClass->create_link(
-    	"Internal Benchmark",
-      	"/apps/benchmark",
-      	is_debug(), // condition to load category
-      	null, // no longer used
-      	"myaddon" // category reference
+    $templateClass->create_category(
+        "Addon Category",
+        true, // always show
+        "/images/custom/addonappicon.png", // icon indicator
+        "myaddon" // category name
+    );
+    $templateClass->create_link(
+        "Internal Benchmark",
+        "/apps/benchmark",
+        is_debug(), // condition to load category
+        null, // no longer used
+        "myaddon" // category reference
     );
 ```
 
@@ -337,6 +347,7 @@ Applications are privileged by role: admin, site, and user. Applications are con
 
 Several hooks are provided to latch into apnscp both for account and user creation. All hook names are prefixed with an underscore ("_"). All hooks run under Site Administrator privilege ("*PRIVILEGE_SITE*"). Any module that implements one must implement all hooks as dictated by the `\Opcenter\Contracts\Hookable` interface.
 
+{: .table .table-striped}
 | Hook        | Event Order | Description              | Args                      |
 | ----------- | ----------- | ------------------------ | ------------------------- |
 | delete_user | before      | user is deleted          | user                      |
@@ -347,48 +358,48 @@ Several hooks are provided to latch into apnscp both for account and user creati
 | edit_user   | after       | user is edited           | olduser, newuser, oldpwd  |
 | verify_conf | before      | verify metadata changes  | ConfigurationContext $ctx |
 
-```php
+```php?start_inline=1
 /**
  * Sample module edit hook, which runs under the context
  * of the edited account with Site Administrator privilege
  */
 public function _edit() {
-	$new = Auth::conf('siteinfo', 'new');
-	$old = Auth::conf('siteinfo', 'new');
-	if ($new === $old) {
-		// no change to "siteinfo" service module
-		return;
-	}
-	if ($new['admin_user'] !== $old['admin_user']) {
-		// admin username change, do something
-	}
-	return true;
+    $new = Auth::conf('siteinfo', 'new');
+    $old = Auth::conf('siteinfo', 'new');
+    if ($new === $old) {
+        // no change to "siteinfo" service module
+        return;
+    }
+    if ($new['admin_user'] !== $old['admin_user']) {
+        // admin username change, do something
+    }
+    return true;
 }
 ```
 
-```php
+```php?start_inline=1
 /**
  * Sample module edit_user hook, which runs under the context
  * of the edited account with Site Administrator privilege
  */
 public function _edit_user(string $olduser, string $newuser, array $oldpwd) {
-	$pwd = $this->user_getpwnam($newuser);
+    $pwd = $this->user_getpwnam($newuser);
     if ($pwd === $oldpwd) {
-		// no change to passdb for user
-		return;
+        // no change to passdb for user
+        return;
     }
-  
+    
     if ($olduser !== $newuser) {
         // username change, do something   
     }
-	return true;
+    return true;
 }
 ```
 ## Verifying Configuration
 
 `verify_conf` hook can reject changes by returning a false value and also alter values. `$ctx` is the module configuration passed by reference. By 
 
-```php
+```php?start_inline=1
 public function _verify_conf(\Opcenter\Service\ConfigurationContext $ctx): bool {
     if (!$ctx['enabled']) {
         return true;

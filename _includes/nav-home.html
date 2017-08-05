@@ -1,0 +1,43 @@
+<header class="navbar navbar-light navbar-toggleable-md bd-navbar">
+  <nav class="container">
+    {% comment %}
+    <nav class="nav navbar-nav float-right">
+      <div class="nav-item dropdown">
+        <a class="nav-item nav-link dropdown-toggle" href="#" id="bd-versions" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          v{{ site.current_version }}
+        </a>
+      </div>
+    </nav>
+    {% endcomment %}
+
+    <div class="d-flex justify-content-between hidden-lg-up">
+      <a class="navbar-brand" href="{{ site.baseurl }}/">
+        <img src="{% link /images/apnscp-40px.png %}" />
+      </a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#bd-main-nav" aria-controls="bd-main-nav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </div>
+
+    <div class="collapse navbar-collapse" id="bd-main-nav">
+      <ul class="nav navbar-nav align-items-center">
+        <li class="nav-item active">
+          <a class="nav-item nav-link {% if page.layout == "home" %}active{% endif %}" href="{{ site.baseurl }}/" ><span class="hidden-lg-up">apnscp</span><img src="/images/apnscp-40px.png" class="hidden-md-down" title="apnscp"/></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-item nav-link {% if page.group == "getting-started" %}active{% endif %}" href="{{ site.baseurl }}/getting-started/introduction/" >Getting Started</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-item nav-link {% if page.group == "admin" %}active{% endif %}" href="{{ site.baseurl }}/admin/managing-accounts/" >Administration</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-item nav-link {% if page.group == "development" %}active{% endif %}" href="{{ site.baseurl }}/development/programming-guide/" >Developer's Zone</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-item nav-link" href="{{ site.api }}" ></a>
+        </li>
+
+      </ul>
+    </div>
+  </nav>
+</header>

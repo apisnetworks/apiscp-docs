@@ -1,0 +1,28 @@
+{% if page.group == "getting-started" %}
+  <h1>Getting started</h1>
+  <p class="lead">
+    An brief history of apnscp, how to download it, and use it.
+  </p>
+{% elsif page.group == "development" %}
+  <h1>Developer's zone</h1>
+  <p class="lead">
+    Development documentation for apnscp detailing how to extend apnscp.
+  </p>
+{% elsif page.group == "admin" %}
+  {% if page.name == "intro" %}
+    <h1>Administration</h1>
+    <p class="lead">
+      Managing, adding, removing, and impersonating accounts.
+    </p>
+  {% elsif page.name == "dns" %}
+  <h1>{{ page.title }}</h1>
+  <p class="lead">
+    DNS crash course guide.
+  </p>
+  {% endif %}
+{% elsif page.group == "misc" %}
+  <h1>Notes</h1>
+  <p class="lead">
+    Errata, changes, and other notes during the course of development.
+  </p>
+{% endif %}

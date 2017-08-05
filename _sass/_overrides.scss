@@ -1,0 +1,25 @@
+
+
+a {
+	font-weight: 600;
+}
+
+.highlighter-rouge > pre {
+	padding: $spacer-y $spacer-x;
+}
+
+.ap-callout {
+	@extend .alert;
+}
+
+.ap-callout-info {
+	@extend .alert-info
+}
+
+.ap-callout-danger {
+	@extend .alert-danger;
+}
+
+.ap-callout-warning {
+	@extend .alert-warning;
+}
