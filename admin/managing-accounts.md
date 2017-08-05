@@ -17,7 +17,7 @@ New accounts may be added from the terminal using `add_domain.sh`, which is an i
 
 ## Deleting Accounts
 
-`DeleteDomain`  handles account removal. DeleteDomain accepts an unlimited number of arguments that must be of the form domain, site, or invoice.
+`DeleteDomain`  handles account removal. `DeleteDomain` accepts an unlimited number of arguments that must be of the form domain, site, or invoice.
 
 ## Suspending Accounts
 
@@ -32,7 +32,9 @@ AddVirtDomain -c billing,invoice=SITE-111 -c siteinfo,admin_user=admin1 -c sitei
 AddVirtDomain -c billing,invoice=SITE-111 -c siteinfo,admin_user=admin2 -c siteinfo,domain=foobar.com
 
 suspend.sh domain1.com
-
+suspend.sh site1
+# Suspend all sites using billing invoice "SITE-111"
+suspsend.sh SITE-111
 ```
 
 ## Hijacking Accounts
@@ -49,3 +51,28 @@ To list files as user "secondary" on example.com in /tmp, use `cmd -d debug.com 
 Arrays are encapsulated using brackets ("[]") and hashes notated with a colon (":"). To grant SELECT , INSERT, and DELETE privileges on database "foo" for user "secondary" connecting over localhost on the account example.com, the following command would be used: 
 
 `cmd -d debug.com sql_set_mysql_privileges secondary localhost foo "[select:1,insert:1,delete:1]"`
+
+# Filesystem Template
+**Filesystem Template** ("FST") represents a collection of read-only layers shared among accounts named after each service enabled. The top-most layer that contains read-write client data is called the **Shadow Layer**. Services live in ``/home/virtual/FILESYSTEMTEMPLATE`` and are typically hardlinked against system libraries for consistency.
+
+## Restricting Updates
+Restriction is done through ```etc/synchronizer.skiplist```. Modified system files, including user control files such as shadow, passwd, and group, are good candidates for inclusion into the skiplist. 
+
+> Any files shared via ```/.socket``` that are linked to from ```/usr``` as a symbolic link should be present in the skiplist to prevent yum-synchronizer from deleting the file on package update.
+
+## Populating FST
+An initial population is done using ``yum-synchronizer``. All installed services are located in the system database in "site_packages". New services may be installed using `yum-sychronizer install PACKAGE SERVICE` where *SERVICE* is a named service under `/home/virtual/FILESYSTEMTEMPLATE` and corresponds to an installed service module.
+
+## Breaking Links
+A FST file may need to be physically separated from a system file when customizing your environment. For example, you may want to change `/etc/sudo.conf` in `/home/virtual/FILESYSTEMTEMPLATE/siteinfo/etc` and keep it separate from the system sudo.conf that would be sourced when logging in as root.
+* First, verify the file is linked:
+    * ```stat -c %h /home/virtual/FILESYSTEMTEMPLATE/siteinfo/etc/sudo.conf```
+    * *A value greater than 1 indicates a hardlink elsewhere, likely to its corresponding system path. This is only true for regular files. Directories cannot be hardlinked in most   filesystems*
+* Second, break the link:
+    * ```cp -dp /home/virtual/FILESYSTEMTEMPLATE/siteinfo/etc/sudo.conf{,.new}```
+    * ```rm -f /home/virtual/FILESYSTEMTEMPLATE/siteinfo/etc/sudo.conf```
+    * ```mv /home/virtual/FILESYSTEMTEMPLATE/siteinfo/etc/sudo.conf{.new,}```
+    * *sudo.conf has now had its hardlink broken and may be edited freely without affecting /etc/sudo.conf. Running stat again will reflect "1".*
+
+## Propagating Changes
+Once a file has been modified within the FST, it is necessary to recreate the composite filesystem. `service fsmount reload` will dump all filesystem caches and rebuild the layers. Users logged into their accounts via terminal will need to logout and log back in to see changes. 
