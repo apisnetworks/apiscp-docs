@@ -147,7 +147,7 @@ The following macros are short-hand to log messages during application execution
 apnscp provides a specialized library, [Util_Process](https://github.com/apisnetworks/util-process), for simplifying program execution. Arguments may be presented as sprintf arguments or by using name backreferences. You can even mix-and-match named and numeric backreferences (although highly discouraged and liable to result in 10,000v to the nipples!)
 
 ```php?start_inline=1
-$ret = Util_Process::exec('echo %(one)s %(two)d %3$s', ['one' => 'one', 1 => 2, 3]);
+$ret = Util_Process::exec('echo %(one)s %(two)d %3$s', ['one' => 'one', 'two' => 2, 3]);
 print $ret['output'];
 exit($ret['success']);
 ```
@@ -342,6 +342,27 @@ Applications are privileged by role: admin, site, and user. Applications are con
 ```
 
 
+
+# Using Composer
+
+apnscp ships with support for the PHP dependency/package manager, [Composer](https://getcomposer.org). 
+
+{% callout danger %}
+Use config/custom/ as your location to install Composer packages. Do not install custom packages under the top-level directory. They will be erased on an apnscp update.
+{% endcallout %}
+
+To install a package switch to conf/config and install the package as you normally would,
+
+```bash
+cd /usr/local/apnscp/conf/custom
+composer require psr/log
+```
+
+
+
+# Themes
+
+apnscp comes with a separate [theme SDK](https://github.com/apisnetworks/apnscp-bootstrap-sdk) available on Github. Global themes can be inserted into `public/css/themes/`. Default theme is adjusted via **[style]** -> **theme**. Users can build and install their own themes if **[style]** -> **allow_custom** is enabled.
 
 # Hooks
 

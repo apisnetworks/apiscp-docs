@@ -8,6 +8,10 @@ a {
 	padding: $spacer-y $spacer-x;
 }
 
+.highlight pre code {
+	color: $gray-lightest;
+}
+
 .ap-callout {
 	@extend .alert;
 }
@@ -22,4 +26,8 @@ a {
 
 .ap-callout-warning {
 	@extend .alert-warning;
+}
+
+.text-small {
+	font-size: smaller;
 }

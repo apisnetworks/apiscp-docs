@@ -1,0 +1,5 @@
+config: config/
+virtual_home: /home/virtual
+httpd-tmpl: sys/httpd/templates/
+opcenter: /etc/virtualhosting
+apnscp: /usr/local/apnscp

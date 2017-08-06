@@ -32,8 +32,11 @@ social_image_path: /images/apnscp-social.png
 current_version:  3.0-alpha
 repo:             https://github.com/apisnetworks/apnscp
 slack:            none
+reddit:           /r/apnscp
 bootstrap_url: https://download.apnscp.com/bootstrap.sh
 bootstrap_sha2: 3995d149be714de424a839d022d1921719e69734b5c529832d8dc985a3d18239
+forums:           https://forums.apnscp.com
+license:          https://my.apnscp.com
 
 download:
   source:         

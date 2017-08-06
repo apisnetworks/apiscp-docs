@@ -30,10 +30,10 @@
     $('.popover-test').popover()
 
     // Indeterminate checkbox example
-    $('.bd-example-indeterminate [type="checkbox"]').prop('indeterminate', true)
+    $('.ap-example-indeterminate [type="checkbox"]').prop('indeterminate', true)
 
     // Disable empty links in docs examples
-    $('.bd-content [href="#"]').click(function (e) {
+    $('.ap-content [href="#"]').click(function (e) {
       e.preventDefault()
     })
 
@@ -49,13 +49,13 @@
     })
 
     // Activate animated progress bar
-    $('.bd-toggle-animated-progress').on('click', function () {
+    $('.ap-toggle-animated-progress').on('click', function () {
       $(this).siblings('.progress').find('.progress-bar-striped').toggleClass('progress-bar-animated')
     })
 
     // Insert copy to clipboard button before .highlight
     $('.highlight').each(function () {
-      var btnHtml = '<div class="bd-clipboard"><span class="btn-clipboard" title="Copy to clipboard">Copy</span></div>'
+      var btnHtml = '<div class="ap-clipboard"><span class="btn-clipboard" title="Copy to clipboard">Copy</span></div>'
       $(this).before(btnHtml)
       $('.btn-clipboard').tooltip()
     })
@@ -97,5 +97,5 @@
   'use strict'
 
   anchors.options.placement = 'left'
-  anchors.add('.bd-content > h1, .bd-content > h2, .bd-content > h3, .bd-content > h4, .bd-content > h5')
+  anchors.add('.ap-content > h1, .ap-content > h2, .ap-content > h3, .ap-content > h4, .ap-content > h5')
 }())

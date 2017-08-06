@@ -3,6 +3,9 @@ layout: docs
 title: Errata
 group: misc
 ---
+{::options toc_levels="2..3" /}
+{:toc}
+* ToC 
 
 ## MySQL
 
@@ -16,7 +19,8 @@ quota, MySQL can first crash, then on autorepair continue to crash.
 
 Sample from /var/log/mysqld.log:
 
-> 7f51e07fd700 InnoDB: Error: Write to file ./somedb/sometable.ibd failed at offset 180224.
+<pre>
+7f51e07fd700 InnoDB: Error: Write to file ./somedb/sometable.ibd failed at offset 180224.
 InnoDB: 16384 bytes should have been written, only 0 were written.
 InnoDB: Operating system error number 122.
 InnoDB: Check that your OS and file system support files of this size.
@@ -30,7 +34,7 @@ InnoDB: Some operating system error numbers are described at
 InnoDB: http://dev.mysql.com/doc/refman/5.6/en/operating-system-error-codes.html
 170802  6:12:06 [ERROR] InnoDB: File ./somedb/sometable.ibd: 'os_file_write_func' returned OS error 222. Cannot continue operation
 170802 06:12:06 mysqld_safe Number of processes running now: 0
-170802 06:12:06 mysqld_safe mysqld restarted
+170802 06:12:06 mysqld_safe mysqld restarted</pre>
 
 #### Solution
 Remove the disk quota from the account temporarily to allow MySQL to repair the tables. Once the table has been repaired,
@@ -92,7 +96,8 @@ main(int argc, char *argv[])
 
 Before CPU hotplug:
 
-```$ time strace -c ./test
+```
+$ time strace -c ./test
     % time     seconds  usecs/call     calls    errors syscall
     ------ ----------- ----------- --------- --------- ----------------
       0.00    0.000000           0         1           read

@@ -1,15 +1,18 @@
 - title: Getting started
   pages:
     - title: What is apnscp
+    - title: Brief history
     - title: Introduction
 - title: Administration
   name: admin
   pages:
-    - title: Managing Accounts
-    - title: DNS in a Nutshell
+    - title: Managing accounts
+    - title: Working with PHP
+    - title: DNS in a nutshell
+    - title: Helper binaries
 - title: Development
   pages:
-    - title: Programming Guide
+    - title: Programming guide
     - title: Layout
 - title: Notes
   pages:

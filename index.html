@@ -17,18 +17,23 @@ layout: home
 <div class="ap-featurette">
   <div class="container">
     <h2 class="ap-featurette-title">
-      Easy to get started.
+      Easy to get started
     </h2>
     <p class="lead">
       apnscp is a drop-in solution for CentOS 6 and 7. Download the installer and begin a 30-day free trial.
     </p>
-    <span class="ap-mastcmd">
-      wget -O {{ site.bootstrap_url }} | bash
-    </span>
-
-
+    <div class="text-center">
+      <span class="ap-mastcmd">
+        wget -O {{ site.bootstrap_url }} | bash
+      </span>
+      <div class="text-small mb-1">
+        sha256: {{ site.bootstrap_sha2 }}
+      </div>
+    </div>
     <hr class="half-rule mt-0">
-
+    <div class="row mb-1 text-center">
+      <a href="{{ site.repo }}-modules/commits/master" class="mx-auto my-1 btn btn-outline-primary">Latest Changelog</a>
+    </div>
 
   </div>
 </div>
@@ -37,39 +42,35 @@ layout: home
   <div class="container">
     <h2 class="ap-featurette-title">Feature-rich for developers</h2>
     <p class="lead">
-      apnscp allows you to do more than just host web sites.
+        apnscp allows you to do more than just host web sites. apnscp provides a platform
+        to let you host other users in a secure, structured environment. apnscp also
+	    provides email hosting capabilities using the same best practices utilized
+	    by some of the best hosting companies.
     </p>
-
-    <div class="row">
-      <div class="col-sm-4 mb-3">
-        <img src="{{ site.baseurl }}/assets/img/" alt="" class="img-fluid">
-        <h4>Node, Ruby, and Python</h4>
-        <p>
-            Use any-version Node, Ruby or Python for your projects. Each instance is
-            private to the account and managed automatically with Passenger.
-        </p>
-      </div>
-      <div class="col-sm-4 mb-3">
-        <img src="{{ site.baseurl }}/assets/img/" alt="" class="img-fluid">
-        <h4>Multi-Tenant Isolation</h4>
-        <p>
-          Work with multiple accounts without knowing you're working along side using account isolation.
-        </p>
-      </div>
-      <div class="col-sm-4 mb-3">
-        <img src="{{ site.baseurl }}/assets/img/" alt="" class="img-fluid">
-        <h4>Security is Standard</h4>
-        <p>
-          apnscp automatically filters out brute-force attacks without affecting performance.
-        </p>
-      </div>
-    </div>
 
     <hr class="half-rule mt-0">
 
-    <p>
-
-    </p>
-    <a href="{{ site.repo }}" class="btn btn-bs">View the GitHub project</a>
+    <div class="row text-center">
+	    <div class="col-4 col-md-3">
+		    <a href="{% link getting-started/what-is-apnscp.md %}" class="btn btn-primary">
+		        What is apnscp?
+	        </a>
+	    </div>
+	    <div class="col-4 col-md-3">
+		    <a href="{% link development/programming-guide.md %}" class="btn btn-primary">
+			    Developer Docs
+		    </a>
+	    </div>
+	    <div class="col-4 col-md-3">
+		    <a href="{{ site.forums }}" class="btn btn-primary">
+			    Community Forums
+		    </a>
+	    </div>
+	    <div class="col-4 col-md-3">
+		    <a href="{{ site.license }}" class="btn btn-primary">
+			    Manage License
+		    </a>
+	    </div>
+    </div>
   </div>
 </div>
