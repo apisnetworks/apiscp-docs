@@ -9,7 +9,8 @@ apnscp is a control panel + platform produced by Apis Networks since 2003 that p
 ## What are some features of apnscp?
 
 * apnscp is built on PHP7, which means it's fast, very fast. Further, apnscp integrates a few Laravel fixins, including [Blade templates](https://laravel.com/docs/5.4/blade) and several [helpers](https://laravel.com/docs/5.2/helpers) that users familiar with Laravel or even PHP, will value in its ease of extendibility.
-* apnscp bundles its isolation and resource enforcement component, as that is part of its platform, into the license. 
+* apnscp is agent-less and designed to run on your server without requiring calling home to carry out tasks.
+* apnscp bundles account isolation and resource enforcement.
 * apnscp provides any-version Node, Python, and Ruby that are isolated to an account. This allows multiple users to run multiple versions without interfering with others.
 
 ## Is apnscp stable?
@@ -18,8 +19,7 @@ apnscp has been continuously in development and actively in use with our clients
 
 Having an active hosting business also affords a 360° view of active threats and emerging patterns that can in turn be incorporated into the panel. For example, [mod_evasive](https://github.com/apisnetworks/mod_evasive) and its subsequent patches were integrated into the platform as a response to curtail brute-force attempts witnessed on production servers.
 
-apnscp is designed first to run on our production servers. Code is covered by unit tests and unit tests are covered
-by predictable input.
+apnscp is designed first to run on our production servers. Code is covered by unit tests and unit tests are covered by predictable input.
 
 ## How can I add apps/modules?
 See [Programming Guide]({% link development/programming-guide.md %}).

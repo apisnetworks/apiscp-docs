@@ -2,7 +2,9 @@
   pages:
     - title: What is apnscp
     - title: Brief history
-    - title: Introduction
+    - title: Features
+    - title: Installation
+    - title: Configuration
 - title: Administration
   name: admin
   pages:

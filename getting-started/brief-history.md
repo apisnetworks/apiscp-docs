@@ -27,6 +27,10 @@ Shared hosting aggregates all accounts onto 1 logical instance. A virtualized in
 
 Because machines vie for processing time among neighboring guests, performance can fluctuate throughout the day. In order to deliver a consistent performance, it's important to minimize the amount of CPU wasted on ancillary tasks, such as brute-force attempts or bots. It is also important to note that the faster a request can be served the less likely another concurrent request would create a resource contention either in accessing same regions of memory or for the web server to spawn another connection slot to handle the request.
 
+### Further reading
+
+*   [Linux Load Averages: Solving the Mystery](http://www.brendangregg.com/blog/2017-08-08/linux-load-averages.html)
+
 ## With root comes great responsibility
 
 Virtual hosting undoubtedly provides greater flexibility than traditional shared hosting environments; however it comes with a downside, you are now your own sysadmin. You know, a sysadmin - the guys you never hear about until *something* goes wrong. Even with their bountiful experience, sometimes they - speaking from personal experience - can encounter eclectic scenarios that not even they know how to address.  Sysadmins are the unsung heroes who enable business to flow. Work in a large firm and hardly know your sysadmin? Congratulate him; he's doing an excellent job.
