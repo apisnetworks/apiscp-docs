@@ -32,7 +32,7 @@ apnscp may be installed from the bootstrap utility. Once installed a 15-day tria
 Before installing, ensure the following conditions are met:
 
 - [] 1 GB RAM (2 GB recommended)
-- [] [Forward-confirmed reverse DNS](https://en.wikipedia.org/wiki/Forward-confirmed_reverse_DNS), i.e. 64.22.68.1 <-> apnscp.com
+- [][Forward-confirmed reverse DNS](https://en.wikipedia.org/wiki/Forward-confirmed_reverse_DNS), i.e. 64.22.68.1 <-> apnscp.com
 - [] CentOS 7.x or RedHat 7.x
 
 ## Bootstrapping apnscp
@@ -43,14 +43,18 @@ Run the command from terminal
 wget -O - {{ site.bootstrap_url }} | bash
 ```
 
-The bootstrapper will install itself, as well as request a SSL certificate from Let's Encrypt's staging environment. Once setup, a password will be generated. Your admin username is "admin" and password listed at the end.
+The bootstrapper will install itself, as well as request a SSL certificate from Let's Encrypt's staging environment if possible. Once setup, a password will be generated. Your admin username is "admin" and password listed at the end.
 
 {% callout info %}
-apnscp will initially request a certificate from Let's Encrypt staging environment. If your forward-confirmed reverse DNS is correct, copy `config/config.ini` to `config/custom/` and change **[letsencrypt]** => **debug** to false, then restart apnscpd, `systemctl apnscpd restart`. apnscp will request a new certificate from Let's Encrypt's production server. Remember that Let's Encrypt limits requests to [20 requests/week](https://letsencrypt.org/docs/rate-limits/), so make sure your DNS is properly setup before disabling debug mode.
-{% callout info %}
+apnscp will initially request a certificate from Let's Encrypt [staging environment](https://letsencrypt.org/docs/staging-environment/). If your forward-confirmed reverse DNS is correct, copy `config/config.ini` to `config/custom/` and change **[letsencrypt]** => **debug** to false, then restart apnscpd, `systemctl restart apnscpd `. apnscp will request a new certificate from Let's Encrypt's production server. Remember that Let's Encrypt limits requests to [20 requests/week](https://letsencrypt.org/docs/rate-limits/), so make sure your DNS is properly setup before disabling debug mode.
+{% endcallout %}
+
+{% callout warning %}
+Bootstrapping Let's Encrypt will fail if DNS is not setup properly. Check out the [DNS in a Nutshell]({% link admin/dns-in-a-nutshell.md %}) section if you need a primer on how DNS works.
+{% endcallout %}
 
 ## First Login
 
-Visit https://\<domain\>:2083 to login to the panel as "admin". Accept the untrusted certificate if generated under debug mode. You can fix this later as noted in [Bootstrapping apnscp](#bootstrapping-apnscp).
+Visit https://\<domain\>:2083 to login to the panel as "admin". Accept the untrusted certificate if a Let's Encrypt production certificate has not been generated yet. You can fix this later as noted in [Bootstrapping apnscp](#bootstrapping-apnscp).
 
 This is the **Administrator** account that can add, delete, and suspend accounts. **Site Administrators** are administrators of accounts created by an Administrator and are conferred all the rights of a **Secondary User**, with the added benefit of adding on domain, creating databases, and limited sudo. Further service configuration profiles may be setup in the following sections.
