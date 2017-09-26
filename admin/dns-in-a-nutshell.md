@@ -76,8 +76,6 @@ The resolver returns either an affirmative record (more on this later) or recurs
 >
 > Consequently, because it's now known across the lineage, as long as the history is remembered, there's no need to ask the great great grandparent for the fact. DNS works the same way, except the duration for which information is retained is dictated by the time-to-live ("TTL") value that is bundled with every DNS result. TTL values can range anywhere from 1 second to 604800 seconds (1 week) or even longer. So long as the time between when the record was requested and current time is less than the TTL, the saved information will be returned.
 
-
-
 ## Tracing DNS
 
 DNS works recursively. Because of this trait, we can trace a request as it flows from the [root servers](https://en.wikipedia.org/wiki/Root_name_server) down to nameservers. 
@@ -137,5 +135,26 @@ Knowing that DNS works recursively, what happens if a link in the chain breaks? 
 
 Why would you want a record to constantly refresh? If you have servers that may be unstable or as a denial of service sink. Typically a DoS attacks just an IP address trying to flood the target with as much data in as short a time as possible. Being able to swap out several expendable [reverse proxies](https://en.wikipedia.org/wiki/Reverse_proxy) that receive and drop traffic (sink) while normal clients obey DNS protocol allows sites under a deluge of malicious traffic to operate. This is, on a rough scale, how CloudFlare and other DDoS solutions operate by rotating out "hot" sinks.
 
-If you anticipate changing servers or DNS records then, 
+If you anticipate changing servers or DNS records then, consider a low DNS TTL. If on the other hand your services are stable, use a higher TTL value to reduce the number of DNS queries. Because DNS operates over UDP, a DNS response is never guaranteed.
 
+{% callout danger %}
+DNS typically operates over [UDP](https://en.wikipedia.org/wiki/User_Datagram_Protocol) instead of TCP. UDP transmission is **not guaranteed**. Therefore depending upon network congestion a DNS response may arrive out of order or not arrive at all. Setting a low TTL value greatly amplifies the risk of losing a DNS response even in robust networks. DNS can be forced to go over TCP to guarantee transmission, but is typically only implemented if a response is > 512 bytes or for a zone (AXFR) transfer. Many services with built-in lightweight DNS resolvers, such as Postfix, do not support DNS over TCP.
+{% endcallout %}
+
+### More on TTL
+
+DNS responses package a **SOA** record, which controls communication between DNS servers (master/slave) as well as how frequently a failed query (no response, negative response) should be honored. Combining a high retry TTL with low cache TTL is disastrous for reasons outlined above. Best practice recommends a modest record TTL no more than 86400 seconds (1 day) and no less than 900 seconds (15 minutes). 
+
+Network congestion cannot be predicted vis-a-vis UDP packet responses cannot be guaranteed. Constantly refreshing a DNS record over UDP is a recipe for disaster. Once the UDP packet fails to resolve, the SOA TTL value is honored. Until that SOA TTL value expires, no further lookups will occur leaving whatever depends upon the result of the DNS lookup in limbo.
+
+```
+@   IN SOA master.apnscp.com. hostmaster.
+apnscp.com. (
+    2017030300 ; serial
+    3600       ; refresh
+    1800       ; retry
+    604800     ; expire
+    600 )      ; ttl
+```
+
+In this above SOA example, TTL is the negative caching TTL (formerly TTL minimum) introduced in [RFC 2308](https://tools.ietf.org/html/rfc2308), which is also a mandatory implementation in any resolving nameserver. Setting a high TTL value can thus result in remaining in a failed state despite a minor hiccup. Keep your negative cache TTL low! DNS is flakey!

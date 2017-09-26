@@ -302,6 +302,23 @@ All apps are located under `apps/`. The "App ID" is the folder under which the a
 
 Controller/Model logic is located in apps/*<app name>*/*<app name>*.php and instantiated first. The class name must be named Page and placed in a namespace named after the app ID. An example app named "Test" is located under apps/test/.
 
+{% callout warning %}
+Controllers will be subject to API changes in the near future.
+{% endcallout %}
+
+### Hooks
+
+apnscp controllers provide a few attachment points for hooks. 
+
+| Hook        | When                | Notes                                    |
+| ----------- | ------------------- | ---------------------------------------- |
+| _init       | After constructor   | Must call parent. Postback is not processed yet. |
+| on_postback | After _init()       | Handle form interaction, classic controller |
+| _layout     | After on_postback() | Must call parent. Calculate head CSS/JS elements. Unavailable in AJAX requests. |
+| _render     | After _layout()     | Template engine is exposed. Recommended time to share Blade variables |
+
+
+
 ## Templates
 
 apnscp uses [Laravel Blade](https://laravel.com/docs/5.4/blade) bundled with Laravel 5.4 for templates or basic "include()" if the template is named *<app name>*/*<app name>*.tpl
@@ -316,6 +333,16 @@ $blade = \Blade::factory();
 $blade->compiler()->directive('datetime', function ($expression) {
     return "<?php echo with({$expression})->format('F d, Y g:i a'); ?>";
 });
+```
+
+#### Sharing Variables
+
+Model variables can be exported to a Blade view in the "_render" hook. This feature is unavailable when using the built-in lean .tpl format.
+
+```php
+public function _render() {
+	$this->view()->share(['options' => $this->getOptions()]);
+}
 ```
 
 
