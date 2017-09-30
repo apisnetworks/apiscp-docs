@@ -310,6 +310,7 @@ Controllers will be subject to API changes in the near future.
 
 apnscp controllers provide a few attachment points for hooks. 
 
+{: .table .table-striped}
 | Hook        | When                | Notes                                    |
 | ----------- | ------------------- | ---------------------------------------- |
 | _init       | After constructor   | Must call parent. Postback is not processed yet. |
