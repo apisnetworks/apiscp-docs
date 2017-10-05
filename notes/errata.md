@@ -168,3 +168,44 @@ then bring the machine back online.
 
 #### See also
 * [Pitfalls of TSC Usage](http://oliveryang.net/2015/09/pitfalls-of-TSC-usage/)
+
+
+
+# Maildrop
+
+## Mailbot ignores DSN auto-replies
+
+### Background
+
+Mailbot, which is responsible for handling auto-replies in the vacation module of apnscp will not generate a response for certain messages. Mailbot is designed to ignore [delivery status notification](https://en.wikipedia.org/wiki/Bounce_message) emails in [check_dsn()](https://github.com/svarshavchik/courier-libs/blob/master/maildrop/mailbot.c) that contain an "Auto-Submitted" header.
+
+### Solution
+
+No workaround exists. It is recommended for email that requires an auto-response if a user is away to not include an "Auto-Submitted" DSN header.
+
+
+
+# Lumen
+
+## Facade usage
+
+### Background
+
+apnscp ships with Laravel Lumen to provide framework for Horizon, a job dispatcher. apnscp conflicts with Laravel's facade accessors, namely Auth.
+
+### Solution
+
+Use literal facade classes in imports rather than relying on shorthand aliases.
+
+```php
+use Illuminate\Support\Facades\Route;
+Route::get('/some/where', 'SomeController@index');
+```
+
+As opposed to
+
+```php
+use Route;
+Route::get('/some/where', 'SomeController@index');
+```
+
