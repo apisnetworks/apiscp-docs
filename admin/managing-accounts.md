@@ -112,3 +112,31 @@ A FST file may need to be physically separated from a system file when customizi
 
 ## Propagating Changes
 Once a file has been modified within the FST, it is necessary to recreate the composite filesystem. `service fsmount reload` will dump all filesystem caches and rebuild the layers. Users logged into their accounts via terminal will need to logout and log back in to see changes. 
+
+# Built-in Checks
+
+## Domain ownership
+
+Before a domain may be added on as an addon domain, apnscp will verify that the domain uses the proper nameservers or that the IP address matches the account IP address. Domains that do not use the configured nameservers (**[dns]** => **hosting_ns**) must pass 1 of 3 challenges, by present in the bypass, or the feature must be disabled.
+
+### Challenge modes
+
+1.  Change nameservers to nameservers provided in **[dns]** => **hosting_ns**. Because of how [DNS caches]({% link admin/dns-in-a-nutshell.md %}) operate, this may take up to 24 hours to propagate once changed.
+2.  Upload a random file to the current hosting provider that contains the same random name in the file.
+3.  Create an A record named "newacct" through the current DNS provider that resolves back to the server. This should carry a 5 minute delay at most if "newacct" did not already exist.
+
+Completing any of the above will allow the domain to be added.
+
+### Bypass file
+
+To bypass challenges for a specific domain, create a file named `{{ site.data.paths.opcenter }}/dnsbypass` with the domain name. Each line must contain only the domain name. If found, no challenges will be assessed upon adding the domain and upon completion, will remove the domain from the list.
+
+### Disabling validation
+
+{% callout danger %}
+
+Disabling validation in instances where more than 1 user has access to the control panel is dangerous! Any domain added to the control panel also has mail authority for the domain. Thus, by adding a domain "gmail.com" and creating a catch-all email in **Mail** > **Manage Mailboxes**, the user now has the ability to redirect all email destined to gmail.com to her local inbox.
+
+{% endcallout %}
+
+Notification whenever a domain is added is *strongly encouraged* when validation is disabled. To generate notifications, enable **[domains]** => **notify**. To disable challenges, change **[domains]** => **dns_check** to false
