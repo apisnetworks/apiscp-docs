@@ -209,7 +209,7 @@ echo $class, $class::MIN_UID;
 
 ### Sample Surrogate
 
-The following surrogate extends the list of nameservers ([dns] => hosting_ns in config.ini) that a domain may be delegated to pass the nameserver check. Note, this has no enforcement if [domains] => dns_check is set to "0" in config.ini.
+The following surrogate extends the list of nameservers (**[dns]** => **hosting_ns** in config.ini) that a domain may be delegated to pass the nameserver check. Note, this has no enforcement if **[domains]** => **dns_check** is set to "0" in config.ini.
 
 {% callout warning %}
 **Remember**: New surrogates are not loaded until the active session has been destroyed via logout or other means
@@ -239,6 +239,10 @@ The following surrogate extends the list of nameservers ([dns] => hosting_ns in 
         }
     }
 ```
+
+### Aliasing 
+
+A surrogate may exist without a named module in `lib/modules/`. In such cases, for example, `Example_Module` will automatically load `Example_Surrogate_Module` and alias the class to `Example_Module` if `lib/modules/example.php` does not exist. 
 
 ## Permissions
 
