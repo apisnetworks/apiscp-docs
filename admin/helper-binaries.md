@@ -17,6 +17,7 @@ Run an apnscp method under an optionally user-defined role.
 
 #### Examples
 
+{:.no_toc}
 ```bash
 # As admin of example.com, get all bandwidth usage
 cmd -d example.com bandwidth_get_all_composite_bandwidth_data
@@ -44,6 +45,7 @@ Get internal site ID from domain. Returns 1 on failure otherwise 0.
 
 #### Example
 
+{:.no_toc}
 ```bash
 get_site_id example.com
 [[ $? -ne 0 ]] && echo "example.com doesn't exist"
@@ -53,6 +55,8 @@ get_site_id example.com
 Determine libraries linked against a binary. Used to resolve dependency problems when propagating a system package into the filesystem template.
 
 #### Examples
+
+{:.no_toc}
 ```bash
 fstresolve /home/virtual/FILESYSTEMTEMPLATE/siteinfo/usr/bin/ar
 ```
@@ -62,10 +66,30 @@ All apnscp scripts are available under `{{ site.data.paths.apnscp}}/bin/php/scri
 
 ### change_dns.php
 
+Bulk change DNS for an account.
+
 ### changelogparser.php
+
+Summarize apnscp changes.
 
 ### reissueAllCertificates.php
 
 ### transfersite.php
 
 ### yum-post.php
+
+
+
+# Compiling
+
+## build/php/php.config
+
+Build PHP for apnscp. To run, change into PHP source directory, then run:
+
+`/usr/local/apnscp/build/php/php.config`
+
+PHP will be built with apnscp module requirements.
+
+## build/httpd/apxs
+
+General utility apxs wrapper to build modules specifically for apnscp. Installed modules will be placed under `sys/httpd/private/modules`. Unless the module conflicts with global Apache instance, modules can be used from `sys/httpd/modules`, which is a symlink to `/usr/lib64/httpd/modules`.

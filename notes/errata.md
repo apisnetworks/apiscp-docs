@@ -63,7 +63,14 @@ disk quotas can be reapplied to the account.
     $ EditDomain -c diskquota,quota=20000 -c diskquota,unit=MB site34 
     {% endhighlight %}
 
+# PostgreSQL
+
+## Changing versions
+
+It is recommended to NOT update PostgreSQL minor versions. PostgreSQL version is decided on initial platform provisioning and cannot be changed.
+
 ## Hardware
+
 ### TSC skew on CPU hotplug
 #### Background
 * **Impact:** Low
@@ -185,13 +192,13 @@ No workaround exists. It is recommended for email that requires an auto-response
 
 
 
-# Lumen
+# Laravel
 
 ## Facade usage
 
 ### Background
 
-apnscp ships with Laravel Lumen to provide framework for Horizon, a job dispatcher. apnscp conflicts with Laravel's facade accessors, namely Auth.
+apnscp ships with Laravel 5.5 to provide framework for Horizon, a job dispatcher. apnscp conflicts with Laravel's facade accessors, namely Auth.
 
 ### Solution
 
@@ -209,3 +216,49 @@ use Route;
 Route::get('/some/where', 'SomeController@index');
 ```
 
+
+
+# SSL
+
+## Let's Encrypt SSL issuance behind SiteLock fails
+
+SiteLock includes a Javascript client test before whitelisting an IP address to access resources behind it. Both apnscp and its [PHP ACME client](https://github.com/kelunik/acme-client) - as well as the official ACME service - perform lightweight HTTP protocol checks without complete browser emulation, meaning it lacks Javascript, video playback, and CSS support that would add unnecessary complexity. Because the test can change and is predicated on having a full Javascript engine, apnscp cannot issue certificates when a site is behind SiteLock.
+
+# Crontab
+
+## Crontab fails
+
+### Background
+
+If permissions on crontab in /home/virtual/FILESYSTEMTEMPLATE/ssh/usr/bin/crontab change such that it loses its setuid bit, the following error is produced whenever a job is scheduled either via crontab from the terminal or via Dev > Task Scheduler:
+
+>    failed to set cron contents for `someuser': /var/spool/cron/#tmp.server.name.XXXXMnchuR: Permission denied
+
+### Solution
+
+Restore the setuid bit on crontab:
+
+```shell
+chmod 4755 /home/virtual/FILESYSTEMTEMPLATE/ssh/usr/bin/crontab 
+```
+
+Then refresh the filesystem layer:
+
+```shell
+/sbin/service fsmount reload
+```
+# Licensing
+
+## DCC
+
+License is incompatible with apnscp. DCC may be installed on servers that are for personal use to further enhance spam detection in email.
+
+```bash
+rpm -ihv http://www6.atomicorp.com/channels/atomic/centos/7/x86_64/RPMS/dcc-1.3.158-5.el7.art.x86_64.rpm
+/usr/local/apnscp/bin/scripts/yum-post.php install dcc siteinfo
+nano /etc/mail/spamassassin/v310.pre
+# Uncomment loadplugin Mail::SpamAssassin::Plugin::DCC
+# Write-out file, exit nano
+systemctl reload fsmount
+systemctl spamassassin restart
+```

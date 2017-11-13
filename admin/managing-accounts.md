@@ -43,6 +43,8 @@ Services that have corresponding filesystem structures are installed under {{ si
 
 # Command-Line Interface
 
+All actions are done through the server terminal. Linux and Mac OS have a built-in ssh client (called "ssh"). For Windows, [PuTTy](http://www.putty.org) (free) and [Token2Shell/MD](https://www.microsoft.com/en-us/store/p/token2shell-md/9nblggh2ncx9) ($10) are recommended.
+
 ## Adding Accounts
 
 New accounts may be added from the terminal using `add_domain.sh`, which is an interactive dialog for creating new accounts. Accounts may also be added freeform using `AddDomain` that accepts multiple parameters, e.g. `AddDomain -c siteinfo,domain=example.com -c siteinfo,admin_user=example -c siteinfo,passwd=mypassword -c mysql,dbaseprefix=debug`. Any value not specified will inherit the plan default in `/etc/virtualhosting/plans/default`. Multiple accounts may be paired with an invoice number for multi-site management. It is recommended to designate one domain as a primary and all other domains as subordinate by specifying *billing,invoice=XX-YY* for the primary domain and *billing,parent_invoice=YY-ZZ* for the subordinates.

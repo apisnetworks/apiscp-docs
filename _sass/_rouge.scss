@@ -205,4 +205,5 @@
 .highlight {
   color: #f8f8f2;
   background-color: #1b1d1e;
+  @include border-radius($border-radius);
 }

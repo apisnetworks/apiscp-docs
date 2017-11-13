@@ -194,6 +194,10 @@ A sample class implementation is found under `modules/example.php`.
 
 A module may be extended with a "surrogate". Surrogates are delegated modules loaded in lieu of modules that ship with apnscp. Surrogates are located under modules/surrogates/*<module name>*.php. Unless the class name is explicitly called, e.g. `User_Module::MIN_UID`, a surrogate will be loaded first, e.g. $this->user_get_home() will check for modules/surrogates/user.php and use that instance before using modules/user.php. A surrogate or native class can be determined at runtime using `apnscpFunctionInterceptor::autoload_class_from_module()`, e.g. `apnscpFunctionInterceptor::autoload_class_from_module('user') . '::MIN_UID'`. Depending upon the presence of surrogates/user.php (override of User_Module), that or modules/user.php (native apnscp module) will be loaded.
 
+{% callout info %}
+"apnscpFunctionInterceptor" can also be referenced in code as "a23r" for brevity.
+{% endcallout %}
+
 Surrogates *should* extend the module for which they are a surrogate; however, can instead extend Module_Skeleton directly to remove built-in methods although this practice is strongly discouraged. Blacklist all methods by setting ['*' => 'PRIVILEGE_NONE']  to your **PERMISSIONS** discussed below.
 
 To ensure an override surrogate is called when explicitly calling a class, use `apnscpFunctionInterceptor::autoload_class_from_module()`. For example,

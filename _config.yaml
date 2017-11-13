@@ -35,6 +35,7 @@ slack:            none
 reddit:           /r/apnscp
 bootstrap_url: https://download.apnscp.com/bootstrap.sh
 bootstrap_sha2: 3995d149be714de424a839d022d1921719e69734b5c529832d8dc985a3d18239
+tether_url: https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js
 forums:           https://forums.apnscp.com
 license:          https://my.apnscp.com
 
@@ -42,7 +43,7 @@ download:
   source:         
   dist:           
 
-blog:             https://blog.apisnetworks.com
+blog:             https://hq.apnscp.com
 
 cdn:
   # See https://www.srihash.org for info on how to generate the hashes
