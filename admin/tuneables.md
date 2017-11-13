@@ -12,5 +12,5 @@ All changes must be made to `config/custom/config.ini`. `config/config.ini` is u
 {% endcallout %}
 
 ``` ini
-{% include config.ini %}
+{% include assets/config.ini %}
 ```
