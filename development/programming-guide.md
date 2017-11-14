@@ -134,7 +134,7 @@ The following macros are short-hand to log messages during application execution
 | ----------------- | ---------------------------------------- | ------------ |
 | fatal()           | Halt script execution, report message.   | null         |
 | error()           | Routine encountered error and should return from routine. Recommended to always return. | false        |
-| warn()            | Routine encountered recoverable error.   | false        |
+| warn()            | Routine encountered recoverable error.   | true         |
 | info()            | Additional information pertaining to routine. | true         |
 | success()         | Action completed successfully.           | true         |
 | debug()           | Message that only emits when DEBUG set to 1 in config.ini | true         |
