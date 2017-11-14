@@ -13,6 +13,7 @@
     - title: DNS in a nutshell
     - title: Helper binaries
     - title: Tuneables
+    - title: Playbooks
 - title: Development
   pages:
     - title: Programming guide
