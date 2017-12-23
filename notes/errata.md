@@ -224,6 +224,20 @@ Route::get('/some/where', 'SomeController@index');
 
 SiteLock includes a Javascript client test before whitelisting an IP address to access resources behind it. Both apnscp and its [PHP ACME client](https://github.com/kelunik/acme-client) - as well as the official ACME service - perform lightweight HTTP protocol checks without complete browser emulation, meaning it lacks Javascript, video playback, and CSS support that would add unnecessary complexity. Because the test can change and is predicated on having a full Javascript engine, apnscp cannot issue certificates when a site is behind SiteLock.
 
+
+
+# vsftpd
+
+## On chdir: Remote host has closed the connection
+
+### Background
+
+vsftpd uses [seccomp sandboxing](https://lwn.net/Articles/656307/) to improve security by reducing potential vectors in the kernel. Removing a user from the system can result in getpwnam() to fail in translating uid to username resulting in a crash. 
+
+### Solution
+
+seccomp filtering is disabled in vsftpd by adding `seccomp_sandbox=NO` to `/etc/vsftpd/vsftpd.conf`.
+
 # Crontab
 
 ## Crontab fails
