@@ -73,7 +73,7 @@ class Someapp_Module extends Module_Skeleton {
 
 ### Warning on Exception Usage
 
-Exceptions convey stack. Stack conveyance adds overhead. Do not throw exceptions in Module code, especially in file_* operations. Do not throw exceptions in any critical part of code that will not immediately terminate flow. In fact, **exception usage is discouraged unless it explicitly results in termination** (in which case, `fatal()` works better) **or a deeply nested call needs to return immediately**. 
+mExceptions convey stack. Stack conveyance adds overhead. Do not throw exceptions in Module code, especially in file_* operations. Do not throw exceptions in any critical part of code that will not immediately terminate flow. In fact, **exception usage is discouraged unless it explicitly results in termination** (in which case, `fatal()` works better) **or a deeply nested call needs to return immediately**. 
 
 ### Non-Exception Usage
 
@@ -134,7 +134,7 @@ The following macros are short-hand to log messages during application execution
 | ----------------- | ---------------------------------------- | ------------ |
 | fatal()           | Halt script execution, report message.   | null         |
 | error()           | Routine encountered error and should return from routine. Recommended to always return. | false        |
-| warn()            | Routine encountered recoverable error.   | true         |
+| warn()            | Routine encountered recoverable error.   | false        |
 | info()            | Additional information pertaining to routine. | true         |
 | success()         | Action completed successfully.           | true         |
 | debug()           | Message that only emits when DEBUG set to 1 in config.ini | true         |
@@ -220,27 +220,28 @@ The following surrogate extends the list of nameservers (**[dns]** => **hosting_
 {% endcallout %}
 
 ```php?start_inline=1
-class Aliases_Module_Surrogate extends Aliases_Module {
-  /**
-   * Extend nameserver checks to include whitelabel nameservers
-   */
-  protected function domain_is_delegated($domain)
-  {
-    $myns = [
-      'ns1.myhostingns.com',
-      'ns2.myhostingns.com',
-      'ns1.whitelabel.com',
-      'ns2.whitelabel.com'
-    ];
-    $nameservers = $this->dns_get_authns_from_host($domain);
-    foreach($nameservers as $nameserver) {
-      if (in_array($nameserver, $myns)) {
-        return 1;
-      }
+<?php
+    class Aliases_Module_Surrogate extends Aliases_Module {
+        /**
+         * Extend nameserver checks to include whitelabel nameservers
+         */
+        protected function domain_is_delegated($domain)
+        {
+            $myns = [
+                'ns1.myhostingns.com',
+                'ns2.myhostingns.com',
+                'ns1.whitelabel.com',
+                'ns2.whitelabel.com'
+            ];
+            $nameservers = $this->dns_get_authns_from_host($domain);
+            foreach($nameservers as $nameserver) {
+                if (in_array($nameserver, $myns)) {
+                    return 1;
+                }
+            }
+            return parent::domain_is_delegated($domain);
+        }
     }
-    return parent::domain_is_delegated($domain);
-  }
-}
 ```
 
 ### Aliasing 
@@ -299,30 +300,6 @@ class My_Module extends Module_Skeleton {
 }
 ```
 
-
-
-## Proxy Loaders
-
-A module may delegate its instance to a dispatcher unique to the module by implementing a `_proxy()` method as part of `Module\Skeleton\Contracts\Proxied`
-
-```php?start_inline=1
-use Module\Skeleton\Contracts\Proxied;
-
-class Example_Module extends \Module_Skeleton implements Proxied {
-  public function _proxy(): \Module_Skeleton {
-    /**
-     * All methods from example will be exported
-     * But all method calls will go through the Misdirection_Module
-     * class
-     * example_test() -> Misdirection_Module::__call('test');
-     */
-  	return new Misdirection_Module();
-  }
-}
-```
-
-
-
 # Creating Applications
 
 ## Application Structure
@@ -371,7 +348,7 @@ $blade->compiler()->directive('datetime', function ($expression) {
 
 Model variables can be exported to a Blade view in the "_render" hook. This feature is unavailable when using the built-in lean .tpl format.
 
-```php?start_inline=1
+```php
 public function _render() {
 	$this->view()->share(['options' => $this->getOptions()]);
 }
@@ -384,20 +361,20 @@ public function _render() {
 Applications are privileged by role: admin, site, and user. Applications are configured initially via lib/html/templateconfig-<role>.php. Custom app overrides are introduced in conf/custom/templates/<role>.php. For example, to create a new category and add an app,
 
 ```php?start_inline=1
-$templateClass->create_category(
-  "Addon Category",
-  true, // always show
-  "/images/custom/addonappicon.png", // icon indicator
-  "myaddon" // category name
-);
-
-$templateClass->create_link(
-  "Internal Benchmark",
-  "/apps/benchmark",
-  is_debug(), // condition to load category
-  null, // no longer used
-  "myaddon" // category reference
-);
+<?php
+    $templateClass->create_category(
+        "Addon Category",
+        true, // always show
+        "/images/custom/addonappicon.png", // icon indicator
+        "myaddon" // category name
+    );
+    $templateClass->create_link(
+        "Internal Benchmark",
+        "/apps/benchmark",
+        is_debug(), // condition to load category
+        null, // no longer used
+        "myaddon" // category reference
+    );
 ```
 
 
@@ -514,12 +491,81 @@ Modules support **contextability**, which allows a new authentication role to be
 
 ```php?start_inline=1
 // create a new site admin session on debug.com
-$context = new \Auth::mockup(null, 'debug.com');
+// returns \Auth_Info_User instance
+$context = new \Auth::context(null, 'debug.com');
 $afi = \apnscpFunctionInterceptor::factory($context);
 // print out the admin email attached to debug.com
 echo $afi->common_get_admin_email();
 ```
 
 {% callout danger %}
-Juggling contexts is dangerous and under early development. Use with care.
+Juggling contexts is dangerous and under early development. Use with care. It is recommended to package any contextable changes with unit tests. A framework is available under `test/contextable`.
 {% endcallout %}
+
+## Cache access
+
+Contextables must pass the active instance when accessing User and Account caches. This can be done by passing the `Auth_Info_User` instance to `spawn()`
+
+```php?start_inline=1
+$context = \Auth::context(null, 'debug.com');
+$cache = \Cache_Account::spawn($context);
+// pull user cache from debug.com - if populated
+$cache->get('users.pwd.gen');
+```
+
+## Preferences and Session access
+
+apnscp includes wrappers to user preferences and session data via `Preferences` and `Session` helper classes. Session access is not supported within a contextable role. Sessions are temporary storage and thus have no utility for a contexted authentication role.
+
+Preferences may be accessed and unlocked for write-access. An afi instance must be created to allow the Preference helper storage to save modified preferences.
+
+```php?start_inline=1
+$user = \Auth::context('jim');
+$prefs = \Preferences::factory($user);
+// necessary to provide API access to the preference helper
+$prefs->unlock(\apnscpFunctionInterceptor::factory($user));
+$prefs->set("foo.bar", "baz"); // assign "baz" to [foo][bar]
+$prefs = null; // save
+```
+
+Failure to graft an afi instance will result in a fatal error on write access. afi grafting is not necessary for read access.
+
+## Detecting contextability
+
+Modules that use the `apnscpFunctionInterceptorTrait` also include a helper function `inContext()` to determine whether the current API call is bound in a contextable scope.
+
+## Limitations
+
+Contextables may not be used in reliable, safe manner to access other URIs in apnscp. Contextables are considered "safe" with module access. Contextables should be used with caution with third-party modules as safety is not guaranteed.
+
+### Avoiding state corruption
+
+Use of any **singleton that is dependent on user roles violates contextability**. Example calls that lose state and use the first authenticated instance include:
+
+```php
+apnscpFunctionInterceptor::init()->call('some_fn');
+// use apnscpFunctionInterceptor::factory(\Auth_Info_User $context)
+DataStream::get()->write($payload);
+// use DataStream::get($context)->write($payload)
+Cache_Account::spawn()->get('foo.bar');
+// use Cache_Account::spawn($context)->get('foo.bar')
+Session::get('entry_domain');
+// sessions are not supported in contextable roles
+Preferences::get('webapps.paths');
+// use array_get(Preferences::factory($context), 'webapps.paths');
+
+```
+
+# Jobs
+
+apnscp includes job management through [Laravel Horizon](https://horizon.laravel.com). Jobs run in a dedicated process, `horizon`, or as a spawnable one-shot queue manager that periodically runs `artisan queue:run`. When in low memory situations, set **[cron]** -> **low_memory**=**1** (see [Configuration](#Configuration)) to use the slower one-short, periodic queue manager.
+
+## Writing Jobs
+
+Jobs should implement `\Lararia\Job`, which serves as a base for all apnscp jobs. Lararia jobs will properly convey `error()`, `warn()`, and `info()` API error reporting macros to the job daemon. "`error()`" indicates a fatal, non-recoverable job failure.  All ER events are bundled in a job report, `\Lararia\Job\Report`.
+
+**SIMPLE EXAMPLE**
+
+# Migrations
+
+apnscp supports Laravel Migrations to keep database schema current.
