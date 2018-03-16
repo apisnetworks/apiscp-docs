@@ -17,7 +17,7 @@ apnscp is partitioned into 2 components: an unprivileged frontend (typically run
 
 `query()` bundles the parcel along with session identifier.
 
-```php
+```php?start_inline=1
 public function test_frontend() {
     if (!IS_CLI) {
         return $this->query("test_backend", "test");
@@ -32,7 +32,7 @@ public function test_backend($arg1) {
 
 Backend calls are wrapped into an `apnscpObject ` transported over a `DataStream` connection. `Module_Skeleton::query()` automatically instantiates a suitable `apnscpObject` query for use with `DataStream`. In special cases, this can be mocked up manually.
 
-```php
+```php?start_inline=1
 public function queryMulti() {
     /**
      * Send multiple backend commands at once, order guaranteed, 
@@ -51,7 +51,7 @@ public function queryMulti() {
 
 `apnscpObject::NO_WAIT` will send a command to backend without waiting on a response. This can be useful in situations in which data must be sent to backend, but status is immaterial. Alternatively, *NO_WAIT* can be used to return immediately provided the backend confers status by another process. An example would be exiting a 1-click install immediately and sending the response via email.
 
-```php
+```php?start_inline=1
 class Someapp_Module extends Module_Skeleton {
   public function install(): ?void {
       if (!IS_CLI) {
@@ -79,7 +79,7 @@ Exceptions convey stack. Stack conveyance adds overhead. Do not throw exceptions
 
 apnscp bundles a general-purpose [error library](https://github.com/apisnetworks/error-reporter) with a variety of macros to simplify life. `fatal()`, `error()`, `warn()`, `info()`, `success()`, `deprecated()`, and `debug()` log issues to the error ring. error(), warn(), info() will copy stack if in **[core]** -> **debug** is set in config.ini (see [Configuration](#Configuration)). **[core]** -> **bug_report** will send a copy of production errors to the listed address.
 
-```php
+```php?start_inline=1
 public function test_value($x) {
     if (is_int($x)) {
         return success('OK!');
@@ -93,7 +93,7 @@ public function test_value($x) {
 
 ER supports argument references as well utilizing [sprintf](http://php.net/manual/en/function.sprintf.php).
 
-```php
+```php?start_inline=1
 public function test_command($command, $args = []) {
     $status = Util_Process::exec($command, $args);
     if (!$status['success']) {
@@ -170,7 +170,7 @@ In addition to basic process execution, the following variations are implemented
 
 UP treats all non-zero exit codes as errors. `success` is a shorthand way to check if the exit code, stored in `return` is zero or non-zero. To extend the range of successful values, supply an additional parameter, or stash it in the config parameter, with exit codes that can either be a regex or array of acceptable values.
 
-```php
+```php?start_inline=1
 $proc = new Util_Process();
 $proc->exec('false', [0,1]);
 $proc->exec('false', '/^[01]$/');
@@ -202,7 +202,7 @@ Surrogates *should* extend the module for which they are a surrogate; however, c
 
 To ensure an override surrogate is called when explicitly calling a class, use `apnscpFunctionInterceptor::autoload_class_from_module()`. For example,
 
-```php
+```php?start_inline=1
 /** 
  * reference either User_Module or User_Module_Surrogate depending 
  * upon implementation
@@ -219,7 +219,7 @@ The following surrogate extends the list of nameservers (**[dns]** => **hosting_
 **Remember**: New surrogates are not loaded until the active session has been destroyed via logout or other means
 {% endcallout %}
 
-```php
+```php?start_inline=1
 class Aliases_Module_Surrogate extends Aliases_Module {
   /**
    * Extend nameserver checks to include whitelabel nameservers
@@ -274,7 +274,7 @@ For example, `PRIVILEGE_SERVER_EXEC|PRIVILEGE_SITE` requires the method call ori
 
 Likewise, once a module has been entered, permissions can optionally no longer apply.
 
-```php
+```php?start_inline=1
 class My_Module extends Module_Skeleton {
     public $exportedFunctions = [
         'entry' => PRIVILEGE_SITE,
@@ -305,7 +305,7 @@ class My_Module extends Module_Skeleton {
 
 A module may delegate its instance to a dispatcher unique to the module by implementing a `_proxy()` method as part of `Module\Skeleton\Contracts\Proxied`
 
-```php
+```php?start_inline=1
 use Module\Skeleton\Contracts\Proxied;
 
 class Example_Module extends \Module_Skeleton implements Proxied {
@@ -359,7 +359,7 @@ apnscp uses [Laravel Blade](https://laravel.com/docs/5.4/blade) bundled with Lar
 
 Create a file named *<app name>*/*<app name>*/views/index.blade.php. This will be the initial page index for the app. $Page will be exposed along with a helper method, \$Page->view() to get an instance of \Illuminate\View. All Blade syntax will work, including extending with new directives:
 
-```php
+```php?start_inline=1
 /** pull from resources/views **/
 $blade = \Blade::factory();
 $blade->compiler()->directive('datetime', function ($expression) {
@@ -371,7 +371,7 @@ $blade->compiler()->directive('datetime', function ($expression) {
 
 Model variables can be exported to a Blade view in the "_render" hook. This feature is unavailable when using the built-in lean .tpl format.
 
-```php
+```php?start_inline=1
 public function _render() {
 	$this->view()->share(['options' => $this->getOptions()]);
 }
@@ -383,7 +383,7 @@ public function _render() {
 
 Applications are privileged by role: admin, site, and user. Applications are configured initially via lib/html/templateconfig-<role>.php. Custom app overrides are introduced in conf/custom/templates/<role>.php. For example, to create a new category and add an app,
 
-```php
+```php?start_inline=1
 $templateClass->create_category(
   "Addon Category",
   true, // always show
@@ -438,7 +438,7 @@ Several hooks are provided to latch into apnscp both for account and user creati
 | edit_user   | after       | user is edited           | olduser, newuser, oldpwd  |
 | verify_conf | before      | verify metadata changes  | ConfigurationContext $ctx |
 
-```php
+```php?start_inline=1
 /**
  * Sample module edit hook, which runs under the context
  * of the edited account with Site Administrator privilege
@@ -457,7 +457,7 @@ public function _edit() {
 }
 ```
 
-```php
+```php?start_inline=1
 /**
  * Sample module edit_user hook, which runs under the context
  * of the edited account with Site Administrator privilege
@@ -479,7 +479,7 @@ public function _edit_user(string $olduser, string $newuser, array $oldpwd) {
 
 `verify_conf` hook can reject changes by returning a false value and also alter values. `$ctx` is the module configuration passed by reference. By 
 
-```php
+```php?start_inline=1
 public function _verify_conf(\Opcenter\Service\ConfigurationContext $ctx): bool {
     if (!$ctx['enabled']) {
         return true;
@@ -512,7 +512,7 @@ apnscp features a lightweight global callback facility called Cardinal.
 
 Modules support **contextability**, which allows a new authentication role to be used throughout the scope. A context is created by first scaffolding a user session, then attaching it to an apnscpFunctionInterceptor instance,
 
-```php
+```php?start_inline=1
 // create a new site admin session on debug.com
 $context = new \Auth::mockup(null, 'debug.com');
 $afi = \apnscpFunctionInterceptor::factory($context);

@@ -7,10 +7,26 @@ group: misc
 {:toc}
 * ToC 
 
-## MySQL
+# Panel
+## shellinabox (Terminal app) fails- `forkpty() failed'
+### Background
 
-### Cyclic InnoDB crash
-#### Background
+All panel components run under the user "nobody". apnscp imposes a per-group limit of 25 processes to prevent monopolization by any given service. In situations, particularly if the panel runs as prefork (*-DPREFORK* flag to `apache`) combined with a high level of cron workers and backend processes, shellinabox (or other components) will fail to spawn. This is most evident in shellinabox responded with `forkpty() failed` upon access from the web portal.
+
+### Solution
+
+Alter the maximum number of simultaneous processes from the terminal.
+
+```bash
+sudo echo -e "nobody nproc soft 35\nnobody nproc hard 70" > /etc/security/limits.d/99-apnscp-nproc-override.conf
+```
+
+This will create 2 entries in /etc/security/limits.d/99-apnscp-nproc-override.conf that set a soft concurrent process limit of 35 processes and a hard (firm limit) of 70 processes. These numbers may be tweaked as necessary.
+
+# MySQL
+
+## Cyclic InnoDB crash
+### Background
 * **Impact:** Severe
 * **Affects:** MariaDB 10.0 and lower
 
@@ -36,7 +52,7 @@ InnoDB: http://dev.mysql.com/doc/refman/5.6/en/operating-system-error-codes.html
 170802 06:12:06 mysqld_safe Number of processes running now: 0
 170802 06:12:06 mysqld_safe mysqld restarted</pre>
 
-#### Solution
+### Solution
 Remove the disk quota from the account temporarily to allow MySQL to repair the tables. Once the table has been repaired,
 disk quotas can be reapplied to the account. 
 
