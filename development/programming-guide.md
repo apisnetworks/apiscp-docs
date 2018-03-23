@@ -1,5 +1,5 @@
 ---
-playout: docs
+layout: docs
 title: Programming Guide
 group: development
 ---
@@ -628,7 +628,7 @@ unlink ($file);
 
 {% callout info %}
 Note that the job must go out of scope to dispatch as the dispatch logic is contained in its destructor.
-{%end callout %}
+{% endcallout %}
 
 ## Binding context
 
