@@ -73,7 +73,7 @@ class Someapp_Module extends Module_Skeleton {
 
 ### Warning on exception usage
 
-mExceptions convey stack. Stack conveyance adds overhead. Do not throw exceptions in Module code, especially in file_* operations. Do not throw exceptions in any critical part of code that will not immediately terminate flow. In fact, **exception usage is discouraged unless it explicitly results in termination** (in which case, `fatal()` works better) **or a deeply nested call needs to return immediately**. 
+Exceptions convey stack. Stack conveyance adds overhead. Do not throw exceptions in Module code, especially in file_* operations. Do not throw exceptions in any critical part of code that will not immediately terminate flow. In fact, **exception usage is discouraged unless it explicitly results in termination** (in which case, `fatal()` works better) **or a deeply nested call needs to return immediately**. 
 
 ### Non-exception usage
 
@@ -130,16 +130,16 @@ Error_Reporter::add_message_callback(Error_Reporter::E_FATAL, new class implemen
 The following macros are short-hand to log messages during application execution. 
 
 {: .table .table-striped}
-| Macro             | Purpose                                  | Return Value |
-| ----------------- | ---------------------------------------- | ------------ |
-| fatal()           | Halt script execution, report message.   | null         |
+| Macro             | Purpose                                                      | Return Value |
+| ----------------- | ------------------------------------------------------------ | ------------ |
+| fatal()           | Halt script execution, report message.                       | null         |
 | error()           | Routine encountered error and should return from routine. Recommended to always return. | false        |
-| warn()            | Routine encountered recoverable error.   | false        |
-| info()            | Additional information pertaining to routine. | true         |
-| success()         | Action completed successfully.           | true         |
-| debug()           | Message that only emits when DEBUG set to 1 in config.ini | true         |
-| deprecated()      | Routine is deprecated. Callee included in message. | true         |
-| deprecated_func() | Same as deprecated(), but include callee's caller | true         |
+| warn()            | Routine encountered recoverable error.                       | true         |
+| info()            | Additional information pertaining to routine.                | true         |
+| success()         | Action completed successfully.                               | true         |
+| debug()           | Message that only emits when DEBUG set to 1 in config.ini    | true         |
+| deprecated()      | Routine is deprecated. Callee included in message.           | true         |
+| deprecated_func() | Same as deprecated(), but include callee's caller            | true         |
 | report()          | Send message with stack trace to **[core]** -> **bug_report** | bool         |
 
 ## Calling programs
@@ -325,8 +325,6 @@ apnscp controllers provide a few attachment points for hooks.
 | on_postback | After _init()       | Handle form interaction, classic controller |
 | _layout     | After on_postback() | Must call parent. Calculate head CSS/JS elements. Unavailable in AJAX requests. |
 | _render     | After _layout()     | Template engine is exposed. Recommended time to share Blade variables |
-
-
 
 ## Templates
 
