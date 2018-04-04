@@ -11,7 +11,7 @@ group: development
 
 apnscp is designed to be flexible and fast. Because apnscp cannot exist without a broker (apnscpd) to transfer critical unprivileged code to privileged backend tasks, a critical choke also exists between this transfer (`$this->query('method', $args)`). Backend methods are designed to be thin. Make your frontend however you want, but inversely proportion complexity to backend calls as they bear the brunt of the logic and each backend roundtrip costs 0.1 ms when session resumption can be used. Without resumption each request is 6x slower.
 
-## Invocation Flow
+## Invocation flow
 
 apnscp is partitioned into 2 components: an unprivileged frontend (typically runs as user "nobody") and a privileged backend that runs as root. Methods can traverse to the backend using a special method, `query(method, arg1, arg2, argn...)`, part of `Module_Skeleton`. 
 
@@ -47,7 +47,7 @@ public function queryMulti() {
 }
 ```
 
-### No Wait Flag 
+### "No Wait" flag 
 
 `apnscpObject::NO_WAIT` will send a command to backend without waiting on a response. This can be useful in situations in which data must be sent to backend, but status is immaterial. Alternatively, *NO_WAIT* can be used to return immediately provided the backend confers status by another process. An example would be exiting a 1-click install immediately and sending the response via email.
 
@@ -69,13 +69,13 @@ class Someapp_Module extends Module_Skeleton {
 }
 ```
 
-## Error Handling
+## Error handling
 
-### Warning on Exception Usage
+### Warning on exception usage
 
 Exceptions convey stack. Stack conveyance adds overhead. Do not throw exceptions in Module code, especially in file_* operations. Do not throw exceptions in any critical part of code that will not immediately terminate flow. In fact, **exception usage is discouraged unless it explicitly results in termination** (in which case, `fatal()` works better) **or a deeply nested call needs to return immediately**. 
 
-### Non-Exception Usage
+### Non-exception usage
 
 apnscp bundles a general-purpose [error library](https://github.com/apisnetworks/error-reporter) with a variety of macros to simplify life. `fatal()`, `error()`, `warn()`, `info()`, `success()`, `deprecated()`, and `debug()` log issues to the error ring. error(), warn(), info() will copy stack if in **[core]** -> **debug** is set in config.ini (see [Configuration](#Configuration)). **[core]** -> **bug_report** will send a copy of production errors to the listed address.
 
@@ -105,7 +105,7 @@ public function test_command($command, $args = []) {
 }
 ```
 
-### Registering Message Callbacks
+### Registering message callbacks
 
 Register callbacks to `add_message_callback()`. For example, to dump stack on fatal errors on DAV during development (or AJAX) where unexpected output breaks protocol formatting:
 
@@ -125,24 +125,24 @@ Error_Reporter::add_message_callback(Error_Reporter::E_FATAL, new class implemen
 });
 ```
 
-### ER Message Buffer Macros
+### ER message buffer macros
 
 The following macros are short-hand to log messages during application execution. 
 
 {: .table .table-striped}
-| Macro             | Purpose                                  | Return Value |
-| ----------------- | ---------------------------------------- | ------------ |
-| fatal()           | Halt script execution, report message.   | null         |
+| Macro             | Purpose                                                      | Return Value |
+| ----------------- | ------------------------------------------------------------ | ------------ |
+| fatal()           | Halt script execution, report message.                       | null         |
 | error()           | Routine encountered error and should return from routine. Recommended to always return. | false        |
-| warn()            | Routine encountered recoverable error.   | true         |
-| info()            | Additional information pertaining to routine. | true         |
-| success()         | Action completed successfully.           | true         |
-| debug()           | Message that only emits when DEBUG set to 1 in config.ini | true         |
-| deprecated()      | Routine is deprecated. Callee included in message. | true         |
-| deprecated_func() | Same as deprecated(), but include callee's caller | true         |
+| warn()            | Routine encountered recoverable error.                       | true         |
+| info()            | Additional information pertaining to routine.                | true         |
+| success()         | Action completed successfully.                               | true         |
+| debug()           | Message that only emits when DEBUG set to 1 in config.ini    | true         |
+| deprecated()      | Routine is deprecated. Callee included in message.           | true         |
+| deprecated_func() | Same as deprecated(), but include callee's caller            | true         |
 | report()          | Send message with stack trace to **[core]** -> **bug_report** | bool         |
 
-## Calling Programs
+## Calling programs
 
 apnscp provides a specialized library, [Util_Process](https://github.com/apisnetworks/util-process), for simplifying program execution. Arguments may be presented as sprintf arguments or by using name backreferences. You can even mix-and-match named and numeric backreferences (although highly discouraged and liable to result in 10,000v to the nipples!)
 
@@ -166,7 +166,7 @@ In addition to basic process execution, the following variations are implemented
 | Sudo         | Switch user. Automatically scope active session. | Slow. Must be run from backend.          | \$proc = new Util_Process_Sudo(); \$proc->setUser('nobody'); $proc->run("whoami"); |
 | Tee          | Copy output elsewhere                    | ???                                      | \$tee = new Util_Process_Tee(['tee' => ''/tmp/flapjacks'); \$proc = new Util_Process(); \$tee->setProcess(\$proc); \$proc->run("dmesg"); |
 
-### Allowing Exit Values
+### Allowing exit values
 
 UP treats all non-zero exit codes as errors. `success` is a shorthand way to check if the exit code, stored in `return` is zero or non-zero. To extend the range of successful values, supply an additional parameter, or stash it in the config parameter, with exit codes that can either be a regex or array of acceptable values.
 
@@ -184,13 +184,13 @@ Both are equivalent and accept a single exit value, "0" or "1".
 
 > Traditionally, 0 is used to signal success with Linux commands. A non-zero return can correspond to any one of numerous [error codes](http://man7.org/linux/man-pages/man3/errno.3.html). It is rare for a command that runs successfully to exit with a non-zero status.
 
-#  Creating Modules
+#  Creating modules
 
 Modules expose an interface for the end-user to interact with from not only the panel, but also API. A module is named *ModuleName*_Module and located in `lib/modules/`. Modules must extend `Module_Skeleton`. Any public method exposed in the module that does not begin with "\_" and has permissions assigned other than `PRIVILEGE_NONE` AND `PRIVILEGE_SERVER_EXEC` is callable from the panel or API. Module rights are discussed a little further under **PERMISSIONS**.
 
 A sample class implementation is found under `modules/example.php`.
 
-## Extending Modules with Surrogates
+## Extending modules with surrogates
 
 A module may be extended with a "surrogate". Surrogates are delegated modules loaded in lieu of modules that ship with apnscp. Surrogates are located under modules/surrogates/*<module name>*.php. Unless the class name is explicitly called, e.g. `User_Module::MIN_UID`, a surrogate will be loaded first, e.g. $this->user_get_home() will check for modules/surrogates/user.php and use that instance before using modules/user.php. A surrogate or native class can be determined at runtime using `apnscpFunctionInterceptor::autoload_class_from_module()`, e.g. `apnscpFunctionInterceptor::autoload_class_from_module('user') . '::MIN_UID'`. Depending upon the presence of surrogates/user.php (override of User_Module), that or modules/user.php (native apnscp module) will be loaded.
 
@@ -211,7 +211,7 @@ $class = apnscpFunctionInterceptor::autoload_class_from_module("user");
 echo $class, $class::MIN_UID;
 ```
 
-### Sample Surrogate
+### Sample surrogate
 
 The following surrogate extends the list of nameservers (**[dns]** => **hosting_ns** in config.ini) that a domain may be delegated to pass the nameserver check. Note, this has no enforcement if **[domains]** => **dns_check** is set to "0" in config.ini.
 
@@ -220,27 +220,28 @@ The following surrogate extends the list of nameservers (**[dns]** => **hosting_
 {% endcallout %}
 
 ```php?start_inline=1
-class Aliases_Module_Surrogate extends Aliases_Module {
-  /**
-   * Extend nameserver checks to include whitelabel nameservers
-   */
-  protected function domain_is_delegated($domain)
-  {
-    $myns = [
-      'ns1.myhostingns.com',
-      'ns2.myhostingns.com',
-      'ns1.whitelabel.com',
-      'ns2.whitelabel.com'
-    ];
-    $nameservers = $this->dns_get_authns_from_host($domain);
-    foreach($nameservers as $nameserver) {
-      if (in_array($nameserver, $myns)) {
-        return 1;
-      }
+<?php
+    class Aliases_Module_Surrogate extends Aliases_Module {
+        /**
+         * Extend nameserver checks to include whitelabel nameservers
+         */
+        protected function domain_is_delegated($domain)
+        {
+            $myns = [
+                'ns1.myhostingns.com',
+                'ns2.myhostingns.com',
+                'ns1.whitelabel.com',
+                'ns2.whitelabel.com'
+            ];
+            $nameservers = $this->dns_get_authns_from_host($domain);
+            foreach($nameservers as $nameserver) {
+                if (in_array($nameserver, $myns)) {
+                    return 1;
+                }
+            }
+            return parent::domain_is_delegated($domain);
+        }
     }
-    return parent::domain_is_delegated($domain);
-  }
-}
 ```
 
 ### Aliasing 
@@ -266,7 +267,7 @@ Modules comprise a variety methods and require specific access rights to protect
 | PRIVILEGE_RESELLER    | Reserved for future support.             |
 | PRIVILEGE_ALL         | All roles may access a method. Does not supersede PRIVILEGE_SERVER_EXEC. |
 
-### Mixing Permissions
+### Mixing permissions
 
 Permissions may be added using bitwise operators to further restrict module entry point or role type.
 
@@ -299,33 +300,9 @@ class My_Module extends Module_Skeleton {
 }
 ```
 
+# Creating applications
 
-
-## Proxy Loaders
-
-A module may delegate its instance to a dispatcher unique to the module by implementing a `_proxy()` method as part of `Module\Skeleton\Contracts\Proxied`
-
-```php?start_inline=1
-use Module\Skeleton\Contracts\Proxied;
-
-class Example_Module extends \Module_Skeleton implements Proxied {
-  public function _proxy(): \Module_Skeleton {
-    /**
-     * All methods from example will be exported
-     * But all method calls will go through the Misdirection_Module
-     * class
-     * example_test() -> Misdirection_Module::__call('test');
-     */
-  	return new Misdirection_Module();
-  }
-}
-```
-
-
-
-# Creating Applications
-
-## Application Structure
+## Application structure
 
 All apps are located under `apps/`. The "App ID" is the folder under which the application is located. A sample application named "test" is bundled with apnscp. A controller must be named after the App ID and end in ".php". The default view may be named after the App ID and end in ".tpl" or located as views/index.blade.php if using Blade. 
 
@@ -349,15 +326,13 @@ apnscp controllers provide a few attachment points for hooks.
 | _layout     | After on_postback() | Must call parent. Calculate head CSS/JS elements. Unavailable in AJAX requests. |
 | _render     | After _layout()     | Template engine is exposed. Recommended time to share Blade variables |
 
-
-
 ## Templates
 
-apnscp uses [Laravel Blade](https://laravel.com/docs/5.4/blade) bundled with Laravel 5.4 for templates or basic "include()" if the template is named *<app name>*/*<app name>*.tpl
+apnscp uses [Laravel Blade](https://laravel.com/docs/5.4/blade) bundled with Laravel 5.5 for templates or basic "include()" if the template is named *<app name>*/*<app name>*.tpl
 
 ### Using Blade
 
-Create a file named *<app name>*/*<app name>*/views/index.blade.php. This will be the initial page index for the app. $Page will be exposed along with a helper method, \$Page->view() to get an instance of \Illuminate\View. All Blade syntax will work, including extending with new directives:
+Create a file named under `apps/custom/`  named *<app name>*/views/index.blade.php. This will be the initial page index for the app. $Page will be exposed along with a helper method, \$Page->view() to get an instance of \Illuminate\View. All Blade syntax will work, including extending with new directives:
 
 ```php?start_inline=1
 /** pull from resources/views **/
@@ -377,27 +352,38 @@ public function _render() {
 }
 ```
 
+### Using Blade outside apps
 
+Blade templates may be overridden outside of apps, such as with email templates or provisioning templates, by copying the asset to `config/custom/`*<named path>*.
 
-## Configuring App Visibility
+For example, to override how Apache VirtualHosts are constructed during account creation:
+
+Copy resources/templates/apache/virtualhost.blade.php to config/custom/resources/templates/apache/virtualhost.blade.php, this can be done by creating the necessary directory structure + copying the file:
+
+```bash
+cd /usr/local/apnscp
+mkdir -p config/custom/resources/templates/apache
+cp -dp resources/templates/apache/virtualhost.blade.php config/custom/resources/templates/apache/
+```
+
+## Configuring app visibility
 
 Applications are privileged by role: admin, site, and user. Applications are configured initially via lib/html/templateconfig-<role>.php. Custom app overrides are introduced in conf/custom/templates/<role>.php. For example, to create a new category and add an app,
 
 ```php?start_inline=1
-$templateClass->create_category(
-  "Addon Category",
-  true, // always show
-  "/images/custom/addonappicon.png", // icon indicator
-  "myaddon" // category name
-);
-
-$templateClass->create_link(
-  "Internal Benchmark",
-  "/apps/benchmark",
-  is_debug(), // condition to load category
-  null, // no longer used
-  "myaddon" // category reference
-);
+    $templateClass->create_category(
+        "Addon Category",
+        true, // always show
+        "/images/custom/addonappicon.png", // icon indicator
+        "myaddon" // category name
+    );
+    $templateClass->create_link(
+        "Internal Benchmark",
+        "/apps/benchmark",
+        is_debug(), // condition to load category
+        null, // no longer used
+        "myaddon" // category reference
+    );
 ```
 
 
@@ -428,15 +414,15 @@ apnscp comes with a separate [theme SDK](https://github.com/apisnetworks/apnscp-
 Several hooks are provided to latch into apnscp both for account and user creation. All hook names are prefixed with an underscore ("_"). All hooks run under Site Administrator privilege ("*PRIVILEGE_SITE*"). Any module that implements one must implement all hooks as dictated by the `\Opcenter\Contracts\Hookable` interface.
 
 {: .table .table-striped}
-| Hook        | Event Order | Description              | Args                      |
-| ----------- | ----------- | ------------------------ | ------------------------- |
-| delete_user | before      | user is deleted          | user                      |
-| delete      | before      | account is deleted       |                           |
-| create      | after       | account is created       |                           |
-| create_user | after       | user is created          | user                      |
-| edit        | after       | account metadata changed |                           |
-| edit_user   | after       | user is edited           | olduser, newuser, oldpwd  |
-| verify_conf | before      | verify metadata changes  | ConfigurationContext $ctx |
+| Hook        | Event Order | Description              | Args                     |
+| ----------- | ----------- | ------------------------ | ------------------------ |
+| delete_user | before      | user is deleted          | user                     |
+| delete      | before      | account is deleted       |                          |
+| create      | after       | account is created       |                          |
+| create_user | after       | user is created          | user                     |
+| edit        | after       | account metadata changed |                          |
+| edit_user   | after       | user is edited           | olduser, newuser, oldpwd |
+| verify_conf | before      | verify metadata changes  | ConfigurationContext ctx |
 
 ```php?start_inline=1
 /**
@@ -475,7 +461,7 @@ public function _edit_user(string $olduser, string $newuser, array $oldpwd) {
     return true;
 }
 ```
-## Verifying Configuration
+## Verifying configuration
 
 `verify_conf` hook can reject changes by returning a false value and also alter values. `$ctx` is the module configuration passed by reference. By 
 
@@ -502,7 +488,7 @@ tpasswd =
 cpasswd = 
 ```
 
-## Event-Driven Callbacks
+## Event-Driven callbacks
 
 apnscp features a lightweight global callback facility called Cardinal.
 
@@ -514,12 +500,161 @@ Modules support **contextability**, which allows a new authentication role to be
 
 ```php?start_inline=1
 // create a new site admin session on debug.com
-$context = new \Auth::mockup(null, 'debug.com');
+// returns \Auth_Info_User instance
+$context = new \Auth::context(null, 'debug.com');
 $afi = \apnscpFunctionInterceptor::factory($context);
 // print out the admin email attached to debug.com
 echo $afi->common_get_admin_email();
 ```
 
 {% callout danger %}
-Juggling contexts is dangerous and under early development. Use with care.
+Juggling contexts is dangerous and under early development. Use with care. It is recommended to package any contextable changes with unit tests. A framework is available under `test/contextable`.
 {% endcallout %}
+
+## Cache access
+
+Contextables must pass the active instance when accessing User and Account caches. This can be done by passing the `Auth_Info_User` instance to `spawn()`
+
+```php?start_inline=1
+$context = \Auth::context(null, 'debug.com');
+$cache = \Cache_Account::spawn($context);
+// pull user cache from debug.com - if populated
+$cache->get('users.pwd.gen');
+```
+
+## Preferences and Session access
+
+apnscp includes wrappers to user preferences and session data via `Preferences` and `Session` helper classes. Session access is not supported within a contextable role. Sessions are temporary storage and thus have no utility for a contexted authentication role.
+
+Preferences may be accessed and unlocked for write-access. An afi instance must be created to allow the Preference helper storage to save modified preferences.
+
+```php?start_inline=1
+$user = \Auth::context('jim');
+$prefs = \Preferences::factory($user);
+// necessary to provide API access to the preference helper
+$prefs->unlock(\apnscpFunctionInterceptor::factory($user));
+$prefs->set("foo.bar", "baz"); // assign "baz" to [foo][bar]
+$prefs = null; // save
+```
+
+Failure to graft an afi instance will result in a fatal error on write access. afi grafting is not necessary for read access.
+
+## Detecting contextability
+
+Modules that use the `apnscpFunctionInterceptorTrait` also include a helper function `inContext()` to determine whether the current API call is bound in a contextable scope.
+
+## Limitations
+
+Contextables may not be used in reliable, safe manner to access other URIs in apnscp. Contextables are considered "safe" with module access. Contextables should be used with caution with third-party modules as safety is not guaranteed.
+
+### Avoiding state corruption
+
+Use of any **singleton that is dependent on user roles violates contextability**. Example calls that lose state and use the first authenticated instance include:
+
+| Context Safe | Snippet                                  |
+| :----------: | ---------------------------------------- |
+|      ❌       | `apnscpFunctionInterceptor::init()->call('some_fn')` |
+|      ✅       | `apnscpFunctionInterceptor::factory(Auth_Info_User $context)` |
+|      ❌       | `DataStream::get()->write(string $payload)` |
+|      ✅       | `DataStream::get(Auth_Info_User $context)->write($payload)` |
+|      ❌       | `Cache_Account::spawn()->get('foo.bar')` |
+|      ✅       | `Cache_Account::spawn(Auth_Info_User $context)->get('foo.bar')` |
+|      ❌       | `Session::get('entry_domain')`           |
+|              | **N/A** *sessions are not supported in contexted roles* |
+|      ❌       | `Preferences::get('webapps.paths')`      |
+|      ✅       | `array_get(Preferences::factory(Auth_Info_User $context), 'webapps.paths')` |
+
+
+# Jobs
+
+apnscp includes job management through [Laravel Horizon](https://horizon.laravel.com). Jobs run in a dedicated process, `horizon`, or as a spawnable one-shot queue manager that periodically runs `artisan queue:run`. When in low memory situations, set **[cron]** -> **low_memory**=**1** (see [Configuration](#Configuration)) to use the slower one-short, periodic queue manager.
+
+## Writing Jobs
+
+Jobs should implement `\Lararia\Job`, which serves as a base for all apnscp jobs. Lararia jobs will properly convey `error()`, `warn()`, and `info()` API error reporting macros to the job daemon. "`error()`" indicates a fatal, non-recoverable job failure.  All ER events are bundled in a job report, `\Lararia\Job\Report`.
+
+```php
+<?php declare(strict_types=1);
+
+    use Illuminate\Contracts\Queue\ShouldQueue;
+    use Illuminate\Support\Facades\Event;
+    use Lararia\Jobs\Job;
+    use Laravel\Horizon\Events\JobFailed;
+
+    class TestJob extends Job implements ShouldQueue {
+
+        protected $msg;
+        protected $filename;
+
+        public function __construct(string $msg)
+        {
+            $this->msg = $msg;
+            $this->filename = tempnam(TEMP_DIR, 'test-msg');
+            unlink($this->filename);
+        }
+
+        public function fire()
+        {
+            $filename = $this->getFilename();
+            Event::listen(JobFailed::class, function ($job) use($filename) {
+                file_put_contents($filename, $this->getLog()[0]['message']);
+                return null;
+            });
+            return error($this->msg);
+        }
+
+        public function getFilename() {
+            return $this->filename;
+        }
+    }
+```
+
+then to fire the job,
+
+```php?start_inline=1
+$job = (\Lararia\Jobs\Job::create(SampleJob::class, "Test message"));
+$file = $job->getFilename();
+$job->dispatch();
+$job = null;
+
+do {
+  sleep(1);
+} while (!file_exists($file));
+echo "Contents: ", file_get_contents($file);
+unlink ($file);
+```
+
+{% callout info %}
+Note that the job must go out of scope to dispatch as the dispatch logic is contained in its destructor.
+{% endcallout %}
+
+## Binding context
+
+apnscp supports binding authentication contexts to a job, for example to run an API command as another user. This is done using the`RunAs` trait and setting context before dispatching the job.
+
+```php
+<?php declare(strict_types=1);
+
+    use Lararia\Jobs\Job;
+    use Lararia\Jobs\Traits\RunAs;
+
+    class TestJob extends Job {
+
+        use RunAs;
+        use \apnscpFunctionInterceptorTrait;
+
+        public function fire()
+        {
+            return $this->common_get_domain();
+        }
+    }
+
+    $job = new TestJob();
+    $job->setContext(\Auth::context(null, 'testing.com'));
+    $job->dispatch();
+
+```
+
+# Migrations
+
+apnscp supports Laravel Migrations to keep database schema current.
