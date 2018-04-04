@@ -21,7 +21,7 @@ apnscp works best with at least 2 GB for services + caching. Additional features
 | argos    | Recommended | CPU         | Monit monitoring profiles + push notification |
 
 
-## Proactive and Reactive Monitoring
+## Proactive and reactive monitoring
 
 Argos is a configured Monit instance designed to afford both proactive and reactive monitoring. Rampart provides a denial-of-service sieve for reducing resource swells from misbehaving bots. apnscp includes disallowance of HTTP/1.0 protocol, by default, to reduce malware. All components work to keep your sites more secure by filtering out garbage. [tuned](https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Power_Management_Guide/Tuned.html) works proactively by retuning system variables as necessary. apnscp ships with the `virtual-guest` profile active.
 
@@ -31,9 +31,10 @@ apnscp may be installed from the bootstrap utility. Once installed a 15-day tria
 
 Before installing, ensure the following conditions are met:
 
-- [] 1 GB RAM (2 GB recommended)
+- [] 2 GB RAM (4 GB recommended)
 - [][Forward-confirmed reverse DNS](https://en.wikipedia.org/wiki/Forward-confirmed_reverse_DNS), i.e. 64.22.68.1 <-> apnscp.com
 - [] CentOS 7.x or RedHat 7.x
+- [] ext4 or xfs root filesystem
 
 ## Bootstrapping apnscp
 
@@ -45,6 +46,8 @@ wget -O - {{ site.bootstrap_url }} | bash
 
 The bootstrapper will install itself, as well as request a SSL certificate from Let's Encrypt's staging environment if possible. Once setup, a password will be generated. Your admin username is "admin" and password listed at the end.
 
+To change the admin username, issue `/usr/local/apnscp/bin/cmd auth_change_username <newuser>` after apnscp is installed.
+
 {% callout info %}
 apnscp will initially request a certificate from Let's Encrypt [staging environment](https://letsencrypt.org/docs/staging-environment/). If your forward-confirmed reverse DNS is correct, copy `config/config.ini` to `config/custom/` and change **[letsencrypt]** => **debug** to false, then restart apnscpd, `systemctl restart apnscpd `. apnscp will request a new certificate from Let's Encrypt's production server. Remember that Let's Encrypt limits requests to [20 requests/week](https://letsencrypt.org/docs/rate-limits/), so make sure your DNS is properly setup before disabling debug mode.
 {% endcallout %}
@@ -53,7 +56,35 @@ apnscp will initially request a certificate from Let's Encrypt [staging environm
 Bootstrapping Let's Encrypt will fail if DNS is not setup properly. Check out the [DNS in a Nutshell]({% link admin/dns-in-a-nutshell.md %}) section if you need a primer on how DNS works.
 {% endcallout %}
 
-## First Login
+## Changing SQL distributions
+
+apnscp will use the recommended versions of MySQL and PostgreSQL. If you would like to change these defaults create a Yaml formatted file named `/root/apnscp-ansible-defaults.yml ` before running the bootstrapper with the chosen major.minor (or major in the case of "10" for PostgreSQL).
+
+```yaml
+---
+mariadb:
+  version: 10.3
+pgsql:
+  version: 10
+```
+
+## Finishing installation
+
+A reboot is necessary if xfs filesystem is used on /.
+
+```bash
+grep '/ xfs' /proc/mounts
+```
+
+If grep yields a result and that result shows "noquota", issue a reboot.
+
+```bash
+shutdown -r now
+```
+
+If grep yields no result, it uses ext4 and quotas have been enabled.
+
+## First login
 
 Visit https://\<domain\>:2083 to login to the panel as "admin". Accept the untrusted certificate if a Let's Encrypt production certificate has not been generated yet. You can fix this later as noted in [Bootstrapping apnscp](#bootstrapping-apnscp).
 
