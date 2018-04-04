@@ -501,7 +501,7 @@ Modules support **contextability**, which allows a new authentication role to be
 ```php?start_inline=1
 // create a new site admin session on debug.com
 // returns \Auth_Info_User instance
-$context = new \Auth::context(null, 'debug.com');
+$context = \Auth::context(null, 'debug.com');
 $afi = \apnscpFunctionInterceptor::factory($context);
 // print out the admin email attached to debug.com
 echo $afi->common_get_admin_email();
