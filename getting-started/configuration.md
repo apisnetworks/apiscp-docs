@@ -45,3 +45,18 @@ vim config/custom/config.ini
 # Restart apnscpd to activate changes
 systemctl restart apnscp
 ```
+## Overriding application constants
+
+Configuration variables are transformed into application-wide constants. Additional constants can be injected into `config/custom/constants.php` or by making necessary additions to `config/custom/config.ini`.
+
+# Repeating bootstrap components
+
+Any component of the bootstrap process can be run again if necessary. All bootstrap components are idempotent, meaning running it will not affect server state unless checks fail.
+
+From `bootstrap.yml`, each role can be represented as a tag. For example, to detect your active IP address and whitelist it in fail2ban,
+
+```shell
+ansible-playbook -c local --tags="fail2ban/whitelist-self" bootstrap.yml
+```
+
+Refer to the [Playbook repo](https://github.com/apisnetworks/apnscp-playbooks) for a list of available playbooks.

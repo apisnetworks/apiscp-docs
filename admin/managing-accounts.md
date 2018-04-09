@@ -43,7 +43,7 @@ Services that have corresponding filesystem structures are installed under {{ si
 
 # Command-Line Interface
 
-All actions are done through the server terminal. Linux and Mac OS have a built-in ssh client (called "ssh"). For Windows, [PuTTy](http://www.putty.org) (free) and [Token2Shell/MD](https://www.microsoft.com/en-us/store/p/token2shell-md/9nblggh2ncx9) ($10) are recommended.
+All actions are done through the server terminal. Linux and Mac OS have a built-in ssh client (called "ssh"). For Windows, [PuTTy](http://www.putty.org) (free) and [Token2Shell](https://www.microsoft.com/en-us/store/p/token2shell/9plm0mdlvgr5) ($10) are recommended.
 
 ## Adding Accounts
 
