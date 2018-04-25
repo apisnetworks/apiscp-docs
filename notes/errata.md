@@ -23,6 +23,22 @@ sudo echo -e "nobody nproc soft 35\nnobody nproc hard 70" > /etc/security/limits
 
 This will create 2 entries in /etc/security/limits.d/99-apnscp-nproc-override.conf that set a soft concurrent process limit of 35 processes and a hard (firm limit) of 70 processes. These numbers may be tweaked as necessary.
 
+# selinux
+
+## Adjusting policy definitions
+
+{% callout info %}
+SELinux support is highly experimental. If you would like to contribute to SELinux policies in apnscp, edit `resources/playbooks/apnscp-vars.yml` and run `bootstrap.yml`. A reboot will be required.
+{% endcallout %}
+
+`audit2allow` is used to transform an audit log into SELinux policies. audit2allow is part of the `selinuxtroubleshoot` package.
+
+```bash
+yum install -y setroubleshoot
+```
+
+Specific usage is available in RedHat's SELinux documentation, [Allowing Access: audit2allow](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/security-enhanced_linux/sect-security-enhanced_linux-fixing_problems-allowing_access_audit2allow).
+
 # MySQL
 
 ## Cyclic InnoDB crash

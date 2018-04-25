@@ -59,4 +59,4 @@ From `bootstrap.yml`, each role can be represented as a tag. For example, to det
 ansible-playbook -c local --tags="fail2ban/whitelist-self" bootstrap.yml
 ```
 
-Refer to the [Playbook repo](https://github.com/apisnetworks/apnscp-playbooks) for a list of available playbooks.
+Refer to the [Playbook repo](https://github.com/apisnetworks/apnscp-playbooks) for a list of available playbooks and [README](https://github.com/apisnetworks/apnscp-playbooks/README.md) for examples.
