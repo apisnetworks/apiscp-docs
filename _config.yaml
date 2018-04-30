@@ -30,11 +30,11 @@ social_image_path: /images/apnscp-social.png
 
 # Custom vars
 current_version:  3.0-alpha
-repo:             https://github.com/apisnetworks/apnscp
+repo:             https://bitbucket.org/apisnetworks/apnscp/commits
 slack:            none
 reddit:           /r/apnscp
 bootstrap_url: https://raw.githubusercontent.com/apisnetworks/apnscp-bootstrapper/master/bootstrap.sh
-bootstrap_sha2: f3fc89ea383d17594cfae0fc353f548486d79d41ea645fa9857671c2f8595bf0
+bootstrap_sha2: 2879842acf9f7fcaadfc53716f7f3e1206a98203db47dc0fbd986c6332a9bd46
 tether_url: https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js
 forums:           https://forums.apnscp.com
 license:          https://my.apnscp.com
