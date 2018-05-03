@@ -30,7 +30,7 @@ social_image_path: /images/apnscp-social.png
 
 # Custom vars
 current_version:  3.0-alpha
-repo:             https://bitbucket.org/apisnetworks/apnscp/commits
+repo:             https://bitbucket.org/apisnetworks/apnscp
 slack:            none
 reddit:           /r/apnscp
 bootstrap_url: https://raw.githubusercontent.com/apisnetworks/apnscp-bootstrapper/master/bootstrap.sh

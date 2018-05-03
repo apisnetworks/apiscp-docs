@@ -31,22 +31,30 @@ apnscp may be installed from the bootstrap utility. Once installed a 15-day tria
 
 Before installing, ensure the following conditions are met:
 
-- [] 2 GB RAM (4 GB recommended)
+- 2 GB RAM (4 GB recommended)
 - [][Forward-confirmed reverse DNS](https://en.wikipedia.org/wiki/Forward-confirmed_reverse_DNS), i.e. 64.22.68.1 <-> apnscp.com
-- [] CentOS 7.x or RedHat 7.x
-- [] ext4 or xfs root filesystem
+- CentOS 7.x or RedHat 7.x
+- XFS or ext4* root filesystem
+
+>  \* RedHat officially supports XFS with OverlayFS, which is used to synthesize filesystem layers. ext4 may be used with 3.10.x kernels shipped with RedhHat/CentOS. Officially only  [XFS](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/7.4_release_notes/technology_previews_file_systems#BZ1206277) is supported, but no problems were noted during cursory testing with ext4.
+>
+> CentOS provides detailed [instructions](https://wiki.centos.org/HowTos/Custom_Kernel) for building a custom 4.x kernel that provides improved OverlayFS support + performance. It is not officially supported by apnscp and thus at one's own risk.
 
 ## Bootstrapping apnscp
 
 Run the command from terminal
 
 ```shell
-wget -O - {{ site.bootstrap_url }} | bash
+wget -O - {{ site.bootstrap_url }} | bash <key id>
 ```
+
+Where *<key id>* is an activation key generated from [my.apnscp.com](https://my.apnscp.com).
 
 The bootstrapper will install itself, as well as request a SSL certificate from Let's Encrypt's staging environment if possible. Once setup, a password will be generated. Your admin username is "admin" and password listed at the end.
 
-To change the admin username, issue `/usr/local/apnscp/bin/cmd auth_change_username <newuser>` after apnscp is installed.
+**To change the admin username**, issue `sudo /usr/local/apnscp/bin/cmd auth_change_username <newuser>` after apnscp is installed.
+
+**To change the admin password**, issue `sudo /usr/local/apnscp/bin/cmd auth_change_password <newpassword>` after apnscp is installed.
 
 {% callout info %}
 apnscp will initially request a certificate from Let's Encrypt [staging environment](https://letsencrypt.org/docs/staging-environment/). If your forward-confirmed reverse DNS is correct, copy `config/config.ini` to `config/custom/` and change **[letsencrypt]** => **debug** to false, then restart apnscpd, `systemctl restart apnscpd `. apnscp will request a new certificate from Let's Encrypt's production server. Remember that Let's Encrypt limits requests to [20 requests/week](https://letsencrypt.org/docs/rate-limits/), so make sure your DNS is properly setup before disabling debug mode.

@@ -24,7 +24,7 @@ layout: home
     </p>
     <div class="text-center">
       <span class="ap-mastcmd">
-        wget -O - {{ site.bootstrap_url }} | bash &lt;key&gt;
+        wget -O setup.sh {{ site.bootstrap_url }} && sh setup.sh &lt;key&gt;
       </span>
       <div class="text-small mb-1">
         sha256: {{ site.bootstrap_sha2 }}
