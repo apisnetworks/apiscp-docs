@@ -48,13 +48,15 @@ Run the command from terminal
 wget -O - {{ site.bootstrap_url }} | bash <key id>
 ```
 
-Where *<key id>* is an activation key generated from [my.apnscp.com](https://my.apnscp.com).
+Where *<key id>* is an activation key generated from [my.apnscp.com](https://my.apnscp.com) or *-f <key>* where <key> is the x509 PEM downloaded from your account on my.apnscp.com and saved locally.
 
 The bootstrapper will install itself, as well as request a SSL certificate from Let's Encrypt's staging environment if possible. Once setup, a password will be generated. Your admin username is "admin" and password listed at the end.
 
-**To change the admin username**, issue `sudo /usr/local/apnscp/bin/cmd auth_change_username <newuser>` after apnscp is installed.
+**To change the admin username**, issue `sudo /usr/local/apnscp/bin/cmd auth_change_username <newuser>` after apnscp is installed. ([API docs](http://api.apnscp.com/class-Auth_Module.html#_change_username))
 
-**To change the admin password**, issue `sudo /usr/local/apnscp/bin/cmd auth_change_password <newpassword>` after apnscp is installed.
+**To change the admin password**, issue `sudo /usr/local/apnscp/bin/cmd auth_change_password <newpassword>` after apnscp is installed. ([API docs](http://api.apnscp.com/class-Auth_Module.html#_change_password))
+
+**To change (or set) the admin email address**, issue  `sudo /usr/local/apnscp/bin/cmd admin_set_email <newaddress>` after apnscp is installed. ([API docs](http://api.apnscp.com/class-Admin_Module.html#_set_email))
 
 {% callout info %}
 apnscp will initially request a certificate from Let's Encrypt [staging environment](https://letsencrypt.org/docs/staging-environment/). If your forward-confirmed reverse DNS is correct, copy `config/config.ini` to `config/custom/` and change **[letsencrypt]** => **debug** to false, then restart apnscpd, `systemctl restart apnscpd `. apnscp will request a new certificate from Let's Encrypt's production server. Remember that Let's Encrypt limits requests to [20 requests/week](https://letsencrypt.org/docs/rate-limits/), so make sure your DNS is properly setup before disabling debug mode.
@@ -63,6 +65,22 @@ apnscp will initially request a certificate from Let's Encrypt [staging environm
 {% callout warning %}
 Bootstrapping Let's Encrypt will fail if DNS is not setup properly. Check out the [DNS in a Nutshell]({% link admin/dns-in-a-nutshell.md %}) section if you need a primer on how DNS works.
 {% endcallout %}
+
+## Reducing memory usage
+
+apnscp is optimized for memory usage. In certain situations, you may wish to squeeze more memory out of installation. This can be done by disabling vscanner, which includes ClamAV, and forgoing apnscp's automated job runner.
+
+```shell
+ansible-playbook bootstrap.yml --extra-vars="clamav_enable=0"
+```
+
+or, a nuclear option to disable all unnecessary components and reduce memory requirements to bare minimum,
+
+```bash
+ansible-playbook bootstrap.yml --extra-vars="has_low_memory=true"
+```
+
+
 
 ## Changing SQL distributions
 

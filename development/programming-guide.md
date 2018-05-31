@@ -414,15 +414,15 @@ apnscp comes with a separate [theme SDK](https://github.com/apisnetworks/apnscp-
 Several hooks are provided to latch into apnscp both for account and user creation. All hook names are prefixed with an underscore ("_"). All hooks run under Site Administrator privilege ("*PRIVILEGE_SITE*"). Any module that implements one must implement all hooks as dictated by the `\Opcenter\Contracts\Hookable` interface.
 
 {: .table .table-striped}
-| Hook        | Event Order | Description              | Args                     |
-| ----------- | ----------- | ------------------------ | ------------------------ |
-| delete_user | before      | user is deleted          | user                     |
-| delete      | before      | account is deleted       |                          |
-| create      | after       | account is created       |                          |
-| create_user | after       | user is created          | user                     |
-| edit        | after       | account metadata changed |                          |
-| edit_user   | after       | user is edited           | olduser, newuser, oldpwd |
-| verify_conf | before      | verify metadata changes  | ConfigurationContext ctx |
+| Hook        | Event Order | Description                              | Args                     |
+| ----------- | ----------- | ---------------------------------------- | ------------------------ |
+| delete_user | before      | user is deleted                          | user                     |
+| delete      | before      | account is deleted *or service disabled* |                          |
+| create      | after       | account is created *or service enabled*  |                          |
+| create_user | after       | user is created                          | user                     |
+| edit        | after       | account metadata changed                 |                          |
+| edit_user   | after       | user is edited                           | olduser, newuser, oldpwd |
+| verify_conf | before      | verify metadata changes                  | ConfigurationContext ctx |
 
 ```php?start_inline=1
 /**
@@ -430,8 +430,11 @@ Several hooks are provided to latch into apnscp both for account and user creati
  * of the edited account with Site Administrator privilege
  */
 public function _edit() {
-    $new = Auth::conf('siteinfo', 'new');
-    $old = Auth::conf('siteinfo', 'new');
+	// note that cur will always be merge: new -> old for edit hook
+	// thus to look at old data, peek at old never cur
+	// cur may be used for create/delete
+    $new = $this->getAuthContext()->conf('siteinfo', 'new');
+    $old = $this->getAuthContext()->conf('siteinfo', 'old');
     if ($new === $old) {
         // no change to "siteinfo" service module
         return;
@@ -461,6 +464,12 @@ public function _edit_user(string $olduser, string $newuser, array $oldpwd) {
     return true;
 }
 ```
+### Special case service enablement/disablement
+
+`create` and `delete` are called when a mapped service configuration (discussed below under "[Mapped Services](#Mapped services)") is enabled or disabled **instead of** `edit`. For example, these three cases assume that "aliases" is disabled for a site (`aliases`,`enabled=0`). Aliases are brought online for the site debug.com with `EditDomain -c aliases,enabled=1 -c aliases,aliases=['foobar.com'] debug.com`.
+
+
+
 ## Verifying configuration
 
 `verify_conf` hook can reject changes by returning a false value and also alter values. `$ctx` is the module configuration passed by reference. By 
@@ -490,9 +499,39 @@ cpasswd =
 
 ## Event-Driven callbacks
 
-apnscp features a lightweight global callback facility called Cardinal.
+apnscp features a lightweight global serial callback facility called Cardinal.
 
+# Service Definitions
 
+Every account consists of metadata called "Service Definitions" that describe what an account is, what features it has, and how it should be handled through automation. Examples of metadata include the administrative login (`siteinfo`,`admin_user`), database access (`mysql`,`enabled` and/or `pgsql`,`enabled`), billing identifier (`billing`,`invoice`), addon domains (`aliases`,`aliases`), or even extended filesystem layers conferred through service enablement, such as (`ssh`,`enabled`) that merges command-line access into an account.
+
+All natively derivable Service Definitions exist as templates in [plans/.skeleton](https://bitbucket.org/apisnetworks/apnscp/src/master/resources/templates/plans/.skeleton/?at=master). Any definition beyond that may be extended, just don't override these definitions and read along!
+
+## Mapped services
+
+A mapped service connects metadata to apnscp through a Service Validator. A Service Validator can accept or reject a sequence of changes determined upon the return value (or trigger of error via [error()](#ER message buffer macros)). Service Validators exist in two forms, as modules through `_verify_conf` [listed above](#Verifying configuration) and classes that reject early by implementing `ServiceValidator`; such objects are mapped services.
+
+## Definition behaviors
+
+Certain services can be triggered automatically.
+
+### MountableLayer
+
+### ServiceReconfiguration
+
+### AlwaysValidate
+
+Whenever a site is created or edited, if a service definition implements `AlwaysValidate`, then the `valid($value)` will be invoked to ensure changes conform to the recommended changes. Returning `FALSE` will halt further execution and perform a rollback through `depopulate()` of any previously registered and confirmed services.
+
+### ServiceInstall
+
+### AlwaysRun
+
+Service Definitions that implement `AlwaysRun` invert the meaning of `ServiceLayer`. `populate()` is now called whenever its configuration is edited or on account creation and `depopulate()` is called when an account is deleted or an edit fails. It can be mixed with `AlwaysValidate` to always run whenever a service value from the service is modified. An example is creating the maildir folder hierarchy. `version` is always checked (`AlwaysValidate` interface) and `Mail/Version` will always create mail folder layout regardless mail,enabled is set to 1 or 0.
+
+## Adding service definitions
+
+@TODO
 
 # Contextables
 
@@ -551,18 +590,18 @@ Contextables may not be used in reliable, safe manner to access other URIs in ap
 
 Use of any **singleton that is dependent on user roles violates contextability**. Example calls that lose state and use the first authenticated instance include:
 
-| Context Safe | Snippet                                  |
-| :----------: | ---------------------------------------- |
-|      ❌       | `apnscpFunctionInterceptor::init()->call('some_fn')` |
-|      ✅       | `apnscpFunctionInterceptor::factory(Auth_Info_User $context)` |
-|      ❌       | `DataStream::get()->write(string $payload)` |
-|      ✅       | `DataStream::get(Auth_Info_User $context)->write($payload)` |
-|      ❌       | `Cache_Account::spawn()->get('foo.bar')` |
-|      ✅       | `Cache_Account::spawn(Auth_Info_User $context)->get('foo.bar')` |
-|      ❌       | `Session::get('entry_domain')`           |
-|              | **N/A** *sessions are not supported in contexted roles* |
-|      ❌       | `Preferences::get('webapps.paths')`      |
-|      ✅       | `array_get(Preferences::factory(Auth_Info_User $context), 'webapps.paths')` |
+| Context Safety | Snippet                                                      |
+| :------------: | ------------------------------------------------------------ |
+|       ❌        | `apnscpFunctionInterceptor::init()->call('some_fn')`         |
+|       ✅        | `apnscpFunctionInterceptor::factory(Auth_Info_User $context)` |
+|       ❌        | `DataStream::get()->write(string $payload)`                  |
+|       ✅        | `DataStream::get(Auth_Info_User $context)->write($payload)`  |
+|       ❌        | `Cache_Account::spawn()->get('foo.bar')`                     |
+|       ✅        | `Cache_Account::spawn(Auth_Info_User $context)->get('foo.bar')` |
+|       ❌        | `Session::get('entry_domain')`                               |
+|                | **N/A** *sessions are not supported in contexted roles*      |
+|       ❌        | `Preferences::get('webapps.paths')`                          |
+|       ✅        | `array_get(Preferences::factory(Auth_Info_User $context), 'webapps.paths')` |
 
 
 # Jobs
