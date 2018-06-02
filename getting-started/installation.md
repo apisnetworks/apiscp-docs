@@ -32,8 +32,9 @@ apnscp may be installed from the bootstrap utility. Once installed a 15-day tria
 Before installing, ensure the following conditions are met:
 
 - 2 GB RAM (4 GB recommended)
+- 7.5 GB storage
 - [][Forward-confirmed reverse DNS](https://en.wikipedia.org/wiki/Forward-confirmed_reverse_DNS), i.e. 64.22.68.1 <-> apnscp.com
-- CentOS 7.x or RedHat 7.x
+- CentOS 7.4+ or RedHat 7.4+
 - XFS or ext4* root filesystem
 
 >  \* RedHat officially supports XFS with OverlayFS, which is used to synthesize filesystem layers. ext4 may be used with 3.10.x kernels shipped with RedhHat/CentOS. Officially only  [XFS](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/7.4_release_notes/technology_previews_file_systems#BZ1206277) is supported, but no problems were noted during cursory testing with ext4.
@@ -79,8 +80,6 @@ or, a nuclear option to disable all unnecessary components and reduce memory req
 ```bash
 ansible-playbook bootstrap.yml --extra-vars="has_low_memory=true"
 ```
-
-
 
 ## Changing SQL distributions
 
