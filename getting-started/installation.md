@@ -46,7 +46,7 @@ Before installing, ensure the following conditions are met:
 Run the command from terminal
 
 ```shell
-wget -O - {{ site.bootstrap_url }} | bash <key id>
+curl {{ site.bootstrap_url }} | bash -s - <key id>
 ```
 
 Where *<key id>* is an activation key generated from [my.apnscp.com](https://my.apnscp.com) or *-f <key>* where <key> is the x509 PEM downloaded from your account on my.apnscp.com and saved locally.

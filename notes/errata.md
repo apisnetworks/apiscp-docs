@@ -23,6 +23,22 @@ sudo echo -e "nobody nproc soft 35\nnobody nproc hard 70" > /etc/security/limits
 
 This will create 2 entries in /etc/security/limits.d/99-apnscp-nproc-override.conf that set a soft concurrent process limit of 35 processes and a hard (firm limit) of 70 processes. These numbers may be tweaked as necessary.
 
+# Apache
+
+##Changing cache 
+
+apnscp ships with disk cache enabled for Apache. Cache backend can be changed from disk to memory or disabled by specifying `OPTIONS` in /etc/sysconfig/httpd. `-DNO_CACHE` disables cache support whereas `-DCACHE_MEMORY` uses shmcb to cache content. 
+
+###Wordpress benchmark
+
+|              | Requests/second | Request duration (mean) |
+| ------------ | --------------- | ----------------------- |
+| No cache     | 142 req/sec     | 7.002 ms                |
+| Cache disk   | 3544 req/sec    | 0.282 ms                |
+| Cache memory | 3754 req/sec    | 0.266 ms                |
+
+\* Taken 2018/06/07 on a Core i5-4590 + NVMe running on a v7.5 apnscp platform
+
 # selinux
 
 ## Adjusting policy definitions
