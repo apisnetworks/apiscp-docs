@@ -9,6 +9,7 @@ group: misc
 
 # Panel
 ## shellinabox (Terminal app) fails- `forkpty() failed'
+
 ### Background
 
 All panel components run under the user "nobody". apnscp imposes a per-group limit of 25 processes to prevent monopolization by any given service. In situations, particularly if the panel runs as prefork (*-DPREFORK* flag to `apache`) combined with a high level of cron workers and backend processes, shellinabox (or other components) will fail to spawn. This is most evident in shellinabox responded with `forkpty() failed` upon access from the web portal.
@@ -263,6 +264,17 @@ As opposed to
 use Route;
 Route::get('/some/where', 'SomeController@index');
 ```
+
+## Custom views aren't recognized
+
+When first creating a new view hierarchy, be sure to rebuild Laravel's cache.
+
+```bash
+cd /usr/local/apnscp
+./artisan config:cache
+```
+
+
 
 
 
