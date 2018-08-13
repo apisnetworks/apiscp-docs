@@ -8,8 +8,14 @@ a {
 	padding: $spacer-y $spacer-x;
 }
 
-.highlight pre code {
-	color: $gray-lightest;
+.highlight {
+	padding: $spacer/2;
+	pre {
+		margin-bottom: 0;
+	}
+	pre code {
+		color: $gray-lightest;
+	}
 }
 
 .ap-callout {
