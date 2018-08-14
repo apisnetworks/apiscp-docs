@@ -20,19 +20,19 @@ Run an apnscp method under an optionally user-defined role.
 {:.no_toc}
 ```bash
 # As admin of example.com, get all bandwidth usage
-cmd -d example.com bandwidth_get_all_composite_bandwidth_data
+cpcmd -d example.com bandwidth_get_all_composite_bandwidth_data
 ```
 
 ```bash
 # Change password as user secondaryuser
-cmd -d  example.com -u secondaryuser auth_change_password newrandompassword
+cpcmd -d  example.com -u secondaryuser auth_change_password newrandompassword
 ```
 
 ```bash
 # Automatically renew Let's Encrypt certificate for example.com as user admin
-cmd pman_schedule_api_cmd_admin example.com "" letsencrypt_renew
+cpcmd pman_schedule_api_cmd_admin example.com "" letsencrypt_renew
 # Alternatively:
-cmd -d example.com letsencrypt_renew
+cpcmd -d example.com letsencrypt_renew
 ```
 
 ### get_site

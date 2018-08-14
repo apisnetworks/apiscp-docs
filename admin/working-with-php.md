@@ -17,9 +17,9 @@ shunned rather than shoehorned into a production environment.
 A secondary fallback interpreter, usually 1 or 2 versions lower is available on port 9000. 
 
 * To enable fallback support for a given domain or site, use the apnscp command driver, cmd:
-  `cmd -d <domain> php_enable_fallback`
+  `cpcmd -d <domain> php_enable_fallback`
 * To disable fallback support, use disable_fallback:
-  `cmd -d <domain> php_disable_fallback`
+  `cpcmd -d <domain> php_disable_fallback`
 
 ## Configuring Fallbacks
 Additional fallbacks may be configured by duplicating `httpd-fallback-common.conf` in 

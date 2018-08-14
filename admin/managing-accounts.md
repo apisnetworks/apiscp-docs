@@ -76,18 +76,18 @@ SuspendDomain SITE-111
 As root, you may override a user account to login using `temp_password DOMAIN`. A temporary password will be issued for 3 minutes allow you to login to the panel. Once the timer expires, the account password will be reset to its previously configured value. This may be repeated multiple times without resetting the original password; however, the 3 minute timer will not be reset.
 
 # Command-line API Utility
-apnscp includes a command-line utility to interact with the panel called `cmd`. `cmd` accepts optional parameters -d and -u to impersonate a given domain and user. For example, to get the uptime as root: `cmd common_get_uptime`. 
+apnscp includes a command-line utility to interact with the panel called `cmd`. `cmd` accepts optional parameters -d and -u to impersonate a given domain and user. For example, to get the uptime as root: `cpcmd common_get_uptime`.
 
-To get the configured [admin email address](https://github.com/apisnetworks/apnscp-modules/blob/master/modules/common.php) for example.com, `cmd -d example.com common_get_admin_email`. 
+To get the configured [admin email address](https://github.com/apisnetworks/apnscp-modules/blob/master/modules/common.php) for example.com, `cpcmd -d example.com common_get_admin_email`.
 
-To list files as user "secondary" on example.com in /tmp, use `cmd -d debug.com -u secondary file_get_directory_contents /tmp`. 
+To list files as user "secondary" on example.com in /tmp, use `cpcmd -d debug.com -u secondary file_get_directory_contents /tmp`.
 
 Arrays are encapsulated using brackets ("[]") and hashes notated with a colon (":"). To grant SELECT , INSERT, and DELETE privileges on database "foo" for user "secondary" connecting over localhost on the account example.com, the following command would be used: 
 
-`cmd -d debug.com sql_set_mysql_privileges secondary localhost foo "[select:1,insert:1,delete:1]"`
+`cpcmd -d debug.com sql_set_mysql_privileges secondary localhost foo "[select:1,insert:1,delete:1]"`
 
 {% callout info %}
-cmd provides the same functionality as Beacon, but does not require an API key to use nor the SOAP API to communicate.
+cpcmd provides the same functionality as Beacon, but does not require an API key to use nor the SOAP API to communicate.
 {% endcallout %}
 
 ## Remote Command-line Utility
@@ -95,10 +95,10 @@ cmd provides the same functionality as Beacon, but does not require an API key t
 In addition to `cmd`, which is targeted for quick administrative tasks from terminal, apnscp provides an environment-agnostic client, [Beacon](https://github.com/apisnetworks/beacon) that interfaces the SOAP API through an HTTP transport.
 
 ```bash
-beacon --key=$(cmd auth_create_api_key "Beacon API key") exec common_get_kernel_version
+beacon --key=$(cpcmd auth_create_api_key "Beacon API key") exec common_get_kernel_version
 ```
 
-`--key` sets the client key and `cmd auth_create_api_key` creates an API key locally. Once a key is set, `--key` may be dropped such that,
+`--key` sets the client key and `cpcmd auth_create_api_key` creates an API key locally. Once a key is set, `--key` may be dropped such that,
 
 ```bash
 beacon exec common_get_listening_ip_addr
