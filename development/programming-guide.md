@@ -157,14 +157,14 @@ In addition to basic process execution, the following variations are implemented
 {: .table .table-striped}
 | Process Type | Purpose                                  | Caveats                                  | Usage                                    |
 | ------------ | ---------------------------------------- | ---------------------------------------- | ---------------------------------------- |
-| Process      | General process invocation               | Unsafe                                   | proc = new Util_Process(); proc->run("echo 'hello world!'"); |
-| Batch        | atd batch run                            | Dependent upon system load               | proc = new Util_Process_Batch(); proc->run('echo "hello %d"', time()); |
-| Chroot       | jail execution to directory              | Slow                                     | proc = new Util_Process_chroot("/home/virtual/site12/fst"); proc->run("hostname"); |
-| Fork         | Immediately fork + run program           | Unable to capture exit code/success. Requires absolute paths. | proc = new Util_Process_Fork(); proc->run("sleep 60 ; touch /tmp/abc"); echo "Off she goes!"; |
-| Safe         | Escape program arguments                 | Arguments must be named                  | proc = new Util_Process_Safe(); proc->run("echo %(hello)s %(time)d %(naughty)s", ['hello' => "hello world!", 'time' => time(), 'naughty' => ':(){ :\|: & };:']); |
-| Schedule     | Run command at a specified time          | Depends upon PHP's [strtotime](http://php.net/manual/en/function.strtotime.php) interpretation | proc = new Util_Process_Schedule("tomorrow"); proc->run("yawwwwn!"); |
-| Sudo         | Switch user. Automatically scope active session. | Slow. Must be run from backend.          | proc = new Util_Process_Sudo(); proc->setUser('nobody'); $proc->run("whoami"); |
-| Tee          | Copy output elsewhere                    | ???                                      | tee = new Util_Process_Tee(['tee' => ''/tmp/flapjacks'); proc = new Util_Process(); tee->setProcess(proc); proc->run("dmesg"); |
+| Process      | General process invocation               | Unsafe                                   | $proc = new Util_Process(); $proc->run("echo 'hello world!'"); |
+| Batch        | atd batch run                            | Dependent upon system load               | $proc = new Util_Process_Batch(); $proc->run('echo "hello %d"', time()); |
+| Chroot       | jail execution to directory              | Slow                                     | $proc = new Util_Process_chroot("/home/virtual/site12/fst"); $proc->run("hostname"); |
+| Fork         | Immediately fork + run program           | Unable to capture exit code/success. Requires absolute paths. | $proc = new Util_Process_Fork(); $proc->run("sleep 60 ; touch /tmp/abc"); echo "Off she goes!"; |
+| Safe         | Escape program arguments                 | Arguments must be named                  | $proc = new Util_Process_Safe(); $proc->run("echo %(hello)s %(time)d %(naughty)s", ['hello' => "hello world!", 'time' => time(), 'naughty' => ':(){ :\|: & };:']); |
+| Schedule     | Run command at a specified time          | Depends upon PHP's [strtotime](http://php.net/manual/en/function.strtotime.php) interpretation | $proc = new Util_Process_Schedule("tomorrow"); $proc->run("yawwwwn!"); |
+| Sudo         | Switch user. Automatically scope active session. | Slow. Must be run from backend.          | $proc = new Util_Process_Sudo(); $proc->setUser('nobody'); $proc->run("whoami"); |
+| Tee          | Copy output elsewhere                    | ???                                      | $tee = new Util_Process_Tee(['tee' => ''/tmp/flapjacks'); $proc = new Util_Process(); $tee->setProcess($proc); $proc->run("dmesg"); |
 
 ### Allowing exit values
 
