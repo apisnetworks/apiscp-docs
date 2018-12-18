@@ -13,7 +13,7 @@ apnscp is designed to be flexible and fast. Because apnscp cannot exist without 
 
 ## Invocation flow
 
-apnscp is partitioned into 2 components: an unprivileged frontend (typically runs as user "nobody") and a privileged backend that runs as root. Methods can traverse to the backend using a special method, `query(method, arg1, arg2, argn...)`, part of `Module_Skeleton`. 
+apnscp is partitioned into 2 components: an unprivileged frontend (typically runs as user "nobody") and a privileged backend that runs as root. Methods can traverse to the backend using a special method, `query(method, arg1, arg2, argn...)`, part of `Module_Skeleton`.
 
 `query()` bundles the parcel along with session identifier.
 
@@ -35,7 +35,7 @@ Backend calls are wrapped into an `apnscpObject ` transported over a `DataStream
 ```php?start_inline=1
 public function queryMulti() {
     /**
-     * Send multiple backend commands at once, order guaranteed, 
+     * Send multiple backend commands at once, order guaranteed,
      * and store results
      */
     $ds = \DataStream::get();
@@ -43,11 +43,11 @@ public function queryMulti() {
     list ($cur, $new, $old) = $ds->multi("common_get_services", $keys)->
         multi("common_get_new_services", $keys)->
         multi("common_get_old_services", $keys)->send();
-  
+
 }
 ```
 
-### "No Wait" flag 
+### "No Wait" flag
 
 `apnscpObject::NO_WAIT` will send a command to backend without waiting on a response. This can be useful in situations in which data must be sent to backend, but status is immaterial. Alternatively, *NO_WAIT* can be used to return immediately provided the backend confers status by another process. An example would be exiting a 1-click install immediately and sending the response via email.
 
@@ -58,7 +58,7 @@ class Someapp_Module extends Module_Skeleton {
           $ds = \DataStream::get();
           $ds->setOption(\apnscpObject::NO_WAIT);
           // NO_WAIT implies null return
-          return $ds->query('someapp_install');      
+          return $ds->query('someapp_install');
       }
       /**
        * Do something in the backend
@@ -73,7 +73,7 @@ class Someapp_Module extends Module_Skeleton {
 
 ### Warning on exception usage
 
-Exceptions convey stack. Stack conveyance adds overhead. Do not throw exceptions in Module code, especially in file_* operations. Do not throw exceptions in any critical part of code that will not immediately terminate flow. In fact, **exception usage is discouraged unless it explicitly results in termination** (in which case, `fatal()` works better) **or a deeply nested call needs to return immediately**. 
+Exceptions convey stack. Stack conveyance adds overhead. Do not throw exceptions in Module code, especially in file_* operations. Do not throw exceptions in any critical part of code that will not immediately terminate flow. In fact, **exception usage is discouraged unless it explicitly results in termination** (in which case, `fatal()` works better) **or a deeply nested call needs to return immediately**.
 
 ### Non-exception usage
 
@@ -120,14 +120,14 @@ Error_Reporter::add_message_callback(Error_Reporter::E_FATAL, new class implemen
         ?string $errcontext,
         array $bt
     ) {
-        dd($bt);	      
+        dd($bt);
     }
 });
 ```
 
 ### ER message buffer macros
 
-The following macros are short-hand to log messages during application execution. 
+The following macros are short-hand to log messages during application execution.
 
 {: .table .table-striped}
 | Macro             | Purpose                                                      | Return Value |
@@ -157,14 +157,14 @@ In addition to basic process execution, the following variations are implemented
 {: .table .table-striped}
 | Process Type | Purpose                                  | Caveats                                  | Usage                                    |
 | ------------ | ---------------------------------------- | ---------------------------------------- | ---------------------------------------- |
-| Process      | General process invocation               | Unsafe                                   | \$proc = new Util_Process(); \$proc->run("echo 'hello world!'"); |
-| Batch        | atd batch run                            | Dependent upon system load               | \$proc = new Util_Process_Batch(); \$proc->run('echo "hello %d"', time()); |
-| Chroot       | jail execution to directory              | Slow                                     | \$proc = new Util_Process_chroot("/home/virtual/site12/fst"); \$proc->run("hostname"); |
-| Fork         | Immediately fork + run program           | Unable to capture exit code/success. Requires absolute paths. | \$proc = new Util_Process_Fork(); \$proc->run("sleep 60 ; touch /tmp/abc"); echo "Off she goes!"; |
-| Safe         | Escape program arguments                 | Arguments must be named                  | \$proc = new Util_Process_Safe(); \$proc->run("echo %(hello)s %(time)d %(naughty)s", ['hello' => "hello world!", 'time' => time(), 'naughty' => ':(){ :\|: & };:']); |
-| Schedule     | Run command at a specified time          | Depends upon PHP's [strtotime](http://php.net/manual/en/function.strtotime.php) interpretation | \$proc = new Util_Process_Schedule("tomorrow"); \$proc->run("yawwwwn!"); |
-| Sudo         | Switch user. Automatically scope active session. | Slow. Must be run from backend.          | \$proc = new Util_Process_Sudo(); \$proc->setUser('nobody'); $proc->run("whoami"); |
-| Tee          | Copy output elsewhere                    | ???                                      | \$tee = new Util_Process_Tee(['tee' => ''/tmp/flapjacks'); \$proc = new Util_Process(); \$tee->setProcess(\$proc); \$proc->run("dmesg"); |
+| Process      | General process invocation               | Unsafe                                   | proc = new Util_Process(); proc->run("echo 'hello world!'"); |
+| Batch        | atd batch run                            | Dependent upon system load               | proc = new Util_Process_Batch(); proc->run('echo "hello %d"', time()); |
+| Chroot       | jail execution to directory              | Slow                                     | proc = new Util_Process_chroot("/home/virtual/site12/fst"); proc->run("hostname"); |
+| Fork         | Immediately fork + run program           | Unable to capture exit code/success. Requires absolute paths. | proc = new Util_Process_Fork(); proc->run("sleep 60 ; touch /tmp/abc"); echo "Off she goes!"; |
+| Safe         | Escape program arguments                 | Arguments must be named                  | proc = new Util_Process_Safe(); proc->run("echo %(hello)s %(time)d %(naughty)s", ['hello' => "hello world!", 'time' => time(), 'naughty' => ':(){ :\|: & };:']); |
+| Schedule     | Run command at a specified time          | Depends upon PHP's [strtotime](http://php.net/manual/en/function.strtotime.php) interpretation | proc = new Util_Process_Schedule("tomorrow"); proc->run("yawwwwn!"); |
+| Sudo         | Switch user. Automatically scope active session. | Slow. Must be run from backend.          | proc = new Util_Process_Sudo(); proc->setUser('nobody'); $proc->run("whoami"); |
+| Tee          | Copy output elsewhere                    | ???                                      | tee = new Util_Process_Tee(['tee' => ''/tmp/flapjacks'); proc = new Util_Process(); tee->setProcess(proc); proc->run("dmesg"); |
 
 ### Allowing exit values
 
@@ -180,7 +180,7 @@ $proc->setExit([1]);
 $proc->exec('false');
 ```
 
-Both are equivalent and accept a single exit value, "0" or "1". 
+Both are equivalent and accept a single exit value, "0" or "1".
 
 > Traditionally, 0 is used to signal success with Linux commands. A non-zero return can correspond to any one of numerous [error codes](http://man7.org/linux/man-pages/man3/errno.3.html). It is rare for a command that runs successfully to exit with a non-zero status.
 
@@ -203,8 +203,8 @@ Surrogates *should* extend the module for which they are a surrogate; however, c
 To ensure an override surrogate is called when explicitly calling a class, use `apnscpFunctionInterceptor::autoload_class_from_module()`. For example,
 
 ```php?start_inline=1
-/** 
- * reference either User_Module or User_Module_Surrogate depending 
+/**
+ * reference either User_Module or User_Module_Surrogate depending
  * upon implementation
  */
 $class = apnscpFunctionInterceptor::autoload_class_from_module("user");
@@ -244,9 +244,9 @@ The following surrogate extends the list of nameservers (**[dns]** => **hosting_
     }
 ```
 
-### Aliasing 
+### Aliasing
 
-A surrogate may exist without a named module in `lib/modules/`. In such cases, for example, `Example_Module` will automatically load `Example_Surrogate_Module` and alias the class to `Example_Module` if `lib/modules/example.php` does not exist. 
+A surrogate may exist without a named module in `lib/modules/`. In such cases, for example, `Example_Module` will automatically load `Example_Surrogate_Module` and alias the class to `Example_Module` if `lib/modules/example.php` does not exist.
 
 ## Permissions
 
@@ -254,7 +254,7 @@ Despite the misnomer, permissions are referred internally as "privileges". Note 
 
 > Traditionally a privilege is something you have. A permission is something you need.
 
-Modules comprise a variety methods and require specific access rights to protect access. A module can exist independent or surrogate an existing module. Module rights are designated via the `$exportedFunctions` class variable. 
+Modules comprise a variety methods and require specific access rights to protect access. A module can exist independent or surrogate an existing module. Module rights are designated via the `$exportedFunctions` class variable.
 
 {: .table .table-striped}
 | Privilege Type        | Role                                     |
@@ -281,17 +281,17 @@ class My_Module extends Module_Skeleton {
         'entry' => PRIVILEGE_SITE,
         'blocked' => PRIVILEGE_SITE|PRIVILEGE_SERVER_EXEC
     ];
-    
-    public function entry() {    
+
+    public function entry() {
         if (!$this->my_blocked()) {
             error("failed to enter blocked module from frontend");
         }
         if (!$this->blocked()) {
             error("this will never trigger");
         }
-        return $this->query('my_blocked'); 
-    }  
-    
+        return $this->query('my_blocked');
+    }
+
     public function blocked() {
         echo "Accessible from ", IS_CLI ? 'CLI' : 'UI';
         echo "Caller: ", \Error_Reporter::get_caller();
@@ -304,7 +304,7 @@ class My_Module extends Module_Skeleton {
 
 ## Application structure
 
-All apps are located under `apps/`. The "App ID" is the folder under which the application is located. A sample application named "test" is bundled with apnscp. A controller must be named after the App ID and end in ".php". The default view may be named after the App ID and end in ".tpl" or located as views/index.blade.php if using Blade. 
+All apps are located under `apps/`. The "App ID" is the folder under which the application is located. A sample application named "test" is bundled with apnscp. A controller must be named after the App ID and end in ".php". The default view may be named after the App ID and end in ".tpl" or located as views/index.blade.php if using Blade.
 
 ## Controller/Model
 
@@ -316,7 +316,7 @@ Controllers will be subject to API changes in the near future.
 
 ### Hooks
 
-apnscp controllers provide a few attachment points for hooks. 
+apnscp controllers provide a few attachment points for hooks.
 
 {: .table .table-striped}
 | Hook        | When                | Notes                                    |
@@ -390,7 +390,7 @@ Applications are privileged by role: admin, site, and user. Applications are con
 
 # Using Composer
 
-apnscp ships with support for the PHP dependency/package manager, [Composer](https://getcomposer.org). 
+apnscp ships with support for the PHP dependency/package manager, [Composer](https://getcomposer.org).
 
 {% callout danger %}
 Use config/custom/ as your location to install Composer packages. Do not install custom packages under the top-level directory. They will be erased on an apnscp update.
@@ -457,9 +457,9 @@ public function _edit_user(string $olduser, string $newuser, array $oldpwd) {
         // no change to passdb for user
         return;
     }
-    
+
     if ($olduser !== $newuser) {
-        // username change, do something   
+        // username change, do something
     }
     return true;
 }
@@ -472,7 +472,7 @@ public function _edit_user(string $olduser, string $newuser, array $oldpwd) {
 
 ## Verifying configuration
 
-`verify_conf` hook can reject changes by returning a false value and also alter values. `$ctx` is the module configuration passed by reference. By 
+`verify_conf` hook can reject changes by returning a false value and also alter values. `$ctx` is the module configuration passed by reference. By
 
 ```php?start_inline=1
 public function _verify_conf(\Opcenter\Service\ConfigurationContext $ctx): bool {
@@ -493,8 +493,8 @@ Likewise the module metadata may look like
 ```
 [myservice]
 enabled = 1
-tpasswd = 
-cpasswd = 
+tpasswd =
+cpasswd =
 ```
 
 ## Event-Driven callbacks
@@ -513,11 +513,15 @@ A mapped service connects metadata to apnscp through a Service Validator. A Serv
 
 ## Definition behaviors
 
-Certain services can be triggered automatically.
+Certain services can be triggered automatically when a service value is toggled or modified.
 
 ### MountableLayer
 
+`MountableLayer` may only be used on "enabled" validators. When enabled, a corresponding read-only filesystem hierarchy under `/home/virtual/FILESYSTEMTEMPLATE` is merged into the account's [filesystem](https://docs.apnscp.com/admin/managing-accounts/#account-layout).
+
 ### ServiceReconfiguration
+
+Implements `reconfigure()` and `rollback()` methods, which consists of the old and new values on edit. On failure `rollback()` is called. Rollback is not compulsory.
 
 ### AlwaysValidate
 
@@ -525,13 +529,159 @@ Whenever a site is created or edited, if a service definition implements `Always
 
 ### ServiceInstall
 
+`ServiceInstall` implements `populate()` and `depopulate()` methods. These are called when the supplied `$value` is true (true, 1, any string of 1 or more characters). It can be used to initially provision a site as well (as with *ipinfo*,*nbaddrs* and *ipinfo*,*ipaddrs* when *namebased* is toggled).
+
 ### AlwaysRun
 
 Service Definitions that implement `AlwaysRun` invert the meaning of `ServiceLayer`. `populate()` is now called whenever its configuration is edited or on account creation and `depopulate()` is called when an account is deleted or an edit fails. It can be mixed with `AlwaysValidate` to always run whenever a service value from the service is modified. An example is creating the maildir folder hierarchy. `version` is always checked (`AlwaysValidate` interface) and `Mail/Version` will always create mail folder layout regardless mail,enabled is set to 1 or 0.
 
-## Adding service definitions
+## Creating service definitions
 
-@TODO
+Service definitions map account metadata to application logic. First, let's look at a hypothetical service  example that enabled Java for an account.
+
+```ini
+[java]
+version=3.0 ; apnscp service version, tied to panel. Must be 3.0.
+enabled=1   ; 1 or 0, mounts the filesystem layer
+services=[] ; arbitrary list of permitted services implemented by module
+```
+
+This service lives in `resources/plans/java/java` where the first `java` is the plan name and second, service named java. A new plan named java can be created using Artisan.
+
+```bash
+cd /usr/local/apnscp
+./artisan opcenter:plan --new java
+```
+
+All files from `resources/plans/.skeleton` will be copied into `resources/plans/java`.
+
+A base plan can be assigned to a site using `-p` or `--plan`,
+
+```
+AddDomain -p java -c siteinfo,domain=newdomain.com -c siteinfo,admin_user=myadmin
+```
+
+Moreover, the default plan can be changed using Artisan.
+
+```
+./artisan opcenter:plan --default java
+```
+
+Now specifying `-p` or `--plan` is implied for site creation.
+
+# Validating service configuration
+
+Let's create a validator for *enabled* and *services* configuration values.
+
+### Opcenter\Validators\Java\Enabled.php
+
+```php
+<?php declare(strict_types=1);
+    /**
+     * Simple Java validator
+     */
+
+    namespace Opcenter\Service\Validators\Java;
+
+    use Opcenter\SiteConfiguration;
+    use Opcenter\Service\Contracts\MountableLayer;
+    use Opcenter\Service\Contracts\ServiceInstall;
+
+    class Enabled extends \Opcenter\Service\Validators\Common\Enabled implements MountableLayer, ServiceInstall
+    {
+        use \FilesystemPathTrait;
+
+        /**
+         * Validate service value
+         */
+        public function valid(&$value): bool
+        {
+            if ($value && !$this->ctx->getServiceValue('ssh','enabled')) {
+                return error('Java requires SSH to be enabled');
+            }
+
+            return parent::valid($value);
+        }
+
+        /**
+         * Mount filesystem, install users
+         *
+         * @param SiteConfiguration $svc
+         * @return bool
+         */
+        public function populate(SiteConfiguration $svc): bool
+        {
+			return true;
+        }
+
+        /**
+         * Unmount filesytem, remove configuration
+         *
+         * @param SiteConfiguration $svc
+         * @return bool
+         */
+        public function depopulate(SiteConfiguration $svc): bool
+        {
+	        return true;
+        }
+	}
+```
+
+`$this->ctx['var']` allows access to other configuration values within the scope of this service. `$this->ctx->getOldServiceValue($svc, $var)` returns the previous service value in `$svc` while `$this->ctx->getNewServiceValue($svc, $var)` gets the new service value if it is set.
+
+`MountableLayer` requires a separate directory in `FILESYSTEMTEMPLATE/` named after the service. This is a read-only layer that is shared across all accounts that have the service enabled. apnscp ships with `siteinfo` and `ssh` service layers which provide basic infrastructure.
+
+### Service mounts
+
+Service mounts are part of `MountableLayer`. Create a new mount named "java" in `/home/virtual/FILESYSTEMTEMPLATE`. You can optionally install RPMs using Yum Synchronizer, which tracks and replicates RPM upgrades automatically.
+
+`-d` is a special flag that will resolve dependencies when replicating a package and ensure that those corresponding packages appear in at least 1 service definition. When dependencies or co-dependencies will be noted as an INFO level during setup. When `-d` is omitted only the specified package will be installed.
+
+## Opcenter\Validators\Java\Services.php
+
+```php
+<?php declare(strict_types=1);
+
+    namespace Opcenter\Service\Validators\Java;
+
+    use Opcenter\Service\ServiceValidator;
+
+    class Services extends ServiceValidator
+    {
+        const DESCRIPTION = 'Enable Java-based services';
+        const VALUE_RANGE = ['tomcat','jboss'];
+
+        public function valid(&$value): bool
+        {
+            if ($value && !$this->ctx['enabled']) {
+                warn("Disabling services - java disabled");
+                $value = [];
+            } else if (!$value) {
+                // ensure type is array
+                $value = [];
+                return true;
+            }
+            if (!$value) {
+                $value = [];
+            }
+
+            // prune duplicate values
+            $value = array_unique($value);
+
+            foreach ($value as $v) {
+                if (!\in_array($v, self::VALUE_RANGE, true)) {
+                    return error("Unknown Java service `%s'", $v);
+                }
+            }
+
+            return true;
+        }
+    }
+```
+
+> By convention, variables that triggered an error are enclosed within `' or prefixed with ":" for multi-line responses, such as stderr. While not mandatory, it helps call out the value that yielded the error and when the variable is omitted rather verbosely.
+
+To keep things simple for now, the service validator checks if the services configured are tomcat or jboss. We'll tie this logic back into the "enabled" service validator. For now to enable this service is simple:
 
 # Contextables
 
