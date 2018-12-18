@@ -192,7 +192,7 @@ A sample class implementation is found under `modules/example.php`.
 
 ## Extending modules with surrogates
 
-A module may be extended with a "surrogate". Surrogates are delegated modules loaded in lieu of modules that ship with apnscp. Surrogates are located under modules/surrogates/*<module name>*.php. Unless the class name is explicitly called, e.g. `User_Module::MIN_UID`, a surrogate will be loaded first, e.g. $this->user_get_home() will check for modules/surrogates/user.php and use that instance before using modules/user.php. A surrogate or native class can be determined at runtime using `apnscpFunctionInterceptor::autoload_class_from_module()`, e.g. `apnscpFunctionInterceptor::autoload_class_from_module('user') . '::MIN_UID'`. Depending upon the presence of surrogates/user.php (override of User_Module), that or modules/user.php (native apnscp module) will be loaded.
+A module may be extended with a "surrogate". Surrogates are delegated modules loaded in lieu of modules that ship with apnscp. Surrogates ar e located under modules/surrogates/*<module name>*.php. Unless the class name is explicitly called, e.g. `User_Module::MIN_UID`, a surrogate will be loaded first, e.g. $this->user_get_home() will check for modules/surrogates/user.php and use that instance before using modules/user.php. A surrogate or native class can be determined at runtime using `apnscpFunctionInterceptor::autoload_class_from_module()`, e.g. `apnscpFunctionInterceptor::autoload_class_from_module('user') . '::MIN_UID'`. Depending upon the presence of surrogates/user.php (override of User_Module), that or modules/user.php (native apnscp module) will be loaded.
 
 {% callout info %}
 "apnscpFunctionInterceptor" can also be referenced in code as "a23r" for brevity.
@@ -247,6 +247,34 @@ The following surrogate extends the list of nameservers (**[dns]** => **hosting_
 ### Aliasing
 
 A surrogate may exist without a named module in `lib/modules/`. In such cases, for example, `Example_Module` will automatically load `Example_Surrogate_Module` and alias the class to `Example_Module` if `lib/modules/example.php` does not exist.
+
+## Proxied modules ("Providers")
+
+A module is proxied if it loads another module in place of itself determined at call-time. For example, consider an account that has a different DNS provider. This information isn't known until the module is initialized and account context data available. These modules implement `Module\Skeleton\Contracts\Proxied`. Once context is populated and `__construct` called, `_proxy()` is invoked to load the appropriate module definition.
+
+```php
+<?php declare(strict_type=1);
+
+	class Sample_Module extends Module_Skeleton implements \Module\Skeleton\Contracts\Proxied
+    {
+        public function _proxy() {
+            if ('builtin' === ($provider = $this->getConfig('sample', 'provider'))) {
+                return $this;
+            }
+            return \Module\Provider::get('sample', $provider, $this->getAuthContext());
+        }
+    }
+```
+
+Where the module provider is referenced by `Opcenter\Sample\Providers\<$provider>\Module` adhering to [studly case](https://stackoverflow.com/questions/32731717/what-is-the-difference-between-studlycaps-and-camelcase) per PSR. The Module class must implement `Module\Provider\Contracts\ProviderInterface`. The provider can be configured for the site by creating a [service definition](#service-definitions) called sample with an service name `provider`.
+
+```bash
+EditDomain -c sample,provider=builtin domain.com
+# or...
+EditDomain -c sample,provider=custom domain.com
+```
+
+"builtin" by convention should refer to the native module first called, i.e. `_proxy()` should return itself.
 
 ## Permissions
 
@@ -342,7 +370,7 @@ $blade->compiler()->directive('datetime', function ($expression) {
 });
 ```
 
-#### Sharing Variables
+#### Sharing variables
 
 Model variables can be exported to a Blade view in the "_render" hook. This feature is unavailable when using the built-in lean .tpl format.
 
@@ -497,15 +525,35 @@ tpasswd =
 cpasswd =
 ```
 
-## Event-Driven callbacks
+## Event-driven callbacks
 
-apnscp features a lightweight global serial callback facility called Cardinal.
+apnscp features a lightweight global serial callback facility called Cardinal. This is used internally and not [context-safe](#contextables).
 
 # Service Definitions
 
 Every account consists of metadata called "Service Definitions" that describe what an account is, what features it has, and how it should be handled through automation. Examples of metadata include the administrative login (`siteinfo`,`admin_user`), database access (`mysql`,`enabled` and/or `pgsql`,`enabled`), billing identifier (`billing`,`invoice`), addon domains (`aliases`,`aliases`), or even extended filesystem layers conferred through service enablement, such as (`ssh`,`enabled`) that merges command-line access into an account.
 
 All natively derivable Service Definitions exist as templates in [plans/.skeleton](https://bitbucket.org/apisnetworks/apnscp/src/master/resources/templates/plans/.skeleton/?at=master). Any definition beyond that may be extended, just don't override these definitions and read along!
+
+A new plan can be created using Artisan.
+
+```bash
+./artisan opcenter:plan --new newplan
+```
+
+All files from `resources/plans/.skeleton` will be copied into `resources/plans/newplan`. Do not edit .skeleton. 10,000v to the nipples shall ensue for violators. A base plan can be assigned to a site using -p or --plan,
+
+```bash
+AddDomain -p newplan -c siteinfo,domain=newdomain.com -c siteinfo,admin_user=myadmin
+```
+
+Moreover, the default plan can be changed using Artisan.
+
+```bash
+./artisan opcenter:plan --default newplan
+```
+
+Now specifying `-p` or `--plan` is implied for site creation.
 
 ## Mapped services
 
@@ -516,27 +564,21 @@ A mapped service connects metadata to apnscp through a Service Validator. A Serv
 Certain services can be triggered automatically when a service value is toggled or modified.
 
 ### MountableLayer
-
 `MountableLayer` may only be used on "enabled" validators. When enabled, a corresponding read-only filesystem hierarchy under `/home/virtual/FILESYSTEMTEMPLATE` is merged into the account's [filesystem](https://docs.apnscp.com/admin/managing-accounts/#account-layout).
 
-### ServiceReconfiguration
+### ServiceInstall
+`ServiceInstall` contains two methods `populate()` and `depopulate()` called when its value is 1 and 0 respectively. This provides granular control over populating services whereas `MountableLayer` merges the corresponding filesystem slice.
 
+### ServiceReconfiguration
 Implements `reconfigure()` and `rollback()` methods, which consists of the old and new values on edit. On failure `rollback()` is called. Rollback is not compulsory.
 
 ### AlwaysValidate
-
 Whenever a site is created or edited, if a service definition implements `AlwaysValidate`, then the `valid($value)` will be invoked to ensure changes conform to the recommended changes. Returning `FALSE` will halt further execution and perform a rollback through `depopulate()` of any previously registered and confirmed services.
 
-### ServiceInstall
-
-`ServiceInstall` implements `populate()` and `depopulate()` methods. These are called when the supplied `$value` is true (true, 1, any string of 1 or more characters). It can be used to initially provision a site as well (as with *ipinfo*,*nbaddrs* and *ipinfo*,*ipaddrs* when *namebased* is toggled).
-
 ### AlwaysRun
-
 Service Definitions that implement `AlwaysRun` invert the meaning of `ServiceLayer`. `populate()` is now called whenever its configuration is edited or on account creation and `depopulate()` is called when an account is deleted or an edit fails. It can be mixed with `AlwaysValidate` to always run whenever a service value from the service is modified. An example is creating the maildir folder hierarchy. `version` is always checked (`AlwaysValidate` interface) and `Mail/Version` will always create mail folder layout regardless mail,enabled is set to 1 or 0.
 
 ## Creating service definitions
-
 Service definitions map account metadata to application logic. First, let's look at a hypothetical service  example that enabled Java for an account.
 
 ```ini
@@ -846,4 +888,28 @@ apnscp supports binding authentication contexts to a job, for example to run an 
 
 # Migrations
 
-apnscp supports Laravel Migrations to keep database schema current.
+apnscp supports Laravel Migrations to keep database schema current. Migrations come in two forms **database** and **platform**. Database migrations use Laravel's [schema builder](https://laravel.com/docs/5.7/migrations). Platform migrations integrate [Bootstrapper](https://github.com/apisnetworks/apnscp-playbooks). All pending migrations may be run with `artisan migrate`
+
+Updating the control panel through `upcp` automatically deploys these migrations when present. Enabling automatic panel updates (`cpmd config_set apnscp.nightly-updates 1` ) also runs migrations every night during panel updates.
+
+## Database migration
+
+Create a new database migration using Artisan
+
+```bash
+cd /usr/local/apnscp
+./artisan make:migration migration_name
+```
+
+Migration will be located in `resources/database/migrations`.
+
+## Platform migration
+
+A platform migration may be created by passing `--platform` to make:migration,
+
+```bash
+cd /usr/local/apnscp
+./artisan make:migration --platform migration_name
+```
+
+The play will be located in `resources/playbooks/migrations`.
