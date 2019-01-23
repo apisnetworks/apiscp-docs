@@ -3,7 +3,7 @@ layout: docs
 title: Errata
 group: misc
 ---
-{::options toc_levels="2..3" /}
+{::options toc_levels="1..2" /}
 {:toc}
 * ToC 
 
@@ -253,6 +253,41 @@ Mailbot, which is responsible for handling auto-replies in the vacation module o
 
 No workaround exists. It is recommended for email that requires an auto-response if a user is away to not include an "Auto-Submitted" DSN header.
 
+## Tracing delivery behavior
+### Background
+Mail may appear to be stuck in Postfix's queue due to an underlying delivery problem. [strace](http://man7.org/linux/man-pages/man1/strace.1.html) or any low-level trace utility can be used to peek into delivery of a message.
+
+### Solution
+Use postcat in conjunction with maildrop to simulate delivery to an intended recipient. For example, list the email queue:
+
+```bash
+postqueue -p
+```
+
+```
+-Queue ID-  --Size-- ----Arrival Time---- -Sender/Recipient-------
+E41B4EC52E      529 Fri Jan  4 13:35:11  srs0=ustn=pm=testing.apisnetworks.com=root@apisnetworks.com
+(temporary failure. Command output: /usr/bin/maildrop: Unable to open mailbox.)
+                                         apisnetworks@apisnetworks.test
+
+-- 0 Kbytes in 1 Request.
+```
+
+Then use postcat to reconstruct its envelope:
+```bash
+postcat -hbq E41B4EC52E
+```
+
+And pipe to maildrop, the LDA for apnscp:
+```bash
+postcat -hbq E41B4EC52E | maildrop -d apisnetworks@apisnetworks.test
+```
+Where apisnetworks@apisnetworks.test maps to a user account named apisnetworks on domain apisnetworks.test.
+
+Fully composed such a command may look similar to:
+```bash
+postcat -hbq E41B4EC52E | strace -s 1024 -f -- maildrop -d apisnetworks@apisnetworks.test
+```
 
 
 # Laravel
