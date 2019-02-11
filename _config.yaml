@@ -34,7 +34,7 @@ repo:             https://gitlab.com/apisnetworks/apnscp
 slack:            none
 reddit:           /r/apnscp
 bootstrap_url: https://raw.githubusercontent.com/apisnetworks/apnscp-bootstrapper/master/bootstrap.sh
-bootstrap_sha2: 8f62c869e09043ddad4cdfb9ac0f2a9d9d073b3c2d59a9a9fb2ac1378ca797d6
+bootstrap_sha2: 4d20dc8e8f0831e6210eb9b783b09afd438a4e2fd62885ece1e2d08870682cef
 tether_url: https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js
 forums:           https://forums.apnscp.com
 license:          https://my.apnscp.com
