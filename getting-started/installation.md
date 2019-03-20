@@ -60,7 +60,7 @@ The bootstrapper will install itself, as well as request a SSL certificate from 
 **To change (or set) the admin email address**, issue  `sudo /usr/local/apnscp/bin/cmd admin_set_email <newaddress>` after apnscp is installed. ([API docs](http://api.apnscp.com/class-Admin_Module.html#_set_email))
 
 {% callout info %}
-apnscp will initially request a certificate from Let's Encrypt [staging environment](https://letsencrypt.org/docs/staging-environment/). If your forward-confirmed reverse DNS is correct, copy `config/config.ini` to `config/custom/` and change **[letsencrypt]** => **debug** to false, then restart apnscpd, `systemctl restart apnscpd `. apnscp will request a new certificate from Let's Encrypt's production server. Remember that Let's Encrypt limits requests to [20 requests/week](https://letsencrypt.org/docs/rate-limits/), so make sure your DNS is properly setup before disabling debug mode.
+apnscp will initially request a certificate from Let's Encrypt [staging environment](https://letsencrypt.org/docs/staging-environment/). If your forward-confirmed reverse DNS is correct, copy `config/config.ini` to `config/custom/` and change **[letsencrypt]** => **debug** to false, then restart apnscp, `systemctl restart apnscp`. apnscp will request a new certificate from Let's Encrypt's production server. Remember that Let's Encrypt limits requests to [20 requests/week](https://letsencrypt.org/docs/rate-limits/), so make sure your DNS is properly setup before disabling debug mode.
 {% endcallout %}
 
 {% callout warning %}
