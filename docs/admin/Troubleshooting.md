@@ -6,7 +6,7 @@ On a fresh install, a user reported problems accessing /phpMyAdmin within the pa
 
 ### Cause
 
- Multiple hostnames were specified for the public IP address in /etc/hosts. 
+ Multiple hostnames were specified for the public IP address in /etc/hosts.
 
 ```
 [server /]$ cat /etc/hosts
@@ -40,8 +40,6 @@ RewriteBase /
 RewriteCond %{VPATH}/site/path/index.html -f
 RewriteRule ^ /site/path/index.html
 ```
-
- 
 
 ## Quota ext4 vs xfs
 

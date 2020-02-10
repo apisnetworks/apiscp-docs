@@ -10,7 +10,7 @@ PHP-FPM offers several advantages over an ISAPI integration:
   PHP-FPM pools run under the group ID of each account, which affords simple [cgroup](https://en.wikipedia.org/wiki/Cgroups ) treatment to each process. ISAPI runs in a threaded environment that is incompatible with cgroup v1 (cgroup v2 supports threaded accounting at the cost of immense complexity). Every request that comes through may be governed by CPU, memory, block IO, and network IO limits. Likewise every request may be accounted towards an account's cumulative usage.
 
 - **Jailing**
-  Pools run within the synthetic root of each account ensuring isolation between accounts. ISAPI uses a variety of mechanisms to impede arbitrary access ([SECURITY.md](../SECURITY.md)) that may provide a *loose deterrent*. PHP-FPM requests are jailed using systemd [namespaces](https://www.freedesktop.org/software/systemd/man/systemd.exec.html#RootDirectory=), a powerful OS feature that is part of userland management (PID 1). 
+  Pools run within the synthetic root of each account ensuring isolation between accounts. ISAPI uses a variety of mechanisms to impede arbitrary access ([SECURITY.md](../SECURITY.md)) that may provide a *loose deterrent*. PHP-FPM requests are jailed using systemd [namespaces](https://www.freedesktop.org/software/systemd/man/systemd.exec.html#RootDirectory=), a powerful OS feature that is part of userland management (PID 1).
 
   To limit snooping or the potential of socket remaps, sockets are stored outside the synthetic root in a general runtime directory that inhibits access beyond directory access using conventional discretionary access controls.
 
@@ -24,7 +24,6 @@ PHP-FPM offers several advantages over an ISAPI integration:
 
 - **RewriteBase fixup**
   `SCRIPT_FILENAME` is rewritten before being passed to proxy. Because of this, PHP scripts on a subdomain or addon domain no longer require `RewriteBase /` to be set greatly reducing confusion on migrating to an apnscp platform.
-
 
 - **Multi-tenancy** *PENDING*
   Users may spawn multiple PHP-FPM pools each with different users. For example, it would be possible to create a PHP pool for production and staging in which the production environment adheres to the principles of [Fortification](Fortification.md) and the staging environment is owned entirely by the developer account; both operate under different UIDs.
@@ -44,10 +43,11 @@ PHP-FPM offers several advantages over an ISAPI integration:
   To help ameliorate memory constraints in high density environments, PHP-FPM uses the [ondemand](https://www.php.net/manual/en/install.fpm.configuration.php#pm) process manager to automatically sleep idle processes after a set time (1 minute). This can be overrode by changing the PHP-FPM [configuration template](https://hq.apiscp.com/service-overrides/). ondemand exhibits a very low latency when used in conjunction with OPCache (enabled by default) to spin up additional workers.
 
 ## Architecture
+
 All PHP-FPM pools are managed through systemd using socket activation. When a request is received by Apache, it writes to a Unix domain socket, outside the account chroot, managed by systemd. systemd spawns the worker pool to handle subsequent requests, which solves the [Thundering herd problem](https://en.wikipedia.org/wiki/Thundering_herd_problem) to a certain extent. Each request is jailed to the account through systemd. cgroup assignment is done prior to pool initialization, which extends to all child processes spawned from within the pool ensuring fair resource treatment. Configuration may be overriden on a per-pool level with pool configuration at the discretion of (and of consequence to) the account owner.
 
-
 # Configuring builds
+
 The default PHP interpreter may be changed using the `apache.php-version` [Scope](Scopes.md). Additional configuration flags may be specified by setting `phpXX_build_flags` in Bootstrapper where XX is \<MAJOR>\<MINOR> (`cp.bootstrapper`is a Scope to facilitate interaction). Alternatively `php_build_flags` may be set, which applies to all PHP builds.
 
 ```bash
@@ -79,13 +79,13 @@ And for the overachieving variety:
 
 ```bash
 yum install -y jq
-cpcmd -o json admin:collect null '[apache.jail:0]' | jq -r 'keys[]' | while read -r SITE ; do   
+cpcmd -o json admin:collect null '[apache.jail:0]' | jq -r 'keys[]' | while read -r SITE ; do
   echo "Editing $(get_config "$SITE" siteinfo domain)"
   EditDomain -c apache,jail=1 "$SITE"
 done
 ```
 
-There will be an elision delay configured in *[httpd]* => *reload_delay* designed to allow multiple HTTP reload calls to merge into a single call to prevent a denial of service attack. By default, this is 2 minutes. 
+There will be an elision delay configured in *[httpd]* => *reload_delay* designed to allow multiple HTTP reload calls to merge into a single call to prevent a denial of service attack. By default, this is 2 minutes.
 
 # Grouped management
 
@@ -117,7 +117,7 @@ systemctl status php-fpm-site1-domain.com
 
 ```
 
-apnscp manages pool groups, restarting as needed after the elision window expires. To restart or suspend the pool for a site, use the `php-fpm-siteXX` service wrapper. 
+apnscp manages pool groups, restarting as needed after the elision window expires. To restart or suspend the pool for a site, use the `php-fpm-siteXX` service wrapper.
 
 ```bash
 # Suspend all pools allocated to site1
@@ -141,6 +141,7 @@ SuspendDomain site1
 ```
 
 ## Bulk update
+
 `php-fpm` is a composite unit to manage all PHP-FPM instances on a server. For example, it may be necessary to propagate configuration changes from a lower filesystem layer.
 
 ```bash
@@ -151,6 +152,7 @@ systemctl start php-fpm
 ```
 
 ## Overriding service definitions
+
 Overriding configuration follows systemd [convention](https://wiki.archlinux.org/index.php/systemd#Editing_provided_units). Create a directory in /etc/systemd/system/ named after the service. Any .conf within the directory will be merged into the service definition thus making it possible, for example, to change the PHP-FPM worker or set environment variables prior to pool startup. Further, overrides are non-destructive and guaranteed to not be overwritten.
 
 ```bash
@@ -167,6 +169,7 @@ systemctl restart php-fpm-site1-example.com
 ```
 
 # Single-user behavior
+
 apnscp supports a single-user behavior which disables the benefits of [Fortification](Fortification.md). This behavior is consistent with cPanel and competing panels that do not isolate web users. Set `apache,webuser` to match the account admin:
 
 ```bash
@@ -175,13 +178,13 @@ EditDomain -c apache,webuser=myadmin -D mydomain.com
 EditDomain -c apache,webuser="$(get_config mydomain.com siteinfo admin_user)" -D mydomain.com
 ```
 
-apnscp will change ownership on all files matching the previous user ("apache") to the new user "myadmin". Ownership change from a system user to an account user is an irreversible process. Now, files created by the web server will be under the account username. *Should and weakness exist* in any web app on the account that allows an attacker to run arbitrary code, then the attacker now has unrestricted access to all users on the account. 
+apnscp will change ownership on all files matching the previous user ("apache") to the new user "myadmin". Ownership change from a system user to an account user is an irreversible process. Now, files created by the web server will be under the account username. *Should and weakness exist* in any web app on the account that allows an attacker to run arbitrary code, then the attacker now has unrestricted access to all users on the account.
 
 This is an extremely dangerous configuration that should be avoided at all costs.
 
 # Resource enforcement
 
-All `cgroup` service directives apply to PHP-FPM workers, including blkio IO throttling. To set a 2 MB/s write throttle on all PHP-FPM tasks use `blkio,writebw` or throttle IOPS use the "iops" equivalent, `blkio,writeiops`: 
+All `cgroup` service directives apply to PHP-FPM workers, including blkio IO throttling. To set a 2 MB/s write throttle on all PHP-FPM tasks use `blkio,writebw` or throttle IOPS use the "iops" equivalent, `blkio,writeiops`:
 
 ```bash
 EditDomain -c cgroup,writebw=2 domain.com
@@ -206,6 +209,7 @@ EditDomain -c cgroup,ioweight=50 -c cgroup,cpuweight=200 domain.com
 ```
 
 ## PHP-FPM timeout
+
 The web server expects a request to complete within **60 seconds**. Any request outside this window will return a *504 Gateway Timeout* response. Alter the system-wide configuration in `/etc/httpd/conf/httpd-custom.conf` by setting `ProxyTimeout 180` to raise the limit to 3 minutes. Proxy timeout may be adjusted on a per-site basis by creating a file named `custom` in `/etc/httpd/conf/siteXX` with the same directive. When overriding per-site, be sure to rebuild the configuration:
 
 ```bash
@@ -218,7 +222,9 @@ systemctl reload httpd
 Granular per-proxy configuration is covered in "[Apache proxy configuration](#apache-proxy-configuration)" below.
 
 ## Converting ISAPI to PHP-FPM
+
 ### .htaccess => .user.ini
+
 Directives are assignment-based rather than directive similar to php.ini. Paths are jailed and respect the synthetic root layout. For example,
 
 **.htaccess**
@@ -232,6 +238,7 @@ PHP-FPM caches per-directory .user.ini files. By default the duration is 300 sec
 Then restart the affected pool, `systemctl restart php-fpm-siteXX` where siteXX is the site marker or do an en masse restart with `systemctl restart php-fpm`.
 
 ### Masquerading other file types as PHP
+
 Don't do this. Use a dispatcher via .htaccess to funnel all requests to emulate desired behavior. Should prevailing wisdom fail, add the following to the .htaccess to map .html and .htm to PHP-FPM:
 
 ```
@@ -250,9 +257,10 @@ security.limit_extensions=.php .phar .html .htm
 Then restart the affected pool, `systemctl restart php-fpm-siteXX` where siteXX is the site marker or do an en masse restart with `systemctl restart php-fpm`.
 
 # Apache proxy configuration
+
 Apache uses an Event MPM, which consists of 1 or more processes (called "servers") consisting of 1 or more threads. By default, each server consists of 20 threads. *THREADS* x *SERVERS* gives the **maximum number of concurrent connections**. See [Apache.md](Apache.md) for more information on configuration.
 
-Each process does not communicate with one another. These processes operate independently. Configurations specified below therefore **apply per server**. For example, setting a "max" number of connections to a PHP-FPM worker as *2* does not restrict at most 2 concurrent connections to a site, but at most *2* concurrent connections in that server process to the PHP-FPM backend. The true limit is *MAX* X *SERVERS*. Keepalives may result in successive requests binding to the former server instead of distributing requests evenly between all servers. 
+Each process does not communicate with one another. These processes operate independently. Configurations specified below therefore **apply per server**. For example, setting a "max" number of connections to a PHP-FPM worker as *2* does not restrict at most 2 concurrent connections to a site, but at most *2* concurrent connections in that server process to the PHP-FPM backend. The true limit is *MAX* X *SERVERS*. Keepalives may result in successive requests binding to the former server instead of distributing requests evenly between all servers.
 
 PHP-FPM utilizes "ondemand" as its process manager to spawn PHP workers on demand and likewise sleep after extended idle periods (*default:* 60 seconds). ondemand imposes a minimum backlog value of 511 connections, which means in the event a PHP-FPM worker cannot furnish a request immediately, up to 511 connections may linger in Apache pending acknowledgement by PHP-FPM before further requests are rejected. If the pending connection balance exceeds `ServerLimit` in Apache, then no further requests may be made to the server, including to static resources.
 
@@ -280,10 +288,12 @@ EditDomain --all
 ```
 
 # Multiversion PHP
+
 Multiversion comes in two flavors, native (also called "multiPHP") and Remi, named after the eponymous author that maintains the Remi build system.
 
 ## Native builds
-ApisCP ships with 1 PHP release for simplicity, but can support multiple versions as necessary. Additional versions may be built using Bootstrapper. A Scope is provided, *apache.php-multi*, that facilitates building new versions. 
+
+ApisCP ships with 1 PHP release for simplicity, but can support multiple versions as necessary. Additional versions may be built using Bootstrapper. A Scope is provided, *apache.php-multi*, that facilitates building new versions.
 
 ```bash
 # Add additional compile-time flags to 7.4 and build it
@@ -298,7 +308,7 @@ All native multiPHP builds are located in /.socket/php/multiphp/native. OPCache 
 
 A site may be reconfigured to utilize the multiPHP release by manually adding an override. There is no direct means to switch versions in the panel yet.
 
-In /etc/systemd/system, create a directory named after the pool and suffixed with ".d". Pools are named php-fpm-siteXX-NAME. For example, to override pool named apis.com on site1, create a directory named *php-fpm-site1-apis.com.d/* and a file named "override.conf". 
+In /etc/systemd/system, create a directory named after the pool and suffixed with ".d". Pools are named php-fpm-siteXX-NAME. For example, to override pool named apis.com on site1, create a directory named *php-fpm-site1-apis.com.d/* and a file named "override.conf".
 
 `systemctl edit php-fpm-site1-apis.com` is equivalent to the above operation.
 
@@ -318,12 +328,12 @@ systemctl restart php-fpm-site1-apis.com
 
 Configuration may be overrode by account owners ("Site Administrators") by placing  accompanying configuration in /etc/phpXX.d.
 
-
 ### Installing modules
 
 Modules may be installed as one would normally expect with regular PHP-FPM. The only difference is the presence of `multiphp_build=true` and `php_version` must be explicitly set to at least MAJOR.MINOR.
 
 To install imagick off PECL for PHP 7.4,,
+
 ```bash
 cd /usr/local/apnscp/resources/playbooks
 ansible-playbook bootstrap.yml  --tags=php/install-pecl-module --extra-vars=pecl_extensions=igbinary --extra-vars=php_version=7.4 --extra-vars=multiphp_build=true
@@ -345,7 +355,7 @@ yum install -y php72-php-ioncube-loader php72-php-pecl-mysql php72-php-opcache
 
 A site may be reconfigured to utilize the Remi PHP release by manually adding an override. There is no direct means to switch versions in the panel yet.
 
-In /etc/systemd/system, create a directory named after the pool and suffixed with ".d". Pools are named php-fpm-siteXX-NAME. For example, to override pool named apis.com on site1, create a directory named *php-fpm-site1-apis.com.d/* and a file named "override.conf". 
+In /etc/systemd/system, create a directory named after the pool and suffixed with ".d". Pools are named php-fpm-siteXX-NAME. For example, to override pool named apis.com on site1, create a directory named *php-fpm-site1-apis.com.d/* and a file named "override.conf".
 
 `systemctl edit php-fpm-site1-apis.com` is equivalent to the above operation.
 
@@ -358,11 +368,13 @@ ExecStart=/usr/bin/scl enable php74 -- php-fpm --daemonize --fpm-config=/etc/php
 ```
 
 Then restart the service,
+
 ```bash
 systemctl restart php-fpm-site1-apis.com
 ```
 
 This is very similar to default configuration with a few key differences:
+
 1. SCL is used to shim a new path, "php-fpm" is picked up in this shimmed path. /usr/sbin/php-fpm would be incorrect.
 2. An empty ExecStart= clears any previous ExecStart directives. Without this, ExecStart would be appended to the inherited ExecStart= command that starts PHP-FPM.
 3. --nodaemonize changes to --daemonize to ensure systemd picks up the scl to php-fpm process image change.
@@ -372,6 +384,7 @@ PHP runtimes are located in `php<MAJOR><MINOR>-runtime` packages. `php<MAJOR><MI
 SCL collection configuration is defined in /etc/scl/conf. Remi PHP versions are named php\<MAJOR>\<MINOR>.
 
 ### Adding non-PHP Remi packages
+
 Additional packages may be installed first from Remi, then replicated into the FST. Yum Synchronizer ("Synchronizer") located in `bin/scripts/yum-post.php` provides a set of tools to manage RPM replication into FST.
 
 ```bash
@@ -389,6 +402,7 @@ cd /usr/local/apnscp
 `-d` calculates dependencies necessary to satisfy operation and installs those packages into the named service layer. When mixing packages between different services that may be satisfied by a union of service layers, it is permissible to omit "-d". Installing packages without installing the dependencies, however, may cause PHP or any binary to fail to load.
 
 ### Solving dependencies
+
 Install the ImageMagick extension from PECL, then attempt to load PHP-FPM from the account, it will fail:
 
 ```bash
@@ -400,6 +414,7 @@ su apis.com
 ```
 
 Exit out of the shell, solve the dependencies, then try again:
+
 ```bash
 # Exit current su apis.com session
 exit
@@ -409,12 +424,14 @@ rpm -qf /usr/lib64/libharfbuzz.so.0
 su apis.com
 # Try loading PHP-FPM again... rinse and repeat until it works
 ```
+
 Do not attempt to install a module directly; it is already relocated. Once satisfied, you may run into permission issues if PHP-FPM runs as an unprivileged system user ("apache") rather than the account owner. `su -s /bin/bash -G ADMINUSER apache` would setup a similar environment to systemd prior to launch.
 
 ## Remi vs source
+
 Remi is an easier system to manage when juggling a variety of PHP versions, but it comes at some cost to performance and potential dependency management.
 
-1. Modular builds are slower than monolithic both in startup time and run time. 
+1. Modular builds are slower than monolithic both in startup time and run time.
 2. Generalized builds are unable to target system-specific optimizations. WordPress throughput for example drops 9.38% (16.13 req/sec vs 17.80 req/sec) when using Remi builds.
 3. Remi is not officially supported by Apis Networks for support. PHP bundled with ApisCP is built with features to address nearly all hosting inquiries over the last 15 years.
 4. Remi builds do not provide configuration adjustments to Site Administrators.

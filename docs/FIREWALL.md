@@ -28,7 +28,7 @@ These entries are permanent.
 
 ## Blacklisting
 
-Likewise a blacklist exists to block addresses that are not blocked by Rampart's adaptive firewall. 
+Likewise a blacklist exists to block addresses that are not blocked by Rampart's adaptive firewall.
 
 ```bash
 cpcmd rampart:blacklist 192.168.0.10
@@ -59,4 +59,3 @@ ipset list whitelist
 # Remove 192.168.0.4 from whitelist
 cpcmd rampart:whitelist 192.168.0.4 remove
 ```
-

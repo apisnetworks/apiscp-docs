@@ -45,6 +45,7 @@ cpcmd admin_update_webapps '[site:mydomain.com]'
 Any command in the panel has a corresponding [API](https://api.apiscp.com/) method. Quite simply, whatever you can do in the panel you can do too from the command-line or afar with [Beacon](https://github.com/apisnetworks/beacon).
 
 ### Alternate invocation
+
 Commands may also be written in a clear form separating the module from the function by a colon and replacing function underscores ("_") with hypens ("-"). The above admin command thus becomes:
 
 ```bash
@@ -52,6 +53,7 @@ cpcmd admin:locate-webapps 'mydomain.com'
 ```
 
 ### Listing all commands
+
 `misc:list-commands(string $filter = '')` lists commands available to the current role. "filter" is any glob-style patern. For example, to see all admin commands available to the admin:
 
 ```bash
@@ -67,6 +69,7 @@ misc:list-commands "*pass*"
 `misc:l` is shorthand for this usage.
 
 ### Introspecting commands
+
 `misc:info(string $filter = '')` displays command information including its signature, documentation, return type, and parameter documentation. It behaves similarly to `misc:list-commands`.
 
 `misc:i` is shorthand for this usage.

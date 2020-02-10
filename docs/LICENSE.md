@@ -13,7 +13,7 @@ Trial and paid versions of apnscp are functionally identical.
 
 ## Upgrading from GUI
 
-1. Login to apnscp as the administrative user. 
+1. Login to apnscp as the administrative user.
 
 2. Visit **License**
     ![License location](./images/license-location.png)
@@ -34,13 +34,13 @@ Licenses are stored in `/usr/local/apnscp/config/license.pem`. The file may eith
 
 ## Restoring license from command-line
 
-A license that has been previously backed up may be restored to an apnscp install. Licenses may be active on one machine at a time. Replace `/usr/local/apnscp/config/license.pem` with the backed up license, then restart apnscp: `systemctl restart apnscp`. apnscp will use the new license following restart. Its usage may be confirmed within the panel via **License** app. 
+A license that has been previously backed up may be restored to an apnscp install. Licenses may be active on one machine at a time. Replace `/usr/local/apnscp/config/license.pem` with the backed up license, then restart apnscp: `systemctl restart apnscp`. apnscp will use the new license following restart. Its usage may be confirmed within the panel via **License** app.
 
 Alternatively the CLI tool may be used to streamline these steps.
 
 ## Command-line helper
 
-`/usr/local/apnscp/bin/scripts/license.php` is a helper to activate, backup, and restore licenses. 
+`/usr/local/apnscp/bin/scripts/license.php` is a helper to activate, backup, and restore licenses.
 
 > ```
 > Usage: license.php MODE  

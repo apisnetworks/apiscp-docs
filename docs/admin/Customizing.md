@@ -6,8 +6,8 @@ ApisCP provides a variety of means to customize your environment. Each service i
 
 ## Apache
 
-**⚠️ DO NOT TOUCH**: /etc/httpd/conf/httpd.conf
-**Customization file**: /etc/httpd/conf/httpd-custom.conf
+**⚠️ DO NOT TOUCH**: /etc/httpd/conf/httpd.conf  
+**Customization file**: /etc/httpd/conf/httpd-custom.conf  
 
 Additionally, module configuration may be inserted in `/etc/httpd/conf.d` to load or modify existing modules. Per-site configuration is located in `/etc/httpd/conf.d/siteXX` or `/etc/httpd/conf.d/siteXX.ssl` for SSL-specific context. By convention customizations are placed in a file named `custom` in these directories. To get the site ID of a domain use the [helper](https://docs.apiscp.com/admin/helper-binaries/#get_site_id) command, `get_site_id`.
 
@@ -15,8 +15,8 @@ After making changes, `htrebuild` will compile Apache's modular configuration fo
 
 ## apnscp
 
-**⚠️ DO NOT TOUCH:** /usr/local/apnscp/config/*
-**Customization file:** /usr/local/apnscp/config/custom/*
+**⚠️ DO NOT TOUCH:** /usr/local/apnscp/config/*  
+**Customization file:** /usr/local/apnscp/config/custom/*  
 
 apnscp supports overriding views, apps, modules, and configuration.
 
@@ -25,6 +25,7 @@ apnscp supports overriding views, apps, modules, and configuration.
 All views may be copied into `config/custom/resources/views/<path>` from `resources/views/<path>`. Custom views take precedence, including all mail templates. Overriding `layout.blade.php` allows customization to the skeleton of all apps in apnscp.
 
 #### Layout
+
 A master layout named "layout" is provided in `resources/views/`. As with all templates suffixed "blade.php", it utilizes [Blade](https://laravel.com/docs/5.6/blade). A theme-specific blade may override the master layout by creating an eponymous template in `config/custom/resources/views/`. For example, to override the "apnscp" theme, create a file named `config/custom/resources/views/apnscp.blade.php`. Inheritance is supported via `@extends("layout")` in addition to section injection.
 
 ### App overrides
@@ -96,6 +97,7 @@ Constants may be overrode or added to global scope via `config/custom/constants.
 ```
 
 ### DNS template overrides
+
 DNS is generated from a base template in `resources/templates/dns`. Presently mail and dns templates are supported. For each template to override copy the respective template to `config/custom/resources/templates/dns/`. Validate DNS template consistency via `cpcmd dns:validate-template TEMPLATENAME`.
 
 ## Themes
@@ -108,12 +110,12 @@ cpcmd config_set apnscp.config style theme newtheme
 
 Per theme layouts may be set following the [layout](#layout) override mentioned above.
 
-### apnscp configuration
+### ApisCP configuration
 
 All configuration must be made to `config/custom/config.ini`. [cpcmd](https://hq.apiscp.com/working-with-cli-helpers/#cpcmd) provides a short-hand tool to edit this file.
 
 ```bash
-# Show all configuration 
+# Show all configuration
 cpcmd config_get apnscp.config
 # Set configuration
 cpcmd config_set apnscp.config core fast_init true
@@ -127,8 +129,8 @@ All changes may be made to `/usr/local/apnscp/config/httpd-custom.conf`. After c
 
 ## Dovecot
 
-**⚠️ DO NOT TOUCH:** /etc/dovecot/conf.d/apnscp.conf
-**Customization file:** /etc/dovecot/local.conf
+**⚠️ DO NOT TOUCH:** /etc/dovecot/conf.d/apnscp.conf  
+**Customization file:** /etc/dovecot/local.conf  
 
 A few conflicting files in /etc/dovecot/conf.d are wiped as part of [Bootstrapper](https://github.com/apisnetworks/apnscp-playbooks/blob/master/roles/mail/configure-dovecot/defaults/main.yml#L9). These files will always be removed if found:
 
@@ -137,8 +139,8 @@ A few conflicting files in /etc/dovecot/conf.d are wiped as part of [Bootstrappe
 
 ## Postfix
 
-**⚠️ DO NOT TOUCH:** /etc/postfix/master.conf
-**Customization file:** /etc/postfix/main.cf
+**⚠️ DO NOT TOUCH:** /etc/postfix/master.conf  
+**Customization file:** /etc/postfix/main.cf  
 
 Postfix does not provide a robust interface to extend its configuration. /etc/postfix/master.cf, which is the service definition for Postfix, may not be updated as it is replaced with [package updates](https://github.com/apisnetworks/postfix).
 
@@ -154,25 +156,25 @@ postfix_custom_config:
 
 ## MySQL
 
-**⚠️ DO NOT TOUCH:** /etc/my.cnf.d/apnscp.conf
-**Customization file:** /etc/my.cnf.d/*
+**⚠️ DO NOT TOUCH:** /etc/my.cnf.d/apnscp.conf  
+**Customization file:** /etc/my.cnf.d/*  
 
 ## PostgreSQL
 
-**⚠️ DO NOT TOUCH:** *n/a*
-**Customization file:** /var/lib/pgsql/\<ver number>
+**⚠️ DO NOT TOUCH:** *n/a*  
+**Customization file:** /var/lib/pgsql/\<ver number>  
 
 ## PHP
 
-**⚠️ DO NOT TOUCH:** /etc/php.ini (*managed block*)
-**Customization file:** /etc/phpXX.d/*
+**⚠️ DO NOT TOUCH:** /etc/php.ini (*managed block*)  
+**Customization file:** /etc/phpXX.d/*  
 
 apnscp uses a managed block in /etc/php.ini. Any directives within this block will always be overwritten. To override any values within this block, make changes in /etc/phpXX.d/ where XX is the version major/minor of PHP. Note this affects global PHP settings. To change settings per site look into [php_value](https://kb.apiscp.com/php/changing-php-settings/) in either `.htaccess` or `siteXX/custom` mentioned above in Apache.
 
 ## rspamd
 
-**⚠️ DO NOT TOUCH:** /etc/rspamd/local.d/*
-**Customization file:** /etc/rspamd/override.d/*
+**⚠️ DO NOT TOUCH:** /etc/rspamd/local.d/*  
+**Customization file:** /etc/rspamd/override.d/*  
 
 For each file in local.d to override create a corresponding file in `override.d/`. This follows either [UCL](https://www.rspamd.com/doc/configuration/ucl.html) or JSON. When working with JSON, drop the leading + closing braces ("{", "}"). This is due to a parsing quirk of rspamd. An [example](https://github.com/apisnetworks/apnscp-playbooks/blob/d65ec74546f85eedec016684316c577975746e1f/roles/mail/rspamd/tasks/set-rspamd-configuration.yml#L29-L36) of reconstituting to valid JSON is available in the Github repository.
 
@@ -189,13 +191,13 @@ rspamd provides many configurables that don't require a direct override. Neural 
 
 ## SpamAssassin
 
-**⚠️ DO NOT TOUCH:** *n/a*
-**Customization file:** /etc/mail/spamassassin/local.cf
+**⚠️ DO NOT TOUCH:** *n/a*  
+**Customization file:** /etc/mail/spamassassin/local.cf  
 
 ## SSH
 
-**⚠️ DO NOT TOUCH:** Managed block in /etc/ssh/sshd_config  (*# BEGIN/# END*)
-**Customization file:** /etc/ssh/sshd_config
+**⚠️ DO NOT TOUCH:** Managed block in /etc/ssh/sshd_config  (*# BEGIN/# END*)  
+**Customization file:** /etc/ssh/sshd_config  
 
 `sshd_config` may be modified. Do not edit the directives within `# BEGIN ApisCP MANAGED BLOCK` and `# END ApisCP MANAGED BLOCK`. Port and public key authentication may be modified with [Scopes](https://gitlab.com/apisnetworks/apnscp/blob/master/docs/admin/Scopes.md),
 
@@ -205,4 +207,3 @@ cpcmd config:set system.sshd-port '[58712,22]'
 # Disallow password-based logins, public key only
 cpcmd config:set system.sshd-pubkey-only true
 ```
-

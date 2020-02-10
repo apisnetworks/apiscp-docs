@@ -6,7 +6,7 @@ Scopes are configuration-specific entry points to apnscp. They may tie into [con
 
 A list of available scopes can be gathered with `cpcmd scope:list`. All scopes correspond to a concrete implementations in [`Opcenter\Admin\Settings`](https://gitlab.com/apisnetworks/apnscp/tree/master/lib/Opcenter/Admin/Settings).
 
-`scope:get` retrieves the scope's configured value. A scope value is idempotent; if it's set value is the same as its input it will not rewrite its settings nor process any tasks associated with itself. 
+`scope:get` retrieves the scope's configured value. A scope value is idempotent; if it's set value is the same as its input it will not rewrite its settings nor process any tasks associated with itself.
 
 `scope:info` displays the configured value, default value, and description for the scope.
 

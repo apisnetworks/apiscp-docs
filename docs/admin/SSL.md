@@ -47,6 +47,7 @@ cpcmd scope:set cp.config letsencrypt lookahead_days 20
 # And up to 1 day after expiration
 cpcmd scope:set cp.config letsencrypt lookbehind_days -1
 ```
+
 Once a certificate order has completed, it is stored under ACME-SERVER/siteXX. The certificate is then copied into siteXX/fst/etc/httpd/conf/ssl.crt and ssl.key directories. Additionally, if haproxy is used for mail (when `cpcmd scope:get cp.config mail proxy` is "haproxy"), then a PEM is also copied as `/etc/haproxy/ssl.d/siteXX`.
 
 A completed certificate resides in 3 places: Let's Encrypt storage in storage/certificates, Apache config in httpd/conf/ssl.{key,crt}, and haproxy (for SMTP/IMAP/POP3) in /etc/haproxy/ssl.d.
@@ -105,18 +106,20 @@ Typical usage is `openssl s_client -connect IP:PORT -servername HOSTNAME` where 
 For example, `openssl s_client -connect apiscp.com:993 -servername apiscp.com | openssl x509 -noout -fingerprint` and `openssl s_client -connect apiscp.com:993 -servername nexus.apiscp.com | openssl x509 -noout -fingerprint` return different fingerprints because different certificates are sent depending upon the servername parameter.
 
 #### Checking expiration date
+
 A certificate is only valid for the expiration dates it is authorized to serve. All times are in GMT.
 
 `openssl s_client -connect apiscp.com:993 -servername apiscp.com | openssl x509 -noout -dates`
 
 #### Checking SANs
+
 SANs are all hostnames bound to a certificate. -text generates significant data, so filter out the noise using `grep`:
 
 `openssl s_client -connect apiscp.com:993 -servername apiscp.com | openssl x509 -noout -text | grep 'DNS:'`
 
 ## Importing certificates
 
-Let's Encrypt will work for most situations, simple SSL and wildcard SSL. Certificates automatically update 10 days in advance. 
+Let's Encrypt will work for most situations, simple SSL and wildcard SSL. Certificates automatically update 10 days in advance.
 
 What if you want to install an EV (extended validation) certificate? Two options, programmatically via `cpcmd -d domain ssl:install` or you can do it the old fashioned way: move the key in `siteXX/fst/etc/httpd/conf/ssl.key/server.key`, CRT as `server.crt` in `ssl.crt/`, chain in `ssl.crt/bundle.crt`, then in `/etc/httpd/conf/siteXX.ssl/`, create a file named custom with:
 

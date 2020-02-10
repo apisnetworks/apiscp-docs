@@ -16,7 +16,7 @@ upcp -b
 
 Each site may run its own crond process when *crontab*,*permit=1* via Dev > Task Scheduler. Each crond service attaches an inotify watcher to each spool file in /var/spool/cron to detect changes and reload crond accordingly.
 
-CentOS sets a default of 128, which if hit will generate spurious "Too many open files" messages (syserr EMFILE). This can be confirmed by trying to start any service: `systemctl restart atd`. 
+CentOS sets a default of 128, which if hit will generate spurious "Too many open files" messages (syserr EMFILE). This can be confirmed by trying to start any service: `systemctl restart atd`.
 
 ApisCP raises this limit to 256, but may need to be higher depending on needs.
 
@@ -30,7 +30,7 @@ Any file lexicographically greater than "apnscp.conf" will override these settin
 
 ## Table definition cache/prepared statements
 
-Prepared statements may fail with errno 1615: "*Prepared statement needs to be re-prepared*". This occurs when a significant number of tables exist in the data dictionary. 
+Prepared statements may fail with errno 1615: "*Prepared statement needs to be re-prepared*". This occurs when a significant number of tables exist in the data dictionary.
 
 From the command-line, run
 
@@ -40,4 +40,3 @@ SET GLOBAL table_definition_cache=16384;
 ```
 
 If the error resolves, this is due to the [table definition](https://dev.mysql.com/doc/refman/5.6/en/server-system-variables.html#sysvar_table_definition_cache) limit of 4096 being reached. Changes may be made permanent by adding `table_definition_cache=16384` under the [mysqld] section in /etc/my.cnf.d/server.cnf or any file lexicographically higher than "apnscp.conf".
-

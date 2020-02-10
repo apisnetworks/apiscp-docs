@@ -2,11 +2,9 @@
 title: DNS
 ---
 
-# Configuring DNS
-
 apnscp ships with a variety of [DNS providers](https://github.com/search?q=topic%3Adns+org%3Aapisnetworks&type=Repositories) that allow for apnscp to communicate directly with your service provider. DNS can be configured per-site or globally; in global configuration all sites that does not explicitly have a DNS provider configured will inherit the global setting.
 
-**Providers**
+## Providers
 
 - null: dummy driver that always returns success
 - builtin: use BIND or write a [surrogate](https://docs.apiscp.com/development/programming-guide/#extending-modules-with-surrogates) module to override DNS behavior
@@ -36,9 +34,13 @@ Account owners have permission to read this configuration directive from apnscp'
 
 As an example,  an authenticated user can easily get the provider key from apnscp's panel with a quick Javascript snippet: `apnscp.cmd("common_get_service_value", ["dns","key"], {async: false})`
 
-## Assigning providers per account
+## Setting DNS per account
 
 Accounts may use a provider other than what is assigned globally. `dns`,`provider` and `dns`,`key` control these parameters.
+
+::: danger
+Any configuration set in this manner may be viewed by the Site Adminstrator. Do not store sensitive keys. In fact, PowerDNS is strongly recommended in multi-tenant environments, which stores authentication in an inaccessible location.
+:::
 
 ```bash
 EditDomain -c dns,provider=null -D somesite.com

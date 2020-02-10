@@ -1,4 +1,5 @@
 # Billing integration
+
 ApisCP is designed to work with the following third-party billing platforms out of the box,
 
 - [Blesta](https://docs.blesta.com/display/user/ApisCP) as of 4.8.0
@@ -6,11 +7,11 @@ ApisCP is designed to work with the following third-party billing platforms out 
 
 The scope of this documentation is for developers to build custom integration modules for ApisCP.
 
-# Custom integration
+## Custom integration
 
-A billing framework is provided to facilitate integration into third-party services. ApisCP tracks sites by its "billing invoice", a service value within the billing class named "invoice". Subordinate sites are parented to the same master account when its *billing*,*parent_invoice* service value matches the parent. 
+A billing framework is provided to facilitate integration into third-party services. ApisCP tracks sites by its "billing invoice", a service value within the billing class named "invoice". Subordinate sites are parented to the same master account when its *billing*,*parent_invoice* service value matches the parent.
 
-## Account groups
+### Account groups
 
 Sites may be grouped by invoice with the following operations: edit, delete, suspend, activate, transfer.
 
@@ -33,7 +34,7 @@ cpcmd admin:collect '[siteinfo.domain,diskquota.quota,ssh.enabled]' '[billing.pa
 # cpcmd admin:collect '[siteinfo.domain,diskquota.quota,ssh.enabled]' '[billing:[parent_invoice:master-invoice-123]]'
 ```
 
-Apply a transformation to boost storage quota to 5000 for all sites that have the billing invoice (or parent invoice) matching master-invoice-123. Use `admin:collect` to filter subordinate sites. 
+Apply a transformation to boost storage quota to 5000 for all sites that have the billing invoice (or parent invoice) matching master-invoice-123. Use `admin:collect` to filter subordinate sites.
 
 ```bash
 EditDomain -c diskquota,quota=5000 master-invoice-123
@@ -78,7 +79,8 @@ done
 
 The above acts similarly except that it does not alter quota for the primary site, just its siblings.
 
-### SSO compatibility
+#### SSO compatibility
+
 SSO is enabled by default. Domains that are subordinate to the master domain (where billing,parent_invoice = billing,invoice) *may not* transition to the parent domain. Only the parent may transition to subordinate accounts and back. ApisCP does not provide lateral transitions between subordinates at this time.
 
 ![SSO visibility](./images/sso-map.png)
@@ -92,7 +94,7 @@ Behavior may be disabled within config.ini by changing *[auth]* => *subordinate_
 cpcmd scope:set cp.config auth subordinate_site_sso false
 ```
 
-## Account state
+### Account state
 
 Extending this process further, `SuspendDomain` and `ActivateDomain` can be used in a similar fashion:
 
@@ -141,17 +143,17 @@ Configuring periodic clean-ups via `opcenter.account-cleanup` Scope is recommend
 cpcmd scope:set opcenter.account-cleanup '30 days'
 ```
 
-## Programming
+### Programming
 
-[PROGRAMMING.md](../PROGRAMMING.md) provides basic information on extending ApisCP's codebase. This section focuses on specific API calls for various scenarios. 
+[PROGRAMMING.md](../PROGRAMMING.md) provides basic information on extending ApisCP's codebase. This section focuses on specific API calls for various scenarios.
 
 A full module index is available either via lib/modules/ or via [api.apiscp.com](https://api.apiscp.com/namespace-none.html). ApisCP includes a SOAP API to interact from afar; lib/Util/API.php is a stub SOAP client that provides excellent foundation. SOAP keys are created within **Dev** > **API Keys**. Error sensitivity can be ratcheted up by sending an "*Abort-On*" header that may facilitate development. By default only fatal()/exceptions generate an immediate abort.
 
 ```php
 $client = \Util_API::create_client(
-    $key, 
-    null, 
-    null, 
+    $key,
+    null,
+    null,
     [
         'stream_context' => stream_context_create([
              'http' => [
@@ -169,30 +171,31 @@ A billing surrogate allows integration of billing metrics into the Dashboard. Fo
 
 class Billing_Module_Surrogate extends Billing_Module {
 
-	/**
-	 * @inheritDoc
-	 */
-	public function get_customer_since()
-	{
-		return strtotime('last year');
-	}
+ /**
+  * @inheritDoc
+  */
+ public function get_customer_since()
+ {
+  return strtotime('last year');
+ }
 
 }
 ```
 
-### Administrative SSO
+#### Administrative SSO
 
 `admin:hijack(string $site, string $user = null, string $gate = null)` allows for the administrator to request an authenticated session with new credentials. If `$user` is omitted, the site administrator is assumed. If `$gate` is omitted, the same authentication gate in which the request arrived will be used. When communicating over API, it will be "SOAP". All gates are available under lib/Auth/.
 
 Once an account has been hijacked, for SOAP usage for example, subsequent queries can send the session ID to the panel to perform commands as that user such as `rampart:is-banned(string $ip, string $jail)` to check if the IP is banned from any service and `rampart:unban(string $ip, string $jail)`.
 
 Some commands, such as `rampart:is-banned` may be invoked as either administrator or site administrator. As a recommendation, perform what you can limiting role privileges when appropriate.
-### Managing accounts
+
+#### Managing accounts
 
 `admin:edit-site(string $site, array $opts)` alters account metadata. Metadata is broken down into services and service parameters. `AddDomain --help` gives an overview of features. These map to concrete implementations in lib/Opcenter/Service/Validators.
 
 Specifying *siteinfo*,*plan* applies a preconfigured plan to the site. `admin:list-plans()` produces all plans available on the server, `admin:get-plan(string $name)` gets the plan information. A plan that doesn't override a feature explicitly inherits from the base plan in resources/templates/plans/.skeleton.
 
-## Resellers
+### Resellers
 
 There is no intention to provide reseller support directly into apnscp. This is the domain of billing software, which among many things should be responsible for allowing an admin to create accounts, suspend accounts, and edit accounts. By extension, this power can be granted to site administrators in a controlled environment that has a close association with billing.

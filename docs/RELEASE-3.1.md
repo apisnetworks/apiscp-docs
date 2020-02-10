@@ -14,7 +14,7 @@ This implementation makes use of systemd's excellent dependency tracking to only
 
 Massive time-series data aggregation poses a significant challenge as platforms accumulate more data with age. Bandwidth data is binned every 3 minutes (controlled via *[bandwidth]* => *resolution* in config.ini). Over the span of 12 months with over 500 sites the number of records balloons to 87.6 million records; a lot to sum when looking at historical records. Worse yet record lookups become expensive with simple algorithms. For example, average case runtime to retrieve a record requires 27 steps (big O log2). We can do better by partitioning data into windows. Knowing that bandwidth cycles every month, data can be separated into smaller **chunks**, 30 day 7.3 million records per segment thus limiting the amount of searches required by 15%. These chunks are unified into a single virtual table called a **hypertable** thus ensuring  transparent storage mechanism for time-series data.
 
-![hypertable and chunks via TimescaleDB](https://assets.iobeam.com/images/docs/illustration-hypertable-chunk.svg) 
+![hypertable and chunks via TimescaleDB](https://assets.iobeam.com/images/docs/illustration-hypertable-chunk.svg)
 
 Improved retrieval performance isn't the best feature, continuous aggregates ("cagg") are! A cagg works in the background, automatically, to summarize data from individual data points.  Going back to the bandwidth example, if we know bandwidth updates every 5 minutes, TimescaleDB recalculates the total, storing in cache, every 5 minutes in revised totals.
 
@@ -24,14 +24,14 @@ As part of 3.1, TimescaleDB will provide real-time reporting on account resource
 
 ```sql
 SELECT
-	site_id,
-	TIME_BUCKET_GAPFILL('5 minutes', ts) AS bucket, 
-	SUM(in_bytes+out_bytes) AS sum 
-FROM 
-	bandwidth_log 
-WHERE 
-	ts >= NOW() - INTERVAL '1 day' AND ts < NOW() 
-GROUP BY site_id, bucket 
+ site_id,
+ TIME_BUCKET_GAPFILL('5 minutes', ts) AS bucket,
+ SUM(in_bytes+out_bytes) AS sum
+FROM
+ bandwidth_log
+WHERE
+ ts >= NOW() - INTERVAL '1 day' AND ts < NOW()
+GROUP BY site_id, bucket
 ORDER BY site_id, bucket;
 ```
 
@@ -68,21 +68,17 @@ While not strictly enforced yet, we ask that third-party developers who release 
 
 Rampart provides generalized protection to all facets of platform: MySQL, IMAP, POP3, SMTP, SSH, panel access, HTTP, and so on. Any service accessible is guarded against brute-force attacks by Rampart, which results in some interesting scenarios with SOHO businesses. Delegated whitelisting allows account administrators to declare up to *n IPv4/IPv6 addresses* immune from brute-force deterrence.
 
-When the address is in a delegated whitelist (Account > Whitelist), an address is immune from brute-force blocks. A user that logs into the panel with the blocked IP address is still presented with a popup explaining the service that triggered a block. 
+When the address is in a delegated whitelist (Account > Whitelist), an address is immune from brute-force blocks. A user that logs into the panel with the blocked IP address is still presented with a popup explaining the service that triggered a block.
 
 # SSO subordinate domains
 
 Bridging the gap between reseller and typical hosting accounts, apnscp now supports login to child domains by the parent. For the first domain, set the service parameter `billing,invoice=IDENTIFIER`. For each child domain parented to this domain, set `billing,parent_invoice=IDENTIFIER`.  Child domains may not login to the parent unless transitioned into by the parent and only within the session transitioned from which the parent transitioned.
 
-![img](https://hq.apiscp.com/content/images/2019/08/My-First-Document--1-.png) 
+![img](https://hq.apiscp.com/content/images/2019/08/My-First-Document--1-.png)
 
 Domain transitioning is a simple process within the user card dropdown. If no known domains are on the same server as the parent, the domain is presented normally.
 
 ![img](https://hq.apiscp.com/content/images/2019/08/EChFArEW4AE_OIo--1-.png)
-
- 
-
- 
 
 # IMAP/POP3/SMTP SNI
 

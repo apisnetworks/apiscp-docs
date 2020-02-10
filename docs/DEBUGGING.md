@@ -2,7 +2,7 @@
 
 ApisCP may emit debugging information when **debug mode** is enabled. You can enable debugging on a per-request basis, or globally using *cp.debug* [Scope](admin/Scopes.md). Backtraces (code pathways) can be enabled by setting *[core]* => *debug_backtrace_qualifier*. Backtraces give context around how an error occurred, making them invaluable for debugging.
 
-`cpcmd scope:set cp.debug true` enables debugging mode globally. 
+`cpcmd scope:set cp.debug true` enables debugging mode globally.
 
 `cpcmd scope:set cp.config core debug_backtrace_qualifier -1` enables backtraces for all reporting classes (fatal, error, warning. info, deprecated, and debug) as well as exceptions. Increasing verbosity levels inherit lower levels. **Backtraces are mandatory** when reporting issues.
 
@@ -19,7 +19,7 @@ The following table is only relevant when panel debugging is enabled.
 
 ![UI Visibility](./images/debugging-ex-visibility.png)
 
-`env DEBUG=1 cpcmd common:whoami` executes the [whoami](https://api.apiscp.com/class-Common_Module.html#_whoami) method in common module. This method simply returns the current username. A special module [test](https://api.apiscp.com/class-Test_Module.html) is available in debug mode to facilitate development. Only this request operates in debug mode ensuring appropriate isolation in a production environment. 
+`env DEBUG=1 cpcmd common:whoami` executes the [whoami](https://api.apiscp.com/class-Common_Module.html#_whoami) method in common module. This method simply returns the current username. A special module [test](https://api.apiscp.com/class-Test_Module.html) is available in debug mode to facilitate development. Only this request operates in debug mode ensuring appropriate isolation in a production environment.
 
 ```bash
 # env DEBUG=1 cpcmd test:benchmark common_whoami
@@ -40,6 +40,7 @@ ERROR: test_benchmark: command does not exist
 When in debug mode, housekeeping and cron services are disabled as well as job runner. Housekeeping/cron tasks may not be invoked traditionally. Job runner invocation is covered under [Jobs](#jobs).
 
 ## Targeted frontend debug
+
 `misc:debug-session(string $id, bool $mode = true)` enables debugging for a frontend session (DAV, UI, SOAP). Session identifier may be retrieved from a browser session by accessing the `session.id` property. `session.debug` encodes whether debug mode is enabled.
 
 ```bash
@@ -49,7 +50,7 @@ env DEBUG=1 cpcmd misc:debug-session aE2uNGVkvpathoXqhofnsKDDXGNBJL9r true
 
 ## Log locations
 
-ApisCP logs messages in a few places. Respective services use their preferred logging locations. This table summarizes common services and their log locations. 
+ApisCP logs messages in a few places. Respective services use their preferred logging locations. This table summarizes common services and their log locations.
 
 All locations are within /var/log unless noted. siteXX is shorthand for /home/virtual/siteXX/fst/. siteXX is the site ID identifier that can be resolved using `get_site_id domain.com`. "..." following siteXX is short-hand for /var/log thus *siteXX ... log* indicates /home/virtual/siteXX/fst/var/log/log. CP_ROOT is the panel home, typically either /usr/local/apnscp or /usr/local/apiscp. Words fully capitalized are symbolic.
 
@@ -92,11 +93,12 @@ systemctl stop apiscp
 cd /usr/local/apnscp/bin
 env DEBUG=1 ./apnscpd -f restart
 ```
+
 When debugging is active, the following tasks are disabled: cron, housekeeping, jobs.
 
 ## PHP-FPM status
 
-FPM pools are grouped by site ID identifier and name. By default, one pool is created named after the primary domain. `php:pools()` lists active pools for a site. 
+FPM pools are grouped by site ID identifier and name. By default, one pool is created named after the primary domain. `php:pools()` lists active pools for a site.
 
 `php:pool-status(string $pool = '')` provides the internal PHP-FPM pool status as reported by systemd's notify feature. These values are real-time metrics as seen by the pool manager.
 
@@ -158,6 +160,7 @@ Applications support both generalized options and specific options. The followin
 *Jobs are unavailable when the panel is in debug mode unless Horizon has been manually started.*
 
 ## Command listing
+
 `misc:list-commands(string $filter = '')` is a role-aware helper that displays available commands. Used in conjunction with [cpcmd](admin/CLI.md#cpcmd), it provides a convenient interface to filter available commands.
 
 ```bash
@@ -172,6 +175,7 @@ cpcmd -d site1 misc:l 'ghost:*'
 ```
 
 ### Introspection
+
 `misc:command-info(string $filter = '')` provides verbose information about the command, including its method signature and documentation. This can be used to explain what parameters an API command anticipates. Method usage is similar to `list-commands`:
 
 ```bash
@@ -184,9 +188,10 @@ cpcmd misc:i 'admin:*'
 ```
 
 ## User preferences
-Preferences are stored in siteXX/info/USER. `common:load-preferences()` is a convenient interface to show these preferences. 
 
-`common:get-user-preferences(string $user)` allows for a Site Administrator access to a user's preferences. 
+Preferences are stored in siteXX/info/USER. `common:load-preferences()` is a convenient interface to show these preferences.
+
+`common:get-user-preferences(string $user)` allows for a Site Administrator access to a user's preferences.
 
 `YAML_INLINE` is an environment variable that controls array folding depth. Increasing folding depth improves readability. The default value is *2*.
 
@@ -214,7 +219,7 @@ env DEBUG=1 cpcmd common:purge-preferences
 cpcmd common:load-preferences
 ```
 
-## Connecting to Redis 
+## Connecting to Redis
 
 Redis manages caching and job queues over a UNIX domain socket. Database 1 is assigned to ApisCP, 2 to jobs, and 3 to rspamd (if utilized), with a decreasing priority assigned to each. Do not issue the `FLUSHALL` command as this will purge rspamd logical replication from PostgreSQL.
 
@@ -229,20 +234,21 @@ keys *
 ## API bypasses
 
 You may bypass API permissions by using a surrogate module. This allows for rapid prototyping of individual API methods which may otherwise be restricted. Surrogates are covered in detail in [PROGRAMMING.md](PROGRAMMING.md).
+
 ```bash
 <?php declare(strict_types=1);
 
-	class Dns_Module_Surrogate extends Dns_Module {
-		public function __construct() {
-			parent::__construct();
-			// ensure we always win permissions
-			$this->exportedFunctions = ['*' => PRIVILEGE_ALL];
-		}
-		
-		public function t() {
-			return $this->_cron();
-		}
-	} 
+ class Dns_Module_Surrogate extends Dns_Module {
+  public function __construct() {
+   parent::__construct();
+   // ensure we always win permissions
+   $this->exportedFunctions = ['*' => PRIVILEGE_ALL];
+  }
+  
+  public function t() {
+   return $this->_cron();
+  }
+ }
 ```
 
 You can now interact with the _cron method from the command-line instead of being restricted by API accessibility rules.

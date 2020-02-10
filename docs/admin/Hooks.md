@@ -1,6 +1,6 @@
 # Hooks
 
-The hook subsystem provides a simple, passive interface to apnscp without module extensions. Hooks are available for edit, create, delete, suspend, activate, import, and export operations. Unlike a module, a hook *cannot* interrupt flow. 
+The hook subsystem provides a simple, passive interface to apnscp without module extensions. Hooks are available for edit, create, delete, suspend, activate, import, and export operations. Unlike a module, a hook *cannot* interrupt flow.
 
 ## Installation
 

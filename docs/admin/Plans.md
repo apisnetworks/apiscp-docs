@@ -19,7 +19,7 @@ A variety of helpers exist to add, delete, modify, suspend, activate, import, an
 | --help             | all          | Show help                                                    |
 | --output=type      | all          | Set the output format. Values are "json" or unset            |
 
-These flags may be passed to the API whenever *$flags* is an accepted parameter. Flags simply present are passed as '[name:true]' whereas flags that accept values are passed as '[name:value]'. 
+These flags may be passed to the API whenever *$flags* is an accepted parameter. Flags simply present are passed as '[name:true]' whereas flags that accept values are passed as '[name:value]'.
 
 As an example, `EditDomain -c cgroup,enabled=0 --all` disables cgroup resource enforcement on all sites.
 
@@ -29,7 +29,7 @@ As an example, `EditDomain -c cgroup,enabled=0 --all` disables cgroup resource e
 
 ### Basic usage
 
-```
+```bash
 AddDomain -c siteinfo,domain=mydomain.com -c siteinfo,admin_user=myadmin
 ```
 
@@ -37,7 +37,7 @@ AddDomain -c siteinfo,domain=mydomain.com -c siteinfo,admin_user=myadmin
 
 Let's alter this and set an email address, which is used to contact the account owner whenever a Web App is updated or when the password is changed. Let's also prompt for a password. But first let's delete *mydomain.com* because domains must be unique per server.
 
-```
+```bash
 DeleteDomain mydomain.com
 AddDomain -c siteinfo,domain=mydomain.com -c siteinfo,admin_user=myadmin -c siteinfo,email=hello@apisnetworks.com -c auth,passwd=1
 ```
@@ -48,7 +48,7 @@ AddDomain -c siteinfo,domain=mydomain.com -c siteinfo,admin_user=myadmin -c site
 
 ApisCP includes a variety of services that can be enabled for an account. Some services must be enabled whereas others can be optionally enabled. Let's create an account that allows up to 2 additional users, disables MySQL, disables email, disables shell access, and disables addon domains. A single-user domain with limited access that may only upload files.
 
-```
+```bash
 AddDomain -c siteinfo,domain=securedomain.com -c siteinfo,admin_user=secureuser -c users,enabled=0 -c users,max=3 -c mysql,enabled=0 -c mail,enabled=0 -c ssh,enabled=0 -c aliases,enabled=0
 ```
 
@@ -60,7 +60,6 @@ AddDomain -c siteinfo,domain=securedomain.com -c siteinfo,admin_user=secureuser 
 ### API usage
 
 `admin:add-site(string $domain, string $admin, array $opts = [], array $flags = [])` is the backend API [call](https://api.apiscp.com/class-Admin_Module.html#_add_site) for this command-line utility. $admin corresponds to siteinfo,admin_user and must be unique.
-
 
 ## EditDomain
 
@@ -74,7 +73,7 @@ EditDomain -c siteinfo,email=hello@apisnetworks.com -D mydomain.com
 
 A simple, common situation is to alter the primary domain of an account. Simply changing the domain attribute under the *siteinfo* service will accomplish this.
 
-```
+```bash
 EditDomain -c siteinfo,domain=newdomain.com mydomain.com
 ```
 
@@ -82,7 +81,7 @@ EditDomain -c siteinfo,domain=newdomain.com mydomain.com
 
 Changing the password is another common operation:
 
-```
+```bash
 EditDomain -c auth,tpasswd=newpasswd site12
 ```
 
@@ -92,7 +91,7 @@ EditDomain -c auth,tpasswd=newpasswd site12
 
 Aliases are domains for which the primary responds. Any alias also serves as a valid authentication mechanism in the *user*@*domain* [login mechanism](https://hq.apiscp.com/apnscp-pre-alpha-technical-release/#loggingintoservices). Any alias without a defined document root will serve content from /var/www/html, which is the [document root](https://kb.apiscp.com/web-content/where-is-site-content-served-from/) for the primary domain.
 
-```
+```bash
 EditDomain -c aliases,aliases=['foobar.com'] mydomain.com
 ```
 
@@ -102,7 +101,7 @@ EditDomain -c aliases,aliases=['foobar.com'] mydomain.com
 
 A dry-run proposes changes without applying them.
 
-```
+```bash
 EditDomain --dry-run -c siteinfo,domain=newdomain.com site1
 # site1:
 #   siteinfo: { domain: newdomain.com }
@@ -118,7 +117,7 @@ Two options complement EditDomain, `--all` and `--reconfig`.
 
 `--all` targets all domains on a server. `--reconfig` applies service reconfiguration to all services that support the feature. It may be used to forcefully regenerate configuration after overriding configuration (see [Customizing.md](Customizing.md)).
 
-```
+```bash
 EditDomain --all
 EditDomain --reconfig
 # or do both!
@@ -129,12 +128,12 @@ EditDomain --all --reconfig
 
 `admin:collect(?array $params = [], array $query = null, array $sites = []): array` is an API command to collect service values from matching accounts. This can be mixed with JSON formatting + jq to perform complex scripting without clunky parsing. For example, to fetch all sites that have the plan "basic" and reconfigure to "advanced":
 
-```
+```bash
 # Install jq first
 yum install -y jq
 cpcmd -o json admin:collect '[]' '[siteinfo.plan:basic]' | jq -r 'keys[]' | while read -r SITE ; do
-	echo "Editing $SITE"
-	EditDomain -c siteinfo,plan="advanced" "$SITE"
+ echo "Editing $SITE"
+ EditDomain -c siteinfo,plan="advanced" "$SITE"
 done
 ```
 
@@ -200,7 +199,7 @@ When a billing invoice is specified any site that possesses this identifier eith
 
 Likewise a domain may be activated by using `ActivateDomain`. It acts similarly to SuspendDomain except that it undoes what SuspendDomain does.
 
-```
+```bash
 ActivateDomain apiscp-XYZ123
 ```
 
@@ -211,24 +210,27 @@ Where *apiscp-XYZ123* is a billing invoice assigned to the account via `-c billi
 `admin:activate-site(string $site): bool` allows reactivation of suspended sites. See [API.md](API.md) for implementing API access. $site may be any site identifier or billing invoice.
 
 # Plans
+
 Plans are related to AddDomain and EditDomain in that they assign preset settings to a domain.
 
 ## Creating plans
+
 New plans may be created using artisan.
 
-```
+```bash
 cd /usr/local/apnscp
 ./artisan opcenter:plan --new custom
 ```
+
 The plan is created within resources/templates/plans/custom. Changes may be made at your leisure. Use `./artisan opcenter:plan --verify PLAN` to confirm the plan named *PLAN*.
 
 A plan may copy another plan's definitions by specifying `--base OLDPLAN`. For example,
 
-```
+```bash
 ./artisan opcenter:plan --new nossh --base custom
 ```
 
-Plans may be created thinly in which services from the **default plan** are inherited unless explicitly named. This allows simplification such as the following "ssh" service definition which disables just SSH access, inheriting all other plan defaults. 
+Plans may be created thinly in which services from the **default plan** are inherited unless explicitly named. This allows simplification such as the following "ssh" service definition which disables just SSH access, inheriting all other plan defaults.
 
 Consider the service "nossh", which has 1 file in resources/templates/plans/nossh named ssh with the following line:
 
@@ -236,6 +238,7 @@ Consider the service "nossh", which has 1 file in resources/templates/plans/noss
 [DEFAULT]
 enabled = 0
 ```
+
 This is a valid plan definition and will inherit all other plan values from the default plan.
 
 Additionally, the familiar `-c` flag may be used to feed individual overrides to a plan,
@@ -245,6 +248,7 @@ Additionally, the familiar `-c` flag may be used to feed individual overrides to
 ```
 
 ## Managing plans
+
 The following commands imply `./artisan opcenter:plan` is used.
 
 `PLAN --default`: set the default plan, e.g. to set the default plan for accounts going forward, use `./artisan opcenter:plan --default custom`. Note this is equivalent to using the cp.config [Scope](Scopes.md) to change *[opcenter]* => *default_plan*.
@@ -265,10 +269,11 @@ These plans can be customized and assigned to an account using -p, `AddDomain -p
 # Install jq first
 yum install -y jq
 cpcmd -o json admin:collect '[]' '[siteinfo.plan:basic]' | jq -r 'keys[]' | while read -r SITE ; do
-	echo "Editing $SITE"
-	EditDomain -c siteinfo,plan="advanced" "$SITE"
+ echo "Editing $SITE"
+ EditDomain -c siteinfo,plan="advanced" "$SITE"
 done
 ```
+
 A plan applied to an account does not reset any service values changed beyond the plan base. For example, if ssh,enabled=1 were the setting on an account and SSH were deactivated by setting ssh,enabled=0 outside the plan settings, then changing to a new plan in which ssh,enabled=1 exists *would not* apply to the site.
 
 This behavior may be altered by supplying `--reset` to EditDomain. See [EditDomain](#EditDomain) above for more information.

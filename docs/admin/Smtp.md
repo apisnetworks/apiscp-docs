@@ -6,11 +6,11 @@ All TCP communication locally to 25 or 587 must be authenticated to preserve an 
 
 ## Smart host support
 
-A smart host relays all outbound email through a single hop. Smart hosts are helpful if the machine is behind a firewalled or restrictive address that may be present on [DNSBLs](https://en.wikipedia.org/wiki/DNSBL). Smart hosts are also helpful to filter all mail through another trusted source. 
+A smart host relays all outbound email through a single hop. Smart hosts are helpful if the machine is behind a firewalled or restrictive address that may be present on [DNSBLs](https://en.wikipedia.org/wiki/DNSBL). Smart hosts are also helpful to filter all mail through another trusted source.
 
 The smart host hop may be configured via `cpcmd scope:set mail.smart-host`.
 
-`cpcmd scope:set mail.smart-host "'[mail.relay.com]:587'" someuser somepassword `
+`cpcmd scope:set mail.smart-host "'[mail.relay.com]:587'" someuser somepassword`
 
 Likewise smart host support may be disabled by setting mail.smart-host to "false".
 
@@ -19,11 +19,12 @@ Likewise smart host support may be disabled by setting mail.smart-host to "false
 Watch out! If the next hop is bracketed, the brackets must be doubly quoted "'[some.place]'" to ensure it's not automatically parsed as an array. Brackets bypass additional MX lookups on the hostname.
 
 ### MailChannels integration
+
 Create a new password via mailchannels.net's Customer Console. *username* is the MailChannels Account ID. Use the mail.smart-host Scope to configure MailChannels in one step:
 
 `cpcmd scope:set mail.smart-host smtp.mailchannels.net username:somepassword`
 
-All mail will relay through MailChannels now using the assigned credentials. SPF records may be altered by overriding the DNS template. 
+All mail will relay through MailChannels now using the assigned credentials. SPF records may be altered by overriding the DNS template.
 
 ```bash
 cd /usr/local/apnscp
@@ -63,19 +64,22 @@ Restart apnscp after making changes. Altering SPF records for other outbound fil
 apnscp contains two transports named *oneshot* and *relaylim* that affect Postfix's retry behavior. Transports may be configured via /etc/postfix/transport (see [transport(5)](http://www.postfix.org/transport.5.html)).
 
 ### oneshot transport
+
 Attempt to deliver the message once. If it fails, the message will not be retried.
 
 ### relaylim transport
+
 Attempt to deliver email in serial. Postfix will deliver up to 20 messages concurrently per domain, which may trigger protective measures on the receiving MTA. Delivering in serial ensures that only 1 connection at a time is opened to the server.
 
 ### Example
+
 via `/etc/postfix/transport`
 
 ```
 # Send mail to Yahoo in serial
 yahoo.com   relaylim:
 # Attempt to send mail once to .ru ccTLDs
-.ru 		oneshot:
+.ru   oneshot:
 # error is a builtin, but used as an example for its utility
 # Any mail to @example.com will be rejected as well as its subdomains
 example.com  error:Bad domain!
@@ -83,7 +87,6 @@ example.com  error:Bad domain!
 ```
 
 > After editing, run `postmap /etc/postfix/transport` to update the database.
-
 
 ## SRS forwards
 
@@ -115,11 +118,10 @@ At this time any message that arrives from a remote MTA will be rewritten with S
 
 Postfix employs a [cleanup](http://www.postfix.org/cleanup.8.html) daemon to insert missing headers into a message. *From:* is inferred from the *Return-Path:* header when absent, which is rewritten by SRS. A From: header may then come across as,
 
-	From: srs0=daf/=pl=apiscp.com=postmaster@jib.apisnetworks.com (Apache)
+ From: srs0=daf/=pl=apiscp.com=postmaster@jib.apisnetworks.com (Apache)
 
 This situation arises when the primary domain is *not authorized* to handle mail for the domain (via *Mail* > *Mail Routing* in the panel). Add a From: header in the message to resolve it, for example:
 
 ```php
 mail('user@example.com', 'Subject Line', 'Email body', ['From' => 'help@apiscp.com']);
 ```
-

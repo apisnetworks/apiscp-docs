@@ -25,7 +25,7 @@ public function test_backend($arg1) {
 }
 ```
 
-Backend calls are wrapped into an `apnscpObject ` transported over a `DataStream` connection. `Module_Skeleton::query()` automatically instantiates a suitable `apnscpObject` query for use with `DataStream`. In special cases, this can be mocked up manually.
+Backend calls are wrapped into an `apnscpObject` transported over a `DataStream` connection. `Module_Skeleton::query()` automatically instantiates a suitable `apnscpObject` query for use with `DataStream`. In special cases, this can be mocked up manually.
 
 ```php
 public function queryMulti() {
@@ -177,7 +177,7 @@ Both are equivalent and accept a single exit value, "0" or "1".
 
 > Traditionally, 0 is used to signal success with Linux commands. A non-zero return can correspond to any one of numerous [error codes](http://man7.org/linux/man-pages/man3/errno.3.html). It is rare for a command that runs successfully to exit with a non-zero status.
 
-#  Creating modules
+# Creating modules
 
 Modules expose an interface for the end-user to interact with from not only the panel, but also API. A module is named *ModuleName*_Module and located in `lib/modules/`. Modules must extend `Module_Skeleton`. Any public method exposed in the module that does not begin with "\_" and has permissions assigned other than `PRIVILEGE_NONE` AND `PRIVILEGE_SERVER_EXEC` is callable from the panel or API. Module rights are discussed a little further under **PERMISSIONS**.
 
@@ -248,7 +248,7 @@ A module is proxied if it loads another module in place of itself determined at 
 ```php
 <?php declare(strict_type=1);
 
-	class Sample_Module extends Module_Skeleton implements \Module\Skeleton\Contracts\Proxied
+ class Sample_Module extends Module_Skeleton implements \Module\Skeleton\Contracts\Proxied
     {
         public function _proxy() {
             if ('builtin' === ($provider = $this->getConfig('sample', 'provider'))) {
@@ -332,21 +332,23 @@ Configuration within `db.yaml` is prefixed with "DB\_". Configuration within `au
 
 For example,
 
-```
-db.yaml
-========
+```yaml
+# db.yaml
+##########
 crm:
   host: localhost
   username: myuser
 
-auth.yaml
-=========
+# auth.yaml
+###########
 dns:
   key: abcdef
   uri: https://foobar.com/endpoint
+```
 
-custom/config.ini
-==========
+```ini
+# custom/config.ini
+###################
 [dns]
 soft_delete=1
 ```
@@ -355,13 +357,13 @@ All three files are translated into different constants available throughout the
 
 ```php
 <?php
-	var_dump(
-		DB_CRM_HOST,
-		DB_CRM_USERNAME,
-		AUTH_DNS_KEY,
-		AUTH_DNS_URI,
-		DNS_SOFT_DELETE
-	);
+ var_dump(
+  DB_CRM_HOST,
+  DB_CRM_USERNAME,
+  AUTH_DNS_KEY,
+  AUTH_DNS_URI,
+  DNS_SOFT_DELETE
+ );
 ```
 
 Given the propensity for conflicts to exist between multiple modules, it is recommended to avoid vague or generic configuration variables, such as the examples above if a panel may run more than 1 variation of a module.
@@ -413,7 +415,7 @@ Model variables can be exported to a Blade view in the "_render" hook. This feat
 
 ```php
 public function _render() {
-	$this->view()->share(['options' => $this->getOptions()]);
+ $this->view()->share(['options' => $this->getOptions()]);
 }
 ```
 
@@ -451,8 +453,6 @@ Applications are privileged by role: admin, site, and user. Applications are con
     );
 ```
 
-
-
 # Using Composer
 
 apnscp ships with support for the PHP dependency/package manager, [Composer](https://getcomposer.org).
@@ -467,8 +467,6 @@ To install a package switch to conf/config and install the package as you normal
 cd /usr/local/apnscp/conf/custom
 composer require psr/log
 ```
-
-
 
 # Themes
 
@@ -494,9 +492,9 @@ Several hooks are provided to latch into apnscp both for account and user creati
  * of the edited account with Site Administrator privilege
  */
 public function _edit() {
-	// note that cur will always be merge: new -> old for edit hook
-	// thus to look at old data, peek at old never cur
-	// cur may be used for create/delete
+ // note that cur will always be merge: new -> old for edit hook
+ // thus to look at old data, peek at old never cur
+ // cur may be used for create/delete
     $new = $this->getAuthContext()->conf('siteinfo', 'new');
     $old = $this->getAuthContext()->conf('siteinfo', 'old');
     if ($new === $old) {
@@ -528,11 +526,10 @@ public function _edit_user(string $olduser, string $newuser, array $oldpwd) {
     return true;
 }
 ```
+
 ### Special case service enablement/disablement
 
 `create` and `delete` are called when a mapped service configuration (discussed below under "[Mapped Services](#Mapped services)") is enabled or disabled **instead of** `edit`. For example, these three cases assume that "aliases" is disabled for a site (`aliases`,`enabled=0`). Aliases are brought online for the site debug.com with `EditDomain -c aliases,enabled=1 -c aliases,aliases=['foobar.com'] debug.com`.
-
-
 
 ## Verifying configuration
 
@@ -545,16 +542,17 @@ public function _verify_conf(\Opcenter\Service\ConfigurationContext $ctx): bool 
     }
     if (!empty($ctx['tpasswd'])) {
         $ctx['cpasswd'] = \Opcenter\Auth\Shadow::crypt($ctx['tpasswd']);
-      	$ctx['tpasswd'] = null;
+       $ctx['tpasswd'] = null;
     } else if (empty($ctx['cpasswd'])) {
         return error("no password provided!");
     }
-  	// do something
+   // do something
 }
 ```
+
 Likewise the module metadata may look like
 
-```
+```ini
 [myservice]
 enabled = 1
 tpasswd =
@@ -600,21 +598,27 @@ A mapped service connects metadata to apnscp through a Service Validator. A Serv
 Certain services can be triggered automatically when a service value is toggled or modified.
 
 ### MountableLayer
+
 `MountableLayer` may only be used on "enabled" validators. When enabled, a corresponding read-only filesystem hierarchy under `/home/virtual/FILESYSTEMTEMPLATE` is merged into the account's [filesystem](https://docs.apiscp.com/admin/managing-accounts/#account-layout).
 
 ### ServiceInstall
+
 `ServiceInstall` contains two methods `populate()` and `depopulate()` called when its value is 1 and 0 respectively. This provides granular control over populating services whereas `MountableLayer` merges the corresponding filesystem slice.
 
 ### ServiceReconfiguration
+
 Implements `reconfigure()` and `rollback()` methods, which consists of the old and new values on edit. On failure `rollback()` is called. Rollback is not compulsory.
 
 ### AlwaysValidate
+
 Whenever a site is created or edited, if a service definition implements `AlwaysValidate`, then the `valid($value)` will be invoked to ensure changes conform to the recommended changes. Returning `FALSE` will halt further execution and perform a rollback through `depopulate()` of any previously registered and confirmed services.
 
 ### AlwaysRun
+
 Service Definitions that implement `AlwaysRun` invert the meaning of `ServiceLayer`. `populate()` is now called whenever its configuration is edited or on account creation and `depopulate()` is called when an account is deleted or an edit fails. It can be mixed with `AlwaysValidate` to always run whenever a service value from the service is modified. An example is creating the maildir folder hierarchy. `version` is always checked (`AlwaysValidate` interface) and `Mail/Version` will always create mail folder layout regardless mail,enabled is set to 1 or 0.
 
 ## Creating service definitions
+
 Service definitions map account metadata to application logic. First, let's look at a hypothetical service  example that enabled Java for an account.
 
 ```ini
@@ -635,13 +639,13 @@ All files from `resources/plans/.skeleton` will be copied into `resources/plans/
 
 A base plan can be assigned to a site using `-p` or `--plan`,
 
-```
+```bash
 AddDomain -p java -c siteinfo,domain=newdomain.com -c siteinfo,admin_user=myadmin
 ```
 
 Moreover, the default plan can be changed using Artisan.
 
-```
+```bash
 ./artisan opcenter:plan --default java
 ```
 
@@ -689,7 +693,7 @@ Let's create a validator for *enabled* and *services* configuration values.
          */
         public function populate(SiteConfiguration $svc): bool
         {
-			return true;
+   return true;
         }
 
         /**
@@ -700,9 +704,9 @@ Let's create a validator for *enabled* and *services* configuration values.
          */
         public function depopulate(SiteConfiguration $svc): bool
         {
-	        return true;
+         return true;
         }
-	}
+ }
 ```
 
 `$this->ctx['var']` allows access to other configuration values within the scope of this service. `$this->ctx->getOldServiceValue($svc, $var)` returns the previous service value in `$svc` while `$this->ctx->getNewServiceValue($svc, $var)` gets the new service value if it is set.
@@ -830,7 +834,6 @@ Use of any **singleton that is dependent on user roles violates contextability**
 |                | **N/A** *sessions are not supported in contexted roles*      |
 |       ❌        | `Preferences::get('webapps.paths')`                          |
 |       ✅        | `array_get(Preferences::factory(Auth_Info_User $context), 'webapps.paths')` |
-
 
 # Jobs
 

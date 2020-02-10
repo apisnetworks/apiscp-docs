@@ -1,3 +1,7 @@
+---
+title: Scopes index
+---
+
 **name:** apache.block10  
 default: true  
 info: Disable or enable HTTP/1.0 access  

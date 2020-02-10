@@ -10,9 +10,9 @@ apnscp is an modern hosting panel + platform that began in 2002 as a panel for A
 
 ## Requirements
 
--   2 GB RAM
--   [Forward-confirmed reverse DNS](https://en.wikipedia.org/wiki/Forward-confirmed_reverse_DNS), i.e. 64.22.68.1 <-> apnscp.com
--   CentOS 7.x or RedHat 7.x
+- 2 GB RAM
+- [Forward-confirmed reverse DNS](https://en.wikipedia.org/wiki/Forward-confirmed_reverse_DNS), i.e. 64.22.68.1 <-> apnscp.com
+- CentOS 7.x or RedHat 7.x
 
 ## Installation
 
@@ -25,4 +25,3 @@ Use the [Issue Tracker](https://bitbucket.org/apisnetworks/apnscp/issues?status=
 ## License
 
 apnscp is (c) Apis Networks. All components except for third-party modules and [apnscp modules](https://github.com/apisnetworks/apnscp-modules) are licensed under a [commercial license](https://bitbucket.org/apisnetworks/apnscp/raw/HEAD/LICENSE). Contact licensing@apisnetworks.com for licensing enquiries. Any dissemination of material herein is prohibited without expressed written consent of Apis Networks.
-

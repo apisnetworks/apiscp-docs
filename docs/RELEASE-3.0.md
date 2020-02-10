@@ -19,8 +19,6 @@ apnscp lifetime licenses are on sale for $129 to celebrate this release. The reg
 
 👉 As with all former releases, refer to the v3.0 [pre-alpha technical release announcement](https://hq.apnscp.com/apnscp-pre-alpha-technical-release/) for installation and usage. 👈
 
-
-
 For existing installations, apnscp will update automatically overnight as long as `apnscp_nightly_update` is enabled (default: yes). If you disabled automatic updates or are many versions behind, update apnscp manually with:
 
 ```bash
@@ -107,7 +105,7 @@ An anti-virus is only as effective as its heuristics dictate, which is at the me
 cpcmd -d someaccount.com file_scan /var/www/html
 ```
 
-## In the pipeline...
+## In the pipeline
 
 Now that 3.0 has been released, it's time to address [feature requests](https://github.com/apisnetworks/apnscp/issues) that will be implemented in 3.1. This includes support for ownCloud, TimescaleDB metrics, PHP-FPM (when `apache,jail=1` is configured for a site), Dovecot/Postfix SNI via haproxy, and block storage attachment. These will be incrementally rolled out as part of the master branch, so if you'd like to continue to receive technology as it's released, set your update policy to "edge":
 

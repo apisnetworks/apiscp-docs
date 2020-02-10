@@ -1,6 +1,6 @@
 ## NAT + private network setup
 
-apnscp will attempt to auto-detect your public IP address during installation. This process may fall short if the server is behind a firewall or on a private network. 
+apnscp will attempt to auto-detect your public IP address during installation. This process may fall short if the server is behind a firewall or on a private network.
 
 ---
 
@@ -50,26 +50,25 @@ These IP addresses are stored in `namebased_ip_addrs` and `namebased_ip6_addrs` 
 
 #### Apache
 
-The IP addresses stored in `namebased_XX_addrs` are used to populate the addresses Apache will listen on. Adjustments are made in `/etc/httpd/conf/httpd-custom.conf` based upon addresses listed within the pools. 
+The IP addresses stored in `namebased_XX_addrs` are used to populate the addresses Apache will listen on. Adjustments are made in `/etc/httpd/conf/httpd-custom.conf` based upon addresses listed within the pools.
 
 * [`apache/configuration`](https://github.com/apisnetworks/apnscp-playbooks/tree/master/roles/apnscp/bootstrap) role will modify`httpd-custom.conf` if the addresses change.
 * Changing pool addresses will not reassign addresses already assigned to sites. This must be done manually. `EditDomain -c ipinfo,nbaddrs=['new.ip.add.ress'] domain` is the easiest means to accomplish this.
 
 #### DNS
 
-The IP address stipulated in `ipinfo`,`nbaddrs` or `ipinfo`,`ipaddrs` (or `ipinfo6`) will be used unless `dns`,`proxy_ip4` (or `proxy_ip6`) is specified or `dns`,`proxy_ip4` has the special value "DEFAULT". If the special value "DEFAULT" is used, then the config.ini setting [dns] => `proxy_ip4` (or `proxy_ip6`) will be used respectively for public DNS. 
+The IP address stipulated in `ipinfo`,`nbaddrs` or `ipinfo`,`ipaddrs` (or `ipinfo6`) will be used unless `dns`,`proxy_ip4` (or `proxy_ip6`) is specified or `dns`,`proxy_ip4` has the special value "DEFAULT". If the special value "DEFAULT" is used, then the config.ini setting [dns] => `proxy_ip4` (or `proxy_ip6`) will be used respectively for public DNS.
 
 * The proxied DNS value (`proxy_ipN`) takes precedence for public DNS even if the site is IP based.
-* Specify `dns`,`proxy_ipN` as empty ("") or null to unset public DNS for a site. If this value is removed, then the value from `ipinfoN`,`nbaddrs` or `ipinfoN`,`ipaddrs` (depending upon setup) will be used for DNS. 
+* Specify `dns`,`proxy_ipN` as empty ("") or null to unset public DNS for a site. If this value is removed, then the value from `ipinfoN`,`nbaddrs` or `ipinfoN`,`ipaddrs` (depending upon setup) will be used for DNS.
 * Specifying DEFAULT for the value will use [dns] => `proxy_ipN`
 
 ### IP-based hosting
 
 When `ipinfo`,`namebased` is `0` (false), a unique IP address is assigned for each account. This assignment pool is pulled from [dns] => `allocation_cidr` in config.ini based upon PTR presence. This IP address must be reachable internally; therefore, the value for ipaddrs will always reference the private/NAT network. PTRs, if supported by the DNS module, are created for both the internal network and public IP.
 
-
-
 ## AWS sample configuration with Route53
+
 * **Instance type**: t2.small
 * **IPv4 Public IP**: 18.217.104.240
 * **IPv4 Internal IP** (via `ip addr list`): 172.31.32.146
@@ -92,7 +91,7 @@ If changing the remote IP address, as with an AWS Elastic IP for example from 18
 ```bash
 cd /home/virtual
 for site in site* ; do
-	/usr/local/sbin/EditDomain -c dns,proxyaddr=['3.18.1.157'] "$site"
+ /usr/local/sbin/EditDomain -c dns,proxyaddr=['3.18.1.157'] "$site"
 done
 cpcmd -d aws-test.apiscp.com letsencrypt:append '[www.aws-test.apiscp.com]' false
 ```

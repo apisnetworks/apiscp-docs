@@ -1,4 +1,4 @@
-# Configuring rspamd
+# rspamd
 
 rspamd can operate in a few flavors depending upon the number of servers you have, how much memory you can set aside, and whether you can trust the data fed into the system.
 
@@ -48,7 +48,7 @@ By default rspamd piggybacks SpamAssassin. Depending upon mail volume this may t
 
 `rspamc learn_ham` and `rspamc learn_spam` will snarf the mailboxes it's fed learning all messages as ham (non-spam) or spam respectively.
 
-**Corpus list**
+### Corpus list
 
 - [Enron corpus](https://www.cs.cmu.edu/~./enron/) (ham)
 - [Enron spam corpus](http://nlp.cs.aueb.gr/software_and_datasets/Enron-Spam/index.html) (spam)
@@ -62,6 +62,7 @@ You can enable learning mail sent to Trash as spam with the following:
 ```bash
 cpcmd config_set apnscp.bootstrapper dovecot_learn_spam_folder '{{ dovecot_imap_root }}Trash'
 ```
+
 ::: v-pre
 "{{ ... }}" is used for variable expansion in Bootstrapper and must be included. By default the IMAP prefix is "INBOX.".
 :::

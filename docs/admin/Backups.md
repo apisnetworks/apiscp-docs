@@ -27,7 +27,7 @@ Installation is broken down into Director/Storage Daemon and File Daemon. The RP
 
 Install the dependencies and official RPM from ApisCP's Yum repository.
 
-```
+```bash
 yum install -y apnscp-bacula
 ```
 
@@ -83,17 +83,11 @@ Backups are stored in `/home/bacula/1` or `2/` depending upon slotting. That's i
 Now that the backup has completed (`status dir` from bconsole), let's restore from backup.
 
 1. Enter restore mode using `restore` command
-
 2. Locate *Find the JobIds for a backup for a client before a specified time* from the menu, usually item 10.
-
 3. Enter the last known time your files worked, e.g. 2019-06-29 12:00:00 (NB: 24-hour clock)
-
 4. Take the JobId from the result.
-
 5. Locate *Select full restore to a specified Job date*, usually item 12.
-
 6. Enter JobId from above.
-
 7. Navigate to the location to restore, all sites are backed up by site.
   ```bash
   cd /home/virtual
@@ -103,10 +97,10 @@ Now that the backup has completed (`status dir` from bconsole), let's restore fr
   mark *
   done
   ```
-*In future iterations of ApisCP, you will be able to mark site1 from /home/virtual to restore the entire site*
-
+  ::: tip
+  In future iterations of ApisCP, you will be able to mark site1 from /home/virtual to restore the entire site
+  :::
 8. Confirm the location to restore. By default */tmp* is used to avoid overwriting data. Type `mod` to modify the restore parameters, then change path to */* to overwrite everything.
-
 9. Enter `yes` to confirm everything is OK
 
 Restore takes a few seconds to minutes to complete depending upon how large the backup is. `status dir` will note whether it's still running.
@@ -119,6 +113,7 @@ When restored to `/tmp`, extended attributes - including ACLs - are preserved. U
 cp -an /tmp/home/virtual/siteX/shadow/var/www/html /home/virtual/siteX/fst/var/www/
 rsync -a /tmp/home/virtual/siteX/shadow/var/www/html /home/virtual/siteX/fst/var/www/
 ```
+
 > In the above examples, `cp` will replace any file missing or older than the backup reference. `rsync` alternatively overwrites all files. CentOS/RHEL aliases `cp` to `cp -i` prompting for confirmation before overwriting.
 
 ## Adding additional machines
@@ -222,6 +217,7 @@ systemctl enable bacula-sd bacula-dir bacula-fd
 ### File Daemon manual installation
 
 For each device whitelist firewall using firewall-cmd.
+
 ```bash
 firewall-cmd --permanent --zone=public --add-source=192.168.100.1
 ```

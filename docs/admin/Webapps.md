@@ -10,9 +10,10 @@ Web apps install under a separate system user with the least amount of permissio
 
 ## Detection
 
-All apps installed via **Web** > **Web Apps** are enrolled into apnscp's automatic update facility unless disenrolled via **Web Apps** "enable auto-updates" option. Enrollment information is preserved as well when an account migrates from one apnscp platform to another. 
+All apps installed via **Web** > **Web Apps** are enrolled into apnscp's automatic update facility unless disenrolled via **Web Apps** "enable auto-updates" option. Enrollment information is preserved as well when an account migrates from one apnscp platform to another.
 
 A site migrated over from a non-apnscp platform or installed manually may be detected and enrolled automatically using `admin_locate_webapps`.
+
 > ```bash
 > # cmd admin_locate_webapps '[site:mydomain.com]'
 > INFO    : Searching on `site49' (mydomain.com)
@@ -29,6 +30,7 @@ A site migrated over from a non-apnscp platform or installed manually may be det
 > ```
 
 ## Updates
+
 Updates process automatically every night. A batch update can be processed immediately with `admin_update_webapps`.
 
 >```bash
@@ -54,21 +56,21 @@ apnscp will upgrade incrementally to the last patch of each minor if supported b
 
 Updates can be controlled to limit the maximal version of an upgrade. To do so,
 
-* **Web** > **Web Apps** > *Select app* 
+* **Web** > **Web Apps** > *Select app*
 * Under Options, **Update version Lock**
-    * "None" process all updates
-        * ✅ 5.0.1 -> 5.0.19
-        * ✅ 5.0.1 -> 5.1.0
-        * ✅ 5.0.1 -> 6.0.0
-    * "Major" process all updates up to the major version
-        * ✅ 5.0.1 -> 5.0.19
-        * ✅ 5.0.1 -> 5.1.0
-        * ❌ 5.0.1 -> 6.0.0
-    * "Minor" process all updates to the minor version
-        * ✅ 5.0.1 -> 5.0.19
-        * ❌5.0.1 -> 5.1.0
-        * ❌5.0.1 -> 6.0.0
-    * Version lock is honored by themes/plugins as well
+  * "None" process all updates
+    * ✅ 5.0.1 -> 5.0.19
+    * ✅ 5.0.1 -> 5.1.0
+    * ✅ 5.0.1 -> 6.0.0
+  * "Major" process all updates up to the major version
+    * ✅ 5.0.1 -> 5.0.19
+    * ✅ 5.0.1 -> 5.1.0
+    * ❌ 5.0.1 -> 6.0.0
+  * "Minor" process all updates to the minor version
+    * ✅ 5.0.1 -> 5.0.19
+    * ❌5.0.1 -> 5.1.0
+    * ❌5.0.1 -> 6.0.0
+  * Version lock is honored by themes/plugins as well
 
 ### Failures
 
