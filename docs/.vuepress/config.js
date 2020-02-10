@@ -60,7 +60,7 @@ module.exports = {
     logo: 'https://apiscp.com/images/logo-inv.svg',
     // lastUpdated: 'Last updated',
     repo: 'https://github.com/apisnetworks/apnscp-docs',
-    docsDir: "",
+    docsDir: "docs",
     editLinks: true,
     editLinkText: 'Help us improve this article!',
     nav: [
@@ -171,6 +171,7 @@ module.exports = {
             "admin/Tuneables",
             "admin/Scopes-list",
             "RELEASE-3.1",
+            "RELEASE-3.0",
             "GLOSSARY"
           ]
         }
