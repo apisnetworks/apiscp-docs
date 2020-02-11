@@ -1,8 +1,6 @@
 ---
-title: 3.0 release notes
+title: "3.0"
 ---
-
-
 
 apnscp v3.0, sponsored by project creep, has been released. This is the first public major release after [16 years](http://old.apisnetworks.com/apnscpyears.php) of development. All major milestones have been implemented, including experimental preview of [rspamd](https://hq.apnscp.com/filtering-spam-with-rspamd/), a vastly superior spam filtering engine, that will power DKIM/ARC signing as well as rate-limiting outbound mail in future releases of apnscp.
 
@@ -115,7 +113,7 @@ cpcmd config_set apnscp.update-policy edge
 
 As always if you run into any issues stop by the [forums](https://forums.apnscp.com/) or [Discord](https://discord.gg/wDBTz6V). I'll be there!
 
-# Changelog
+## Changelog
 
 - REL: apnscp 3.0
 - **NEW**: license upgrade (License)

@@ -1,5 +1,5 @@
 ---
-title: Command-line Helpers
+title: Helpers
 ---
 ApisCP provides a variety of command-line helpers that allow you to interact with your accounts. For example, you may want to put the panel in [headless mode](https://github.com/apisnetworks/apnscp-playbooks#toggling-headless-mode), which disables web-based access, automate account management, or even too run a command as another site.
 
@@ -73,3 +73,61 @@ misc:list-commands "*pass*"
 `misc:info(string $filter = '')` displays command information including its signature, documentation, return type, and parameter documentation. It behaves similarly to `misc:list-commands`.
 
 `misc:i` is shorthand for this usage.
+
+### get_site
+
+Get site name from domain. Same as "site" + `get_site_id` 
+
+### get_site_id
+
+Get internal site ID from domain. Returns 1 on failure otherwise 0.
+
+#### Example
+
+{:.no_toc}
+```bash
+get_site_id example.com
+[[ $? -ne 0 ]] && echo "example.com doesn't exist"
+```
+### fstresolve
+
+Determine libraries linked against a binary. Used to resolve dependency problems when propagating a system package into the filesystem template.
+
+#### Example
+
+```bash
+fstresolve /home/virtual/FILESYSTEMTEMPLATE/siteinfo/usr/bin/ar
+```
+
+## Scripts
+All ApisCP scripts are available under `{{ $themeConfig.APNSCP_ROOT }}/bin/php/scripts`. All scripts make use of the apnscp CLI framework and require invocation with `apnscp_php` to operate.
+
+### change_dns.php
+
+Bulk change DNS for an account.
+
+### changelogparser.php
+
+Summarize apnscp changes.
+
+
+### reissueAllCertificates.php
+
+### transfersite.php
+
+### yum-post.php
+
+## Build scripts
+
+### build/php/php.config
+
+Build PHP for apnscp. To run, change into PHP source directory, then run:
+
+`{{ $themeConfig.APNSCP_ROOT }}/build/php/php.config`
+
+PHP will be built with apnscp module requirements.
+
+### build/httpd/apxs
+General utility apxs wrapper to build modules specifically for apnscp. Installed modules will be placed under `sys/httpd/private/modules`. Unless the module conflicts with global Apache instance, modules can be used from `sys/httpd/modules`, which is a symlink to `/usr/lib64/httpd/modules`.
+
+

@@ -8,7 +8,7 @@ All accounts are located in `/home/virtual`. Each account is assigned a unique n
 
 ### FILESYSTEMTEMPLATE
 
-Services that have corresponding filesystem structures are installed under /home/virtual/FILESYSTEMTEMPLATE. Refer to [Filesystem Template](https://docs.apiscp.com/admin/managing-accounts/#filesystem-template) section below for managing this component.
+Services that have corresponding filesystem structures are installed under /home/virtual/FILESYSTEMTEMPLATE. Refer to [Filesystem Template](#filesystem-template) section below for managing this component.
 
 ### fst
 

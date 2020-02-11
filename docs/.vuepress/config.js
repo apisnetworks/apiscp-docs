@@ -1,11 +1,15 @@
+
 module.exports = {
-  plugins: [
+   plugins: [
     '@vuepress/active-header-links',
     '@vuepress/back-to-top',
     [
       '@vuepress/pwa', {
         serviceWorker: true,
-        updatePopup: true
+        updatePopup: {
+          message: "New content is available.",
+          buttonText: "Refresh"
+        }
       }
     ],
     'alias',
@@ -28,13 +32,7 @@ module.exports = {
     'admin/**/*.vue',
     'admin/**/*.md'
   ],
-  // config for Service Worker
-  serviceWorker: {
-    updatePopup: {
-      message: "New content is available.",
-      buttonText: "Refresh"
-    }
-  },
+
   redirectionMapping: {
     "GLOSSARY": "glossary"
   },
@@ -55,8 +53,10 @@ module.exports = {
         href: "/favicon.ico"
       }
     ],
+    ['link', { rel: 'manifest', href: '/manifest.json' }],
   ],
   themeConfig: {
+    APNSCP_ROOT: '/usr/local/apnscp',
     logo: 'https://apiscp.com/images/logo-inv.svg',
     // lastUpdated: 'Last updated',
     repo: 'https://github.com/apisnetworks/apnscp-docs',
@@ -120,32 +120,60 @@ module.exports = {
         {
           title: "Administration",
           collapsable: false,
+          sidebarDepth: 3,
           children: [
-            "admin/CLI",
-            "admin/Scopes",
+            {
+              title: "Command-line",
+              children: [
+                "admin/CLI",
+                "admin/Plans",
+                "admin/Scopes",
+              ]
+            },
 
-            "admin/Plans",
+
+
             "admin/Backups",
 
-            "admin/Migrations",
+             {
+              title: "Migrations",
+              children: [
+                "admin/Migrations - cPanel",
+                "admin/Migrations - server",
+              ]
+            },
 
             "admin/Filesystem",
+            {
+              title: "Network",
+              children: [
+                "admin/DNS",
+                "admin/NAT",
+                "admin/SSL",
+              ]
+            },
 
-            "admin/DNS",
-            "admin/NAT",
-
-            "admin/SSL",
             "admin/Monitoring",
 
-            "admin/Smtp",
-            "admin/LDA",
-            "admin/Filtering",
+            {
+              title: "Mail",
+              children: [
+                "admin/Smtp",
+                "admin/LDA",
+                "admin/Filtering",
+              ]
+            },
 
-            "admin/Evasive",
-            "admin/PHP-FPM",
+            {
+              title: "HTTP",
+              children: [
+                "admin/Evasive",
+                "admin/PHP-FPM",
 
-            "admin/Webapps",
-            "admin/Fortification",
+                "admin/Webapps",
+                "admin/Fortification",
+              ]
+            },
 
             "admin/Troubleshooting",
 
@@ -155,12 +183,13 @@ module.exports = {
         },
         {
           title: "Extending",
-          collapsable: true,
+          collapsable: false,
           children: [
             "admin/Customizing",
             "admin/Billing integration",
             "admin/Hooks",
-            "PROGRAMMING"
+            "PROGRAMMING",
+            "admin/Hydration"
           ]
         },
         {
@@ -170,8 +199,13 @@ module.exports = {
             "AUTHORS",
             "admin/Tuneables",
             "admin/Scopes-list",
-            "RELEASE-3.1",
-            "RELEASE-3.0",
+            {
+              title: "Release notes",
+              children: [
+                "RELEASE-3.1",
+                "RELEASE-3.0",
+              ]
+            },
             "GLOSSARY"
           ]
         }

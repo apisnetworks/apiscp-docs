@@ -2,7 +2,7 @@
 
 ApisCP is designed to work with the following third-party billing platforms out of the box,
 
-- [Blesta](https://docs.blesta.com/display/user/ApisCP) as of 4.8.0
+- [Blesta](https://docs.blesta.com/display/user/APNSCP) as of 4.8.0
 - [WHMCS](https://github.com/LithiumHosting/apnscp-whmcs)
 
 The scope of this documentation is for developers to build custom integration modules for ApisCP.

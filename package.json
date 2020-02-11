@@ -3,7 +3,8 @@
     "docs:check": "markdownlint docs/*.md docs/admin/**/*.md && prettier --list-different --write \"docs/admin/**/*.md docs/*.{js,json,css,scss,vue,md}\"",
     "dev": "vuepress dev",
     "docs:dev": "vuepress dev docs --temp .temp --debug",
-    "docs:build": "vuepress build docs"
+    "docs:build": "vuepress build docs",
+    "docs:link-check": "rbenv exec ruby .circleci/dead-links.rb -p docs/admin"
   },
   "name": "apnscp-vuepress",
   "version": "1.0.0",

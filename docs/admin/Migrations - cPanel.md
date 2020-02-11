@@ -1,5 +1,5 @@
 ---
-title: cPanel Migrations
+title: cPanel migrations
 alias: migrations
 ---
 

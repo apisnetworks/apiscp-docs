@@ -1,4 +1,4 @@
-# PHP-FPM Configuration
+# PHP-FPM configuration
 
 PHP-FPM is a high performance PHP daemon built on FastCGI and introduced in apnscp 3.1. On apnscp platforms PHP-FPM demonstrates a 2-3x higher throughput than mod_php ("ISAPI"), which integrates into Apache as a module. In PHP-FPM, a request is sent over a UNIX domain socket to a dedicated worker pool for processing. In ISAPI, PHP requests are handled by a separate VM integrated into Apache that must scaffold and tear down at the end of each request. ISAPI is ideal in low-memory environments but loses relevance outside the niche scenario.
 

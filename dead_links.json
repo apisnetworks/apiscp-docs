@@ -1,0 +1,59 @@
+{
+  "external": [
+    [
+      "https://www.troyhunt.com/extended-validation-certificates-are-really-really-dead/ -> 0",
+      "docs/admin/SSL.md"
+    ],
+    [
+      "https://docs.apiscp.com/admin/managing-accounts/#adding-accounts -> 404",
+      "docs/admin/Plans.md"
+    ],
+    [
+      "https://docs.apiscp.com/admin/helper-binaries/#get_site_id -> 404",
+      "docs/admin/Customizing.md"
+    ],
+    [
+      "https://docs.apiscp.com/development/programming-guide/#hooks -> 404",
+      "docs/admin/Filesystem.md"
+    ],
+    [
+      "https://docs.apiscp.com/development/programming-guide/#extending-modules-with-surrogates -> 404",
+      "docs/admin/DNS.md"
+    ],
+    [
+      "https://docs.apiscp.com/admin/tuneables/ -> 404",
+      "docs/admin/Plans.md"
+    ],
+    [
+      "https://docs.blesta.com/display/user/ApisCP -> 404",
+      "docs/admin/Billing integration.md"
+    ],
+    [
+      "http://hostineer.com/linux-man/man7/maildropfilter.7.html#lbBI -> 404",
+      "docs/admin/LDA.md"
+    ],
+    [
+      "http://hostineer.com/linux-man/man7/maildropfilter.7.html -> 404",
+      "docs/admin/LDA.md"
+    ],
+    [
+      "https: -> 0",
+      "docs/admin/SSL.md"
+    ],
+    [
+      "http: -> 0",
+      "docs/admin/SSL.md"
+    ],
+    [
+      "https://asciinema.org/a/260493.svg -> 502",
+      "docs/admin/Migrations.md"
+    ],
+    [
+      "https://asciinema.org/a/260493 -> 502",
+      "docs/admin/Migrations.md"
+    ]
+  ],
+  "internal": [
+
+  ]
+}

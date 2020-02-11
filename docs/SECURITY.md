@@ -127,3 +127,6 @@ htpasswd /var/www/.htpasswd someuser
 ```
 
 Now "someuser" has access to the DAV location in which the above .htaccess is placed.
+
+## Previous disclosures
+- [AP-01/AP-07](https://hq.apiscp.com/ap-01-ap-07-security-vulnerability-update/) disclosures (July 2019; courtesy Rack911 Labs)

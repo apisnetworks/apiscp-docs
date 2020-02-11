@@ -1,5 +1,5 @@
 ---
-title: Plan and Site Management
+title: Site and Plan Management
 ---
 Plans are service presets that may be assigned to an account. ApisCP contains a default present named "basic" that is a good fit for non-power users to balance resource consumption and accessibility.
 
@@ -33,7 +33,9 @@ As an example, `EditDomain -c cgroup,enabled=0 --all` disables cgroup resource e
 AddDomain -c siteinfo,domain=mydomain.com -c siteinfo,admin_user=myadmin
 ```
 
-> Creates a new domain named *mydomain.com* with an administrative user *myadmin*. The email address defaults to [blackhole@apiscp.com](mailto:blackhole@apiscp.com) and password is randomly generated.
+::: details
+Creates a new domain named *mydomain.com* with an administrative user *myadmin*. The email address defaults to [blackhole@apiscp.com](mailto:blackhole@apiscp.com) and password is randomly generated.
+:::
 
 Let's alter this and set an email address, which is used to contact the account owner whenever a Web App is updated or when the password is changed. Let's also prompt for a password. But first let's delete *mydomain.com* because domains must be unique per server.
 
@@ -41,8 +43,9 @@ Let's alter this and set an email address, which is used to contact the account 
 DeleteDomain mydomain.com
 AddDomain -c siteinfo,domain=mydomain.com -c siteinfo,admin_user=myadmin -c siteinfo,email=hello@apisnetworks.com -c auth,passwd=1
 ```
-
-> ApisCP will prompt for a password and require confirmation. Email address will be set to [hello@apisnetworks.com](mailto:hello@apisnetworks.com).
+::: details
+ApisCP will prompt for a password and require confirmation. Email address will be set to [hello@apisnetworks.com](mailto:hello@apisnetworks.com).
+:::
 
 #### Tweaking services
 
@@ -85,7 +88,9 @@ Changing the password is another common operation:
 EditDomain -c auth,tpasswd=newpasswd site12
 ```
 
-> A new password is set in plain-text, "newpasswd". The third password alternative is cpasswd, which is a [crypt()](http://man7.org/linux/man-pages/man3/crypt.3.html)'d password. An optimal crypted password may be generated with [auth_crypt](https://api.apiscp.com/class-Auth_Module.html#_crypt). Alternatively, `cpcmd auth_crypt newpasswd` may be used to create the crypted password or To note, EditDomain accepts either the primary domain of an account, an aliased domain of an account (addon domain), or the site identifier. Aliases are discussed next.
+::: details
+A new password is set in plain-text, "newpasswd". The third password alternative is cpasswd, which is a [crypt()](http://man7.org/linux/man-pages/man3/crypt.3.html)'d password. An optimal crypted password may be generated with [auth_crypt](https://api.apiscp.com/class-Auth_Module.html#_crypt). Alternatively, `cpcmd auth_crypt newpasswd` may be used to create the crypted password or To note, EditDomain accepts either the primary domain of an account, an aliased domain of an account (addon domain), or the site identifier. Aliases are discussed next.
+:::
 
 ### Aliases
 
@@ -95,7 +100,9 @@ Aliases are domains for which the primary responds. Any alias also serves as a v
 EditDomain -c aliases,aliases=['foobar.com'] mydomain.com
 ```
 
-> aliases,aliases is dangerous! It is not an append-only operation, meaning that whatever aliases value is is what is attached, nothing more and nothing less. A safer option is `aliases_add_domain`, `aliases_remove_domain` part of the API, which adds or removes domains in a singular process. This is part of `cpcmd` discussed later on.
+::: danger
+aliases,aliases is dangerous! It is not an append-only operation, meaning that whatever aliases value is is what is attached, nothing more and nothing less. A safer option is `aliases_add_domain`, `aliases_remove_domain` part of the API, which adds or removes domains in a singular process. This is part of `cpcmd` discussed later on.
+:::
 
 ### Dry-runs
 
@@ -145,7 +152,7 @@ When `--plan=NEWPLAN --reset` is specified, only *unchanged defaults* are applie
 
 When `--reset` exists without a plan specifier, then the default plan settings are applied. A plan setting is only applied if the new plan's default value is not an array or not null. Certain parameters distinct to accounts, such as paswords, addon domains, and invoice are never reset.
 
-## Changing plans
+### Changing plans
 
 Plans are covered later in this section. Note the behavior when changing plans is that *only* the unchanged differences are applied. To reset all unprotected service variables to their new plan value, use `--reset` in conjunction with `--plan` as noted above.
 
@@ -157,7 +164,7 @@ Plans are covered later in this section. Note the behavior when changing plans i
 **--dry-run**: show proposed changes without applying them.  
 **--backup**: create a backup of the metadata prior to editing. This metadata is stored in siteXX/info/backup. Each successive run overwrites this data.  
 
-### Listing services
+#### Listing services
 
 `AddDomain -h` will list all available services. These services map to resources/templates/plans/.skeleton/, which infer support data from lib/Opcenter/Service/Validators/*Service Name*/*Service Var*/.php.
 
@@ -167,7 +174,7 @@ Plans are covered later in this section. Note the behavior when changing plans i
 
 ## DeleteDomain
 
-Domains may be deleted using `DeleteDomain`. DeleteDomain accepts a list of arguments that may be either the site identifier, domain, aliased domain, or [invoice](https://docs.apiscp.com/admin/managing-accounts/#adding-accounts) (billing,invoice OR billing,parent_invoice service value). Invoices allow you to quickly group multiple accounts. Invoices are discussed briefly below.
+Domains may be deleted using `DeleteDomain`. DeleteDomain accepts a list of arguments that may be either the site identifier, domain, aliased domain, or invoice (billing,invoice OR billing,parent_invoice service value). Invoices allow you to quickly group multiple accounts. Invoices are discussed briefly below.
 
 ### Flags
 

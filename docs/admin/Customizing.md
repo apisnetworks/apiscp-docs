@@ -13,16 +13,20 @@ Additionally, module configuration may be inserted in `/etc/httpd/conf.d` to loa
 
 After making changes, `htrebuild` will compile Apache's modular configuration followed by `systemctl reload httpd` to reload the web server.
 
-## apnscp
+## ApisCP
 
 **⚠️ DO NOT TOUCH:** /usr/local/apnscp/config/*  
 **Customization file:** /usr/local/apnscp/config/custom/*  
 
-apnscp supports overriding views, apps, modules, and configuration.
+ApisCP supports overriding views, apps, modules, and configuration.
+
+::: tip
+ApisCP was originally called APNSCP. Internally, in many places, the panel is still referred to as APNSCP. ApisCP is a bit easier to pronounce.
+:::
 
 ### View overrides
 
-All views may be copied into `config/custom/resources/views/<path>` from `resources/views/<path>`. Custom views take precedence, including all mail templates. Overriding `layout.blade.php` allows customization to the skeleton of all apps in apnscp.
+All views may be copied into `config/custom/resources/views/<path>` from `resources/views/<path>`. Custom views take precedence, including all mail templates. Overriding `layout.blade.php` allows customization to the skeleton of all apps in ApisCP.
 
 #### Layout
 
@@ -30,7 +34,7 @@ A master layout named "layout" is provided in `resources/views/`. As with all te
 
 ### App overrides
 
-Copy the app from `apps/<name>` to `config/custom/apps/<name>`.  Role menus, i.e. what is loaded when a corresponding user type logs in (admin, site, user) may be overridden as well. Menus are based on code under `lib/html/templateconfig-<role>.php`. Additional includes may be located under `config/custom/templates/<role>.php`. This is a sample extension for apnscp when a billing module is configured to allow clients direct access to manage billing:
+Copy the app from `apps/<name>` to `config/custom/apps/<name>`.  Role menus, i.e. what is loaded when a corresponding user type logs in (admin, site, user) may be overridden as well. Menus are based on code under `lib/html/templateconfig-<role>.php`. Additional includes may be located under `config/custom/templates/<role>.php`. This is a sample extension for ApisCP when a billing module is configured to allow clients direct access to manage billing:
 
 `config/custom/templates/site.php`:
 
@@ -64,7 +68,7 @@ $templateClass->create_link(
 
 #### Hiding/removing existing apps
 
-Apps populated as part of apnscp may be hidden or removed from view using `hide()` and `remove()` respectively. Application ID is the basename from the URI path, i.e. for /apps/foo the application ID is "foo" and likewise "quuz" is the application ID for /apps/quuz.
+Apps populated as part of ApisCP may be hidden or removed from view using `hide()` and `remove()` respectively. Application ID is the basename from the URI path, i.e. for /apps/foo the application ID is "foo" and likewise "quuz" is the application ID for /apps/quuz.
 
 `config/custom/templates/admin.php`:
 
@@ -78,7 +82,7 @@ Apps populated as part of apnscp may be hidden or removed from view using `hide(
 
 ### App view overrides
 
-Any app that uses Blade templates (`views/` directory) is eligible to override components of the template structure. Create the same structure in `config/custom/apps/<name>` as is in `apps/<name>`. For example to override `apps/ssl/views/partials/certificate-detected.blade.php`, copy that file to `config/custom/apps/ssl/views/partials/certificate-detected.blade.php`. apnscp will load the view from this location first. It is advisable to copy the entire application over (*App overrides*) as application structure may change between releases.
+Any app that uses Blade templates (`views/` directory) is eligible to override components of the template structure. Create the same structure in `config/custom/apps/<name>` as is in `apps/<name>`. For example to override `apps/ssl/views/partials/certificate-detected.blade.php`, copy that file to `config/custom/apps/ssl/views/partials/certificate-detected.blade.php`. ApisCP will load the view from this location first. It is advisable to copy the entire application over (*App overrides*) as application structure may change between releases.
 
 ### Global constants
 
@@ -105,7 +109,7 @@ DNS is generated from a base template in `resources/templates/dns`. Presently ma
 New themes may be created and placed under `public/css/themes` and `public/images/themes`. The default theme may be changed with `cpcmd`:
 
 ```bash
-cpcmd config_set apnscp.config style theme newtheme
+cpcmd config_set cp.config style theme newtheme
 ```
 
 Per theme layouts may be set following the [layout](#layout) override mentioned above.
@@ -116,16 +120,16 @@ All configuration must be made to `config/custom/config.ini`. [cpcmd](https://hq
 
 ```bash
 # Show all configuration
-cpcmd config_get apnscp.config
+cpcmd config_get cp.config
 # Set configuration
-cpcmd config_set apnscp.config core fast_init true
+cpcmd config_set cp.config core fast_init true
 ```
 
-Refer to [config.ini](https://gitlab.com/apisnetworks/apnscp/blob/master/config/config.ini) that ships with apnscp for a list of configurables.
+Refer to [config.ini](https://gitlab.com/apisnetworks/apnscp/blob/master/config/config.ini) that ships with ApisCP for a list of configurables.
 
 ### HTTP configuration
 
-All changes may be made to `/usr/local/apnscp/config/httpd-custom.conf`. After changing, restart apnscp, `systemctl restart apnscp`
+All changes may be made to `/usr/local/apnscp/config/httpd-custom.conf`. After changing, restart ApisCP, `systemctl restart apiscp`
 
 ## Dovecot
 
@@ -169,7 +173,7 @@ postfix_custom_config:
 **⚠️ DO NOT TOUCH:** /etc/php.ini (*managed block*)  
 **Customization file:** /etc/phpXX.d/*  
 
-apnscp uses a managed block in /etc/php.ini. Any directives within this block will always be overwritten. To override any values within this block, make changes in /etc/phpXX.d/ where XX is the version major/minor of PHP. Note this affects global PHP settings. To change settings per site look into [php_value](https://kb.apiscp.com/php/changing-php-settings/) in either `.htaccess` or `siteXX/custom` mentioned above in Apache.
+ApisCP uses a managed block in /etc/php.ini. Any directives within this block will always be overwritten. To override any values within this block, make changes in /etc/phpXX.d/ where XX is the version major/minor of PHP. Note this affects global PHP settings. To change settings per site look into [php_value](https://kb.apiscp.com/php/changing-php-settings/) in either `.htaccess` or `siteXX/custom` mentioned above in Apache.
 
 ## rspamd
 
