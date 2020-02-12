@@ -128,6 +128,7 @@ module.exports = {
                 "admin/CLI",
                 "admin/Plans",
                 "admin/Scopes",
+                "admin/Bootstrapper",
               ]
             },
 

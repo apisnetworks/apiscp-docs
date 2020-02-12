@@ -10,3 +10,4 @@ title: Majordomo
 3. For each user in /var/lib/majordomo/lists/NAME, an email is generated
 
 ### Simulating a delivery
+
