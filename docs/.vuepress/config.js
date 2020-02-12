@@ -162,6 +162,7 @@ module.exports = {
                 "admin/Smtp",
                 "admin/LDA",
                 "admin/Filtering",
+                "admin/Majordomo",
               ]
             },
 
