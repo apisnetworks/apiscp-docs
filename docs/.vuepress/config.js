@@ -169,9 +169,9 @@ module.exports = {
             {
               title: "HTTP",
               children: [
-                "admin/Evasive",
                 "admin/PHP-FPM",
-
+                "admin/Evasive",
+                "admin/ModSecurity",
                 "admin/Webapps",
                 "admin/Fortification",
               ]
