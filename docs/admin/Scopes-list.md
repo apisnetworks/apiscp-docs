@@ -112,6 +112,9 @@ info: View Argos backends
 settings: null  
 
 **name:** argos.config  
+default: mixed  
+info: Set an Argos directive. Provide backend or "" to apply to all backends  
+settings: mixed  
 
 **name:** argos.init  
 default: false  
@@ -209,7 +212,7 @@ settings: string
 
 **name:** cron.start-range  
 default: 3-22  
-info: 'Run cronjobs during these hours. Current time: 00:35 EST  
+info: 'Run cronjobs during these hours. Current time: 17:37 EST  
 
   Hint: default timezone can be changed with system.timezone'  
 settings: int range  
@@ -290,6 +293,9 @@ info: Get nameservers for server
 settings: array  
 
 **name:** net.ssl  
+default: testing.apisnetworks.com  
+info: Request SSL certificates for the following hosts  
+settings: string|array  
 
 **name:** opcenter.account-cleanup  
 default: true  
@@ -297,6 +303,9 @@ info: Periodically clean-up accounts on the server
 settings: string|false  
 
 **name:** rampart.blacklist  
+default: ''  
+info: Temporarily blacklist an IP address in Rampart  
+settings: string  
 
 **name:** rampart.fail2ban-whitelist  
 default: 127.0.0.1/8  
@@ -304,6 +313,9 @@ info: Whitelist an IP address from Rampart
 settings: string  
 
 **name:** rampart.whitelist  
+default: 127.0.0.1/8  
+info: Whitelist an IP address from Rampart brute-force detection  
+settings: string  
 
 **name:** ssl.debug  
 default: false  

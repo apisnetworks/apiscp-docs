@@ -109,7 +109,7 @@ DNS is generated from a base template in `resources/templates/dns`. Presently ma
 New themes may be created and placed under `public/css/themes` and `public/images/themes`. The default theme may be changed with `cpcmd`:
 
 ```bash
-cpcmd config_set cp.config style theme newtheme
+cpcmd scope:set cp.config style theme newtheme
 ```
 
 Per theme layouts may be set following the [layout](#layout) override mentioned above.
@@ -120,9 +120,9 @@ All configuration must be made to `config/custom/config.ini`. [cpcmd](https://hq
 
 ```bash
 # Show all configuration
-cpcmd config_get cp.config
+cpcmd scope:get cp.config
 # Set configuration
-cpcmd config_set cp.config core fast_init true
+cpcmd scope:set cp.config core fast_init true
 ```
 
 Refer to [config.ini](https://gitlab.com/apisnetworks/apnscp/blob/master/config/config.ini) that ships with ApisCP for a list of configurables.
@@ -133,7 +133,7 @@ All changes may be made to `/usr/local/apnscp/config/httpd-custom.conf`. After c
 
 ## Dovecot
 
-**⚠️ DO NOT TOUCH:** /etc/dovecot/conf.d/apnscp.conf  
+**⚠️ DO NOT TOUCH:** /etc/dovecot/conf.d//apnscp.conf  
 **Customization file:** /etc/dovecot/local.conf  
 
 A few conflicting files in /etc/dovecot/conf.d are wiped as part of [Bootstrapper](https://github.com/apisnetworks/apnscp-playbooks/blob/master/roles/mail/configure-dovecot/defaults/main.yml#L9). These files will always be removed if found:

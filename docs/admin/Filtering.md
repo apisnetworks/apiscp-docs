@@ -11,7 +11,7 @@ For the less attentive variety `cpcmd scope:set system.integrity-check 1` perfor
 This is the default mode that unlocks all capabilities including greylisting, conversational whitelisting, fuzzy matches, user settings and neural learning.
 
 ```bash
-cpcmd config_set apnscp.bootstrapper rspamd_enabled true
+cpcmd scope:set cp.bootstrapper rspamd_enabled true
 ```
 
 ## Single-server scanning with centralized Redis
@@ -19,9 +19,9 @@ cpcmd config_set apnscp.bootstrapper rspamd_enabled true
 rspamd scanning will continue to operate on the current server, but all statistics are sent to a centralized database. This ostensibly confers the advantage of speeding up its learning process.
 
 ```bash
-cpcmd config_set apnscp.bootstrapper rspamd_enabled true
-cpcmd config_set apnscp.bootstrapper rspamd_redis_server redisserver:port
-cpcmd config_set apnscp.bootstrapper rspamd_redis_password redispass
+cpcmd scope:set cp.bootstrapper rspamd_enabled true
+cpcmd scope:set cp.bootstrapper rspamd_redis_server redisserver:port
+cpcmd scope:set cp.bootstrapper rspamd_redis_password redispass
 ```
 
 ## Centralized scanning
@@ -29,8 +29,8 @@ cpcmd config_set apnscp.bootstrapper rspamd_redis_password redispass
 A server can be designated to scan mail exclusively. Additional configuration should be taken to open the firewall ports and restrict trusted network traffic as well on the host machine.
 
 ```bash
-cpcmd config_set apnscp.bootstrapper rspamd_enabled true
-cpcmd config_set apnscp.bootstrapper rspamd_worker_socket somehost:someport
+cpcmd scope:set cp.bootstrapper rspamd_enabled true
+cpcmd scope:set cp.bootstrapper rspamd_worker_socket somehost:someport
 ```
 
 ## Low memory without Redis
@@ -38,8 +38,8 @@ cpcmd config_set apnscp.bootstrapper rspamd_worker_socket somehost:someport
 Setting `has_low_memory` will put apnscp into a miserly mode stripping many auxiliary features, including Redis (backend becomes SQLite), neural learning, conversational whitelisting, and greylisting.
 
 ```bash
-cpcmd config_set apnscp.bootstrapper has_low_memory true
-cpcmd config_set apnscp.bootstrapper rspamd_enabled true
+cpcmd scope:set cp.bootstrapper has_low_memory true
+cpcmd scope:set cp.bootstrapper rspamd_enabled true
 ```
 
 ## Training rspamd
@@ -60,7 +60,7 @@ apnscp supports automatic learning by dragging email into and out of your "Spam"
 You can enable learning mail sent to Trash as spam with the following:
 
 ```bash
-cpcmd config_set apnscp.bootstrapper dovecot_learn_spam_folder '{{ dovecot_imap_root }}Trash'
+cpcmd scope:set cp.bootstrapper dovecot_learn_spam_folder '{{ dovecot_imap_root }}Trash'
 ```
 
 ::: v-pre

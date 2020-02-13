@@ -4,11 +4,11 @@ title: Programming Guide
 
 # Basics
 
-apnscp is designed to be flexible and fast. Because apnscp cannot exist without a broker (apnscpd) to transfer critical unprivileged code to privileged backend tasks, a critical choke also exists between this transfer (`$this->query('method', $args)`). Backend methods are designed to be thin. Make your frontend however you want, but inversely proportion complexity to backend calls as they bear the brunt of the logic and each backend roundtrip costs 0.1 ms when session resumption can be used. Without resumption each request is 6x slower.
+ApisCP is designed to be flexible and fast. Because ApisCP cannot exist without a broker (apnscpd) to transfer critical unprivileged code to privileged backend tasks, a critical choke also exists between this transfer (`$this->query('method', $args)`). Backend methods are designed to be thin. Make your frontend however you want, but inversely proportion complexity to backend calls as they bear the brunt of the logic and each backend roundtrip costs 0.1 ms when session resumption can be used. Without resumption each request is 6x slower.
 
 ## Invocation flow
 
-apnscp is partitioned into 2 components: an unprivileged frontend (typically runs as user "nobody") and a privileged backend that runs as root. Methods can traverse to the backend using a special method, `query(method, arg1, arg2, argn...)`, part of `Module_Skeleton`.
+ApisCP is partitioned into 2 components: an unprivileged frontend (typically runs as user "nobody") and a privileged backend that runs as root. Methods can traverse to the backend using a special method, `query(method, arg1, arg2, argn...)`, part of `Module_Skeleton`.
 
 `query()` bundles the parcel along with session identifier.
 
@@ -72,7 +72,7 @@ Exceptions convey stack. Stack conveyance adds overhead. Do not throw exceptions
 
 ### Non-exception usage
 
-apnscp bundles a general-purpose [error library](https://github.com/apisnetworks/error-reporter) with a variety of macros to simplify life. `fatal()`, `error()`, `warn()`, `info()`, `success()`, `deprecated()`, and `debug()` log issues to the error ring. error(), warn(), info() will copy stack if in **[core]** -> **debug** is set in config.ini (see [Configuration](#Configuration)). **[core]** -> **bug_report** will send a copy of production errors to the listed address.
+ApisCP bundles a general-purpose [error library](https://github.com/apisnetworks/error-reporter) with a variety of macros to simplify life. `fatal()`, `error()`, `warn()`, `info()`, `success()`, `deprecated()`, and `debug()` log issues to the error ring. error(), warn(), info() will copy stack if in **[core]** -> **debug** is set in config.ini (see [Configuration](#Configuration)). **[core]** -> **bug_report** will send a copy of production errors to the listed address.
 
 ```php
 public function test_value($x) {
@@ -138,7 +138,7 @@ The following macros are short-hand to log messages during application execution
 
 ## Calling programs
 
-apnscp provides a specialized library, [Util_Process](https://github.com/apisnetworks/util-process), for simplifying program execution. Arguments may be presented as sprintf arguments or by using name backreferences. You can even mix-and-match named and numeric backreferences (although highly discouraged and liable to result in 10,000v to the nipples!)
+ApisCP provides a specialized library, [Util_Process](https://github.com/apisnetworks/util-process), for simplifying program execution. Arguments may be presented as sprintf arguments or by using name backreferences. You can even mix-and-match named and numeric backreferences (although highly discouraged and liable to result in 10,000v to the nipples!)
 
 ```php
 $ret = Util_Process::exec('echo %(one)s %(two)d %3$s', ['one' => 'one', 'two' => 2, 3]);
@@ -185,7 +185,7 @@ A sample class implementation is found under `modules/example.php`.
 
 ## Extending modules with surrogates
 
-A module may be extended with a "surrogate". Surrogates are delegated modules loaded in lieu of modules that ship with apnscp. Surrogates ar e located under modules/surrogates/*\<module name>*.php. Unless the class name is explicitly called, e.g. `User_Module::MIN_UID`, a surrogate will be loaded first, e.g. $this->user_get_home() will check for modules/surrogates/user.php and use that instance before using modules/user.php. A surrogate or native class can be determined at runtime using `apnscpFunctionInterceptor::autoload_class_from_module()`, e.g. `apnscpFunctionInterceptor::autoload_class_from_module('user') . '::MIN_UID'`. Depending upon the presence of surrogates/user.php (override of User_Module), that or modules/user.php (native apnscp module) will be loaded.
+A module may be extended with a "surrogate". Surrogates are delegated modules loaded in lieu of modules that ship with ApisCP. Surrogates ar e located under modules/surrogates/*\<module name>*.php. Unless the class name is explicitly called, e.g. `User_Module::MIN_UID`, a surrogate will be loaded first, e.g. $this->user_get_home() will check for modules/surrogates/user.php and use that instance before using modules/user.php. A surrogate or native class can be determined at runtime using `apnscpFunctionInterceptor::autoload_class_from_module()`, e.g. `apnscpFunctionInterceptor::autoload_class_from_module('user') . '::MIN_UID'`. Depending upon the presence of surrogates/user.php (override of User_Module), that or modules/user.php (native ApisCP module) will be loaded.
 
 ::: tip
 "apnscpFunctionInterceptor" can also be referenced in code as "a23r" for brevity.
@@ -322,13 +322,13 @@ class My_Module extends Module_Skeleton {
 
 ## Configuration
 
-apnscp provides 3 general purpose configuration files in `config/`:
+ApisCP provides 3 general purpose configuration files in `config/`:
 
 - `db.yaml` database configuration
 - `auth.yaml` third-party configuration/API keys
-- `custom/config.ini`, overrides defaults in config.ini. **Do not make changes in** `config.ini`. `cpcmd config:set apnscp.config section option value` is a Scope to facilitate usage.
+- `custom/config.ini`, overrides defaults in config.ini. **Do not make changes in** `config.ini`. `cpcmd config:set cp.config section option value` is a Scope to facilitate usage.
 
-Configuration within `db.yaml` is prefixed with "DB\_". Configuration within `auth.yaml` is prefixed with "AUTH\_" to reduce the risk of collision between sources. Configuration in `custom/config.ini` is presented as-is. Values are transformed into constants on apnscp boot. Any changes require a restart, `systemctl restart apnscp`.
+Configuration within `db.yaml` is prefixed with "DB\_". Configuration within `auth.yaml` is prefixed with "AUTH\_" to reduce the risk of collision between sources. Configuration in `custom/config.ini` is presented as-is. Values are transformed into constants on ApisCP boot. Any changes require a restart, `systemctl restart apiscp`.
 
 For example,
 
@@ -372,7 +372,7 @@ Given the propensity for conflicts to exist between multiple modules, it is reco
 
 ## Application structure
 
-All apps are located under `apps/`. The "App ID" is the folder under which the application is located. A sample application named "test" is bundled with apnscp. A controller must be named after the App ID and end in ".php". The default view may be named after the App ID and end in ".tpl" or located as views/index.blade.php if using Blade.
+All apps are located under `apps/`. The "App ID" is the folder under which the application is located. A sample application named "test" is bundled with ApisCP. A controller must be named after the App ID and end in ".php". The default view may be named after the App ID and end in ".tpl" or located as views/index.blade.php if using Blade.
 
 ## Controller/Model
 
@@ -384,7 +384,7 @@ Controllers will be subject to API changes in the near future.
 
 ### Hooks
 
-apnscp controllers provide a few attachment points for hooks.
+ApisCP controllers provide a few attachment points for hooks.
 
 | Hook        | When                | Notes                                    |
 | ----------- | ------------------- | ---------------------------------------- |
@@ -395,7 +395,7 @@ apnscp controllers provide a few attachment points for hooks.
 
 ## Templates
 
-apnscp uses [Laravel Blade](https://laravel.com/docs/5.4/blade) bundled with Laravel 5.5 for templates or basic "include()" if the template is named *\<APP NAME>*/*\<APP NAME>*.tpl
+ApisCP uses [Laravel Blade](https://laravel.com/docs/5.4/blade) bundled with Laravel 5.5 for templates or basic "include()" if the template is named *\<APP NAME>*/*\<APP NAME>*.tpl
 
 ### Using Blade
 
@@ -455,10 +455,10 @@ Applications are privileged by role: admin, site, and user. Applications are con
 
 # Using Composer
 
-apnscp ships with support for the PHP dependency/package manager, [Composer](https://getcomposer.org).
+ApisCP ships with support for the PHP dependency/package manager, [Composer](https://getcomposer.org).
 
 ::: danger
-Use config/custom/ as your location to install Composer packages. Do not install custom packages under the top-level directory. They will be erased on an apnscp update.
+Use config/custom/ as your location to install Composer packages. Do not install custom packages under the top-level directory. They will be erased on an ApisCP update.
 :::
 
 To install a package switch to conf/config and install the package as you normally would,
@@ -470,11 +470,11 @@ composer require psr/log
 
 # Themes
 
-apnscp comes with a separate [theme SDK](https://github.com/apisnetworks/apnscp-bootstrap-sdk) available on Github. Global themes can be inserted into `public/css/themes/`. Default theme is adjusted via **[style]** -> **theme**. Users can build and install their own themes if **[style]** -> **allow_custom** is enabled.
+ApisCP comes with a separate [theme SDK](https://github.com/apisnetworks/apnscp-bootstrap-sdk) available on Github. Global themes can be inserted into `public/css/themes/`. Default theme is adjusted via **[style]** -> **theme**. Users can build and install their own themes if **[style]** -> **allow_custom** is enabled.
 
 # Hooks
 
-Several hooks are provided to latch into apnscp both for account and user creation. All hook names are prefixed with an underscore ("_"). All hooks run under Site Administrator privilege ("*PRIVILEGE_SITE*"). Any module that implements one must implement all hooks as dictated by the `\Opcenter\Contracts\Hookable` interface.
+Several hooks are provided to latch into ApisCP both for account and user creation. All hook names are prefixed with an underscore ("_"). All hooks run under Site Administrator privilege ("*PRIVILEGE_SITE*"). Any module that implements one must implement all hooks as dictated by the `\Opcenter\Contracts\Hookable` interface.
 
 | Hook        | Event Order | Description                              | Args                     |
 | ----------- | ----------- | ---------------------------------------- | ------------------------ |
@@ -561,7 +561,7 @@ cpasswd =
 
 ## Event-driven callbacks
 
-apnscp features a lightweight global serial callback facility called Cardinal. This is used internally and not [context-safe](#contextables).
+ApisCP features a lightweight global serial callback facility called Cardinal. This is used internally and not [context-safe](#contextables).
 
 # Service Definitions
 
@@ -591,7 +591,7 @@ Now specifying `-p` or `--plan` is implied for site creation.
 
 ## Mapped services
 
-A mapped service connects metadata to apnscp through a Service Validator. A Service Validator can accept or reject a sequence of changes determined upon the return value (or trigger of error via [error()](#ER message buffer macros)). Service Validators exist in two forms, as modules through `_verify_conf` [listed above](#Verifying configuration) and classes that reject early by implementing `ServiceValidator`; such objects are mapped services.
+A mapped service connects metadata to ApisCP through a Service Validator. A Service Validator can accept or reject a sequence of changes determined upon the return value (or trigger of error via [error()](#ER message buffer macros)). Service Validators exist in two forms, as modules through `_verify_conf` [listed above](#Verifying configuration) and classes that reject early by implementing `ServiceValidator`; such objects are mapped services.
 
 ## Definition behaviors
 
@@ -623,7 +623,7 @@ Service definitions map account metadata to application logic. First, let's look
 
 ```ini
 [java]
-version=3.0 ; apnscp service version, tied to panel. Must be 3.0.
+version=3.0 ; ApisCP service version, tied to panel. Must be 3.0.
 enabled=1   ; 1 or 0, mounts the filesystem layer
 services=[] ; arbitrary list of permitted services implemented by module
 ```
@@ -711,7 +711,7 @@ Let's create a validator for *enabled* and *services* configuration values.
 
 `$this->ctx['var']` allows access to other configuration values within the scope of this service. `$this->ctx->getOldServiceValue($svc, $var)` returns the previous service value in `$svc` while `$this->ctx->getNewServiceValue($svc, $var)` gets the new service value if it is set.
 
-`MountableLayer` requires a separate directory in `FILESYSTEMTEMPLATE/` named after the service. This is a read-only layer that is shared across all accounts that have the service enabled. apnscp ships with `siteinfo` and `ssh` service layers which provide basic infrastructure.
+`MountableLayer` requires a separate directory in `FILESYSTEMTEMPLATE/` named after the service. This is a read-only layer that is shared across all accounts that have the service enabled. ApisCP ships with `siteinfo` and `ssh` service layers which provide basic infrastructure.
 
 ### Service mounts
 
@@ -795,7 +795,7 @@ $cache->get('users.pwd.gen');
 
 ## Preferences and Session access
 
-apnscp includes wrappers to user preferences and session data via `Preferences` and `Session` helper classes. Session access is not supported within a contextable role. Sessions are temporary storage and thus have no utility for a contexted authentication role.
+ApisCP includes wrappers to user preferences and session data via `Preferences` and `Session` helper classes. Session access is not supported within a contextable role. Sessions are temporary storage and thus have no utility for a contexted authentication role.
 
 Preferences may be accessed and unlocked for write-access. An afi instance must be created to allow the Preference helper storage to save modified preferences.
 
@@ -816,7 +816,7 @@ Modules that use the `apnscpFunctionInterceptorTrait` also include a helper func
 
 ## Limitations
 
-Contextables may not be used in reliable, safe manner to access other URIs in apnscp. Contextables are considered "safe" with module access. Contextables should be used with caution with third-party modules as safety is not guaranteed.
+Contextables may not be used in reliable, safe manner to access other URIs in ApisCP. Contextables are considered "safe" with module access. Contextables should be used with caution with third-party modules as safety is not guaranteed.
 
 ### Avoiding state corruption
 
@@ -837,11 +837,11 @@ Use of any **singleton that is dependent on user roles violates contextability**
 
 # Jobs
 
-apnscp includes job management through [Laravel Horizon](https://horizon.laravel.com). Jobs run in a dedicated process, `horizon`, or as a spawnable one-shot queue manager that periodically runs `artisan queue:run`. When in low memory situations, set **[cron]** -> **low_memory**=**1** (see [Configuration](#Configuration)) to use the slower one-short, periodic queue manager.
+ApisCP includes job management through [Laravel Horizon](https://horizon.laravel.com). Jobs run in a dedicated process, `horizon`, or as a spawnable one-shot queue manager that periodically runs `artisan queue:run`. When in low memory situations, set **[cron]** -> **low_memory**=**1** (see [Configuration](#Configuration)) to use the slower one-short, periodic queue manager.
 
 ## Writing Jobs
 
-Jobs should implement `\Lararia\Job`, which serves as a base for all apnscp jobs. Lararia jobs will properly convey `error()`, `warn()`, and `info()` API error reporting macros to the job daemon. "`error()`" indicates a fatal, non-recoverable job failure.  All ER events are bundled in a job report, `\Lararia\Job\Report`.
+Jobs should implement `\Lararia\Job`, which serves as a base for all ApisCP jobs. Lararia jobs will properly convey `error()`, `warn()`, and `info()` API error reporting macros to the job daemon. "`error()`" indicates a fatal, non-recoverable job failure.  All ER events are bundled in a job report, `\Lararia\Job\Report`.
 
 ```php
 <?php declare(strict_types=1);
@@ -900,7 +900,7 @@ Note that the job must go out of scope to dispatch as the dispatch logic is cont
 
 ## Binding context
 
-apnscp supports binding authentication contexts to a job, for example to run an API command as another user. This is done using the`RunAs` trait and setting context before dispatching the job.
+ApisCP supports binding authentication contexts to a job, for example to run an API command as another user. This is done using the`RunAs` trait and setting context before dispatching the job.
 
 ```php
 <?php declare(strict_types=1);
@@ -927,9 +927,9 @@ apnscp supports binding authentication contexts to a job, for example to run an 
 
 # Migrations
 
-apnscp supports Laravel Migrations to keep database schema current. Migrations come in two forms **database** and **platform**. Database migrations use Laravel's [schema builder](https://laravel.com/docs/5.7/migrations). Platform migrations integrate [Bootstrapper](https://github.com/apisnetworks/apnscp-playbooks). All pending migrations may be run with `artisan migrate`
+ApisCP supports Laravel Migrations to keep database schema current. Migrations come in two forms **database** and **platform**. Database migrations use Laravel's [schema builder](https://laravel.com/docs/5.7/migrations). Platform migrations integrate [Bootstrapper](https://github.com/apisnetworks/apnscp-playbooks). All pending migrations may be run with `artisan migrate`
 
-Updating the control panel through `upcp` automatically deploys these migrations when present. Enabling automatic panel updates (`cpmd config_set apnscp.nightly-updates 1` ) also runs migrations every night during panel updates.
+Updating the control panel through `upcp` automatically deploys these migrations when present. Enabling automatic panel updates (`cpmd scope:set cp.nightly-updates 1` ) also runs migrations every night during panel updates.
 
 ## Database migration
 
@@ -944,7 +944,7 @@ Migration will be located in `resources/database/migrations`.
 
 ## Platform migration
 
-A platform migration may be created by passing `--platform` to make:migration,
+A platform migration may be created by passing `--platform` to `make:migration`,
 
 ```bash
 cd /usr/local/apnscp

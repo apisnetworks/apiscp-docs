@@ -24,8 +24,8 @@ Additional providers may be created by using any of the existing DNS providers a
 `cpcmd` provides a simple method of setting global DNS defaults.
 
 ```bash
-cpcmd config_set dns.default-provider cloudflare
-cpcmd config_set dns.default-provider-key '[key:ABCDEF123,secret:AbCdEf12345,proxy:true]'
+cpcmd scope:set dns.default-provider cloudflare
+cpcmd scope:set dns.default-provider-key '[key:ABCDEF123,secret:AbCdEf12345,proxy:true]'
 ```
 
 Note that all providers have different configuration requirements. Refer to the README.md bundled with each provider for more information. Provider documentation is also packaged with apnscp in `lib/Opcenter/<Provider Type>/Providers/<Provider Name>` directory.

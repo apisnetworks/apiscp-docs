@@ -1,3 +1,7 @@
+---
+title: Glossary
+---
+
 {:#Account metadata}
 : *Metadata* about an account that resides in *siteXX/info*. Examples of metadata include the primary domain, admin username, bandwidth allotment.
 
