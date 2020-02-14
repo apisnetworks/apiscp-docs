@@ -194,7 +194,9 @@ Passing null to $site and [since:timespec] to $flags allows deletion of suspende
 
 Domains may be deactivated from the command-line using `SuspendDomain`. It accepts a list of arguments, which may be the site identifier, domain, aliased domain, or [billing invoice](Billing%20integration.md).
 
-> A suspended domain revokes access to all services, except panel, as well as page access. Panel access may be overridden by setting *[auth]* => *suspended_login* to true in [config.ini](https://docs.apiscp.com/admin/tuneables/).
+::: tip
+A suspended domain revokes access to all services, except panel, as well as page access. Panel access may be overridden by setting *[auth]* => *suspended_login* to true in [config.ini](https://docs.apiscp.com/admin/tuneables/).
+:::
 
 When a billing invoice is specified any site that possesses this identifier either as billing,invoice or billing,parent_invoice will be suspended.
 
