@@ -114,6 +114,24 @@ cpcmd scope:set cp.config style theme newtheme
 
 Per theme layouts may be set following the [layout](#layout) override mentioned above.
 
+### Building themes
+
+Grunt is used to build themes from the [SDK](https://github.com/apisnetworks/apnscp-bootstrap-sdk). Some [Sass](https://sass-lang.com/) knowledge is recommended. [Bootstrap](https://getbootstrap.com/docs/4.0/getting-started/introduction/) is also helpful to know but simple enough to learn as you go along. ApisCP is presently based on Bootstrap 4.0.
+
+```bash
+git clone https://github.com/apisnetworks/apnscp-bootstrap-sdk
+pushd apnscp-bootstrap-sdk
+npm install -D
+env THEME=apnscp grunt watch
+```
+Now changes may be made to the "apnscp" theme in `scss/themes/apnscp`. It will also be necessary to put either the panel in debug mode using the *cp.debug* scope or by flagging the session as debug. Session is encoded in the browser session as `session.id`. Use this value with misc:debug-session to selectively enable debugging for this session:
+
+```bash
+# Enable debugging on session LETceXuAZ9p1MW0yPd7n1b3Btk9t9Weh
+env DEBUG=1 misc:debug-session LETceXuAZ9p1MW0yPd7n1b3Btk9t9Weh
+```
+It's recommended to create a new theme by copying one of the existing themes. Default theme may be changed using `cpcmd scope:set cp.config style theme NEWTHEME`. Likewise run `env THEME=NEWTHEME grunt` to build a minified release of the theme prior to shipment. Debug sessions source non-minified assets.
+
 ### ApisCP configuration
 
 All configuration must be made to `config/custom/config.ini`. [cpcmd](https://hq.apiscp.com/working-with-cli-helpers/#cpcmd) provides a short-hand tool to edit this file.

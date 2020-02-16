@@ -286,3 +286,83 @@ done
 A plan applied to an account does not reset any service values changed beyond the plan base. For example, if ssh,enabled=1 were the setting on an account and SSH were deactivated by setting ssh,enabled=0 outside the plan settings, then changing to a new plan in which ssh,enabled=1 exists *would not* apply to the site.
 
 This behavior may be altered by supplying `--reset` to EditDomain. See [EditDomain](#EditDomain) above for more information.
+
+
+## Complex plan usage
+
+OverlayFS, part of [BoxFS](Filesystem.md), may be used to create complex plans that add additional services.
+
+A cPanelesque feature allows users to use cron while disabling ssh. Doing so still allows the user arbitrary access to SSH into the server by opening a tunnel within a cron task, so the only means to ensure an environment without shell access is to disable all ingress routes. Despite this advice, cron may be enabled while disabling terminal access with a new service layer that utilizes the whiteout feature of OverlayFS:
+
+```bash
+mkdir -p /home/virtual/FILESYSTEMTEMPLATE/nossh/etc/pam.d
+mknod /home/virtual/FILESYSTEMTEMPLATE/nossh/etc/pam.d/sshd c 0 0
+touch /home/virtual/site1/info/services/nossh
+/etc/systemd/user/fsmount.init mount site1 nossh
+```
+
+::: details
+Use OverlayFS' whiteout feature to mask the sshd pam service, so you'd have all the affordances of the ssh service layer/bins but without the ability to authenticate via SSH. Layers are left-to-right precedence and layers are mounted lexicographically. To have a service supercede "nossh" name it lower in the alphabet such as "negatednossh".
+:::
+
+Any character device with major:minor 0:0 is hidden on upper layers. This a feature consistent with layered filesystems, OverlayFS and aufs notably. ApisCP uses OverlayFS presently but used aufs prior to [2016](http://updates.hostineer.com/2016/01/luna-launched-open-beta/). A corresponding [surrogate](../PROGRAMMING.md#extending-modules-with-surrogates) is created to mount the layer if the package name matches a package which lacks ssh but permits cron:
+
+```php
+<?php declare(strict_types=1);
+
+    class Ssh_Module_Surrogate extends Ssh_Module
+    {
+        const SSHLESS_PLANS = ['basic'];
+        public function _create()
+        {
+            parent::_create();
+            $plan = $this->getServiceValue('siteinfo', 'plan', \Opcenter\Service\Plans::default());
+            if (!\in_array($plan, static::SSHLESS_PLANS, true)) {
+                return;
+            }
+
+            return $this->maskSsh();
+        }
+
+        public function _edit()
+        {
+            parent::_edit();
+            $newPlan = array_get($this->getNewServices('siteinfo'), 'plan', \Opcenter\Service\Plans::default());
+            $oldPlan = array_get($this->getOldServices('siteinfo'), 'plan', \Opcenter\Service\Plans::default());
+            if (\in_array($oldPlan, static::SSHLESS_PLANS, true) === ($post = \in_array($newPlan, static::SSHLESS_PLANS, true))) {
+                return;
+            }
+            return $post ? $this->maskSsh() : $this->unmaskSsh();
+        }
+
+        private function maskSsh(): bool {
+            $layer = new \Opcenter\Service\ServiceLayer($this->site);
+            if (!$layer->installServiceLayer('nossh') || !$layer->reload()) {
+                return error("Failed to mount `nossh' service");
+            }
+            return true;
+        }
+
+        private function unmaskSsh(): bool
+        {
+            $layer = new \Opcenter\Service\ServiceLayer($this->site);
+            if (!$layer->uninstallServiceLayer('nossh') || !$layer->reload()) {
+                return error("Failed to unmount `nossh' service");
+            }
+
+            return true;
+        }
+    }
+```
+
+Make sure the plan listed above in `SSHLESS_PLANS` exists (see [artisan opcenter:plan](https://my.apiscp.com/docs/programming-guide#service-definitions)) and you're off to the races!
+
+You may confirm the service layer has been mounted via mount in procfs:
+
+```bash
+EditDomain -p basic site12
+grep 'site12/fst' /proc/mounts | grep lowerdir=
+# You should see "nossh" in the composite layer
+# Additionally, confirm the layer marker has been installed
+ls /home/virtual/site12/info/services/nossh
+```
