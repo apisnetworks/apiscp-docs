@@ -84,7 +84,7 @@ service fsmount reload_site site1
 
 ::: tip
 
-A more detailed example is available within [Site and Plan Management](Plans.md#Complex plan usage) that applies this layer programmatically based on assigned plan.
+A more detailed example is available within [Site and Plan Management](Plans.md#Complex-plan-usage) that applies this layer programmatically based on assigned plan.
 
 :::
 

@@ -94,7 +94,7 @@ A new password is set in plain-text, "newpasswd". The third password alternative
 
 ### Aliases
 
-Aliases are domains for which the primary responds. Any alias also serves as a valid authentication mechanism in the *user*@*domain* [login mechanism](https://hq.apiscp.com/apnscp-pre-alpha-technical-release/#loggingintoservices). Any alias without a defined document root will serve content from /var/www/html, which is the [document root](https://kb.apiscp.com/web-content/where-is-site-content-served-from/) for the primary domain.
+Aliases are domains for which the primary responds. Any alias also serves as a valid authentication mechanism in the *user*@*domain* [login mechanism](../INSTALL.md#logging-into-services). Any alias without a defined document root will serve content from /var/www/html, which is the [document root](https://kb.apiscp.com/web-content/where-is-site-content-served-from/) for the primary domain.
 
 ```bash
 EditDomain -c aliases,aliases=['foobar.com'] mydomain.com
@@ -195,7 +195,7 @@ Passing null to $site and [since:timespec] to $flags allows deletion of suspende
 Domains may be deactivated from the command-line using `SuspendDomain`. It accepts a list of arguments, which may be the site identifier, domain, aliased domain, or [billing invoice](Billing%20integration.md).
 
 ::: tip
-A suspended domain revokes access to all services, except panel, as well as page access. Panel access may be overridden by setting *[auth]* => *suspended_login* to true in [config.ini](https://docs.apiscp.com/admin/tuneables/).
+A suspended domain revokes access to all services, except panel, as well as page access. Panel access may be overridden by setting *[auth]* => *suspended_login* to true in [config.ini](Tuneables.md).
 :::
 
 When a billing invoice is specified any site that possesses this identifier either as billing,invoice or billing,parent_invoice will be suspended.
@@ -355,7 +355,7 @@ Any character device with major:minor 0:0 is hidden on upper layers. This a feat
     }
 ```
 
-Make sure the plan listed above in `SSHLESS_PLANS` exists (see [artisan opcenter:plan](https://my.apiscp.com/docs/programming-guide#service-definitions)) and you're off to the races!
+Make sure the plan listed above in `SSHLESS_PLANS` exists (see [artisan opcenter:plan](../PROGRAMMING.md#creating-service-definitions)) and you're off to the races!
 
 You may confirm the service layer has been mounted via mount in procfs:
 

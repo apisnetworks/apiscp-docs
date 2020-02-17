@@ -9,7 +9,7 @@ ApisCP provides a variety of means to customize your environment. Each service i
 **⚠️ DO NOT TOUCH**: /etc/httpd/conf/httpd.conf  
 **Customization file**: /etc/httpd/conf/httpd-custom.conf  
 
-Additionally, module configuration may be inserted in `/etc/httpd/conf.d` to load or modify existing modules. Per-site configuration is located in `/etc/httpd/conf.d/siteXX` or `/etc/httpd/conf.d/siteXX.ssl` for SSL-specific context. By convention customizations are placed in a file named `custom` in these directories. To get the site ID of a domain use the [helper](https://docs.apiscp.com/admin/helper-binaries/#get_site_id) command, `get_site_id`.
+Additionally, module configuration may be inserted in `/etc/httpd/conf.d` to load or modify existing modules. Per-site configuration is located in `/etc/httpd/conf.d/siteXX` or `/etc/httpd/conf.d/siteXX.ssl` for SSL-specific context. By convention customizations are placed in a file named `custom` in these directories. To get the site ID of a domain use the [helper](CLI.md#get-site-id) command, `get_site_id`.
 
 After making changes, `htrebuild` will compile Apache's modular configuration followed by `systemctl reload httpd` to reload the web server.
 
@@ -134,7 +134,7 @@ It's recommended to create a new theme by copying one of the existing themes. De
 
 ### ApisCP configuration
 
-All configuration must be made to `config/custom/config.ini`. [cpcmd](https://hq.apiscp.com/working-with-cli-helpers/#cpcmd) provides a short-hand tool to edit this file.
+All configuration must be made to `config/custom/config.ini`. [cpcmd](CLI.md#cpcmd) provides a short-hand tool to edit this file.
 
 ```bash
 # Show all configuration
@@ -221,7 +221,7 @@ rspamd provides many configurables that don't require a direct override. Neural 
 **⚠️ DO NOT TOUCH:** Managed block in /etc/ssh/sshd_config  (*# BEGIN/# END*)  
 **Customization file:** /etc/ssh/sshd_config  
 
-`sshd_config` may be modified. Do not edit the directives within `# BEGIN ApisCP MANAGED BLOCK` and `# END ApisCP MANAGED BLOCK`. Port and public key authentication may be modified with [Scopes](https://gitlab.com/apisnetworks/apnscp/blob/master/docs/admin/Scopes.md),
+`sshd_config` may be modified. Do not edit the directives within `# BEGIN ApisCP MANAGED BLOCK` and `# END ApisCP MANAGED BLOCK`. Port and public key authentication may be modified with [Scopes](Scopes.md),
 
 ```bash
 # Enable ssh daemon ports 22 and 58712

@@ -63,6 +63,10 @@ module.exports = {
     docsDir: "docs",
     editLinks: true,
     editLinkText: 'Help us improve this article!',
+    algolia: {
+      apiKey: 'd2f15fd1086962aaabb924f6aa693249',
+      indexName: 'apnscp-docs',
+    },
     nav: [
       {
         text: "Home",
@@ -180,6 +184,7 @@ module.exports = {
             "admin/Troubleshooting",
 
             "admin/Maps",
+            "admin/Benchmarking",
             "DEBUGGING",
           ]
         },
