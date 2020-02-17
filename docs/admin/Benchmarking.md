@@ -85,3 +85,43 @@ Run the following commands to create a new domain named "benchmark.test". DNS an
 ::: tip
 Overriding your [hosts file](https://kb.apnscp.com/dns/previewing-your-domain/) would allow you to access the WordPress administrative portal as if it were a real, resolvable domain. Use the IP from `cpcmd -d benchmark.test site:ip-address`.
 :::
+
+#### Extending
+
+Let's take this one step further, configuring a WP Redis object cache. Use `redis:create` to create a new Redis instance for the account, then `wp-cli` to install a Redis cache plugin. 
+
+```bash
+# Create a new Redis instance for benchmark.test named "wp-test" listening on /tmp/redis.sock
+cpcmd -d benchmark.test redis:create wp-test '[unixsocket:/tmp/redis.sock]'
+# Switch to benchmark.test account to configure plugin
+su benchmark.test
+cd /var/www/html
+wp-cli plugin install --activate redis-cache
+# Edit wp-config.php using nano
+EDITOR=nano wp-cli config edit
+```
+
+Then after `$table_prefix` add:
+
+```php
+define('WP_REDIS_PATH', '/tmp/redis.sock');
+```
+
+![Redis configuration](./images/wp-config-edit.png)
+
+Activate Redis cache and you're set!
+
+```bash
+wp-cli redis enable
+# Verify it is running
+wp-cli redis status
+```
+
+Exit out of the subshell, run as an unrestricted user, then verify data is cached:
+
+```bash
+exit
+ab -n 10 -c 1 http://benchmark.test/
+echo "KEYS *" | redis-cli -s /home/virtual/benchmark.test/tmp/redis.sock
+```
+
