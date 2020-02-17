@@ -15,3 +15,7 @@ cd /usr/local/apnscp/bin/
 ```
 
 A recovered map will provide the minimal environment to successfully delete a failed site addition, should it fail to delete entirely.
+
+::: danger
+Additional issues may persist after rebuilding your map. It is strongly encouraged then to validate HTTP configuration reloads without incident using `htrebuild` as well as configuring service alerts in [Argos](Monitoring.md).
+:::

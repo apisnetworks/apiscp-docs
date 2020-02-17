@@ -65,3 +65,23 @@ cpcmd scope:set apache.block10 false
 ab -n 1000 -c 1 http://mydomain.com/
 ```
 
+### Fast WordPress benchmark
+Creating a test account to benchmark WordPress is simple with a few CLI commands. Once your done benchmarking, run `DeleteDomain benchmark.test` to remove it (or keep it around for a rainy day).
+
+```bash
+ AddDomain -c siteinfo,domain=benchmark.test -c dns,provider=null -c mail,provider=null -c siteinfo,admin_user=benchmark-user
+ grep -Eq "benchmark.test\b" /etc/hosts || (echo "$(cpcmd -d benchmark.test site:ip-address) benchmark.test" >> /etc/hosts)
+ cpcmd -d benchmark.test wordpress:install benchmark.test
+ cpcmd scope:set apache.evasive enabled false
+ cpcmd scope:set apache.block10 false
+ sleep 120
+ ab -n 1000 -c 1 http://benchmark.test/
+```
+
+::: details
+Run the following commands to create a new domain named "benchmark.test". DNS and email will be disabled for the domain. Install WordPress, disable Evasive and HTTP/1.0 protection on the account. Sleep for 2 minutes for *[httpd]* => *reload_delay* to expire (`at -l` shows pending jobs), then run 1000 requests in serial against the domain.
+:::
+
+::: tip
+Overriding your [hosts file](https://kb.apnscp.com/dns/previewing-your-domain/) would allow you to access the WordPress administrative portal as if it were a real, resolvable domain. Use the IP from `cpcmd -d benchmark.test site:ip-address`.
+:::
