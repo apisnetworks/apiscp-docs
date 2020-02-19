@@ -6,7 +6,7 @@ footer: Copyright © 2020 Apis Networks
 
 # Introduction
 
-apnscp is an modern hosting panel + platform that began in 2002 as a panel for Apis Networks. apnscp runs agentless and is 100% self-hosted. Licenses can be purchased from [my.apnscp.com](https://my.apnscp.com).
+apnscp is an modern hosting panel + platform that began in 2002 as a panel for Apis Networks. apnscp runs agentless and is 100% self-hosted. Licenses can be purchased from [my.apiscp.com](https://my.apiscp.com).
 
 ## Requirements
 
@@ -16,11 +16,11 @@ apnscp is an modern hosting panel + platform that began in 2002 as a panel for A
 
 ## Installation
 
-See [docs.apnscp.com](https://docs.apnscp.com/getting-started/installation/). Installation may be customized using the [utility](https://apnscp.com/#customize) on apnscp.com.
+See [docs.apiscp.com](INSTALL.md). Installation may be customized using the [utility](https://apiscp.com/#customize) on apnscp.com.
 
 ## Contributing
 
-Use the [Issue Tracker](https://bitbucket.org/apisnetworks/apnscp/issues?status=new&status=open) to post feature requests.
+Use the [Issue Tracker](https://github.com/apisnetworks/apnscp) to post feature requests.
 
 ## License
 
