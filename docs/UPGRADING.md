@@ -4,26 +4,26 @@ Updates are separated into two categories, panel and system.
 
 ## Panel updates
 
-apnscp follows semantic versioning beginning with 3.0.0. Versions are split into 3 categories delimited by a period numerically ascending.
+ApisCP follows semantic versioning beginning with 3.0.0. Versions are split into 3 categories delimited by a period numerically ascending.
 
-* Major is the leading number (3). Major versions are guaranteed to introduce significant changes that may require rework to third-party modules that use apnscp. Major changes should be deployed with caution on any environment.
+* Major is the leading number (3). Major versions are guaranteed to introduce significant changes that may require rework to third-party modules that use ApisCP. Major changes should be deployed with caution on any environment.
 * Minor is the second number (0). Minor versions may introduce minor API changes or new services, however will not break anything in a meaningful way. Minor changes are considered safe for most environments.
 * Patch is the final number (0). Patch versions introduce non-destructive additions or bugfixes and are considered safe to always apply.
 
-apnscp is configured to deploy patch and minor updates on update. This is controlled with `apnscp_update_policy` in [apnscp-vars.yml](https://github.com/apisnetworks/apnscp-playbooks/blob/master/apnscp-vars.yml). Update policy can be configured using a [scope](docs/Scopes.md). Updates are checked automatically every night. This behavior can be changed with `apnscp_nightly_update` in apnscp-vars.yml or via `apnscp.nightly-updates` scope.
+ApisCP is configured to deploy patch and minor updates on update. This is controlled with `cp.update-policy` [Scope](admin/Scopes.md). Updates are checked automatically every night. This behavior can be changed via `cp.nightly-updates` Scope.
 
 Set the update policy to "edge" to help test new features. "edge" deploys code that is published to Gitlab before a formal release tag is defined for a commit.
 
 For example, to disable update checks, but deploy the latest code on manual update via `upcp`:
 
 ```bash
-cpcmd config:set apnscp.update-policy edge
-cpcmd config:set apnscp.nightly-updates false
+cpcmd scope:set cp.update-policy edge
+cpcmd scope:set cp.nightly-updates false
 ```
 
 ### upcp update helper
 
-`upcp` is an alias to `build/upcp.sh` distributed as part of apnscp. `upcp` checks for releases off Gitlab and deploys consistent with your update policy. A variety of flags can influence how upcp operates. With the exception of `--reset`, they may be mixed.
+`upcp` is an alias to `build/upcp.sh` distributed as part of ApisCP. `upcp` checks for releases off Gitlab and deploys consistent with your update policy. A variety of flags can influence how upcp operates. With the exception of `--reset`, they may be mixed.
 
 | Flag    | Purpose                                                      |
 | ------- | ------------------------------------------------------------ |
@@ -38,14 +38,27 @@ cpcmd config:set apnscp.nightly-updates false
 
 ### FLARE Updates
 
-FLARE is a separate update system for apnscp that performs hourly checks for critical releases. FLARE is automatically enabled whenever nightly updates are enabled (`cpcmd config:get apnscp.nightly-updates`). This feature is a crucial side-channel to allow emergency updates should the need arise (new OS update introduces volatile changes, zero day mitigation, etc). FLARE checks are handled via `apnscp-flare-check` timer and its eponymous oneshot service.
+FLARE is a separate update system for ApisCP that performs hourly checks for critical releases. FLARE is automatically enabled whenever nightly updates are enabled (`cpcmd scope:get cp.nightly-updates`). This feature is a crucial side-channel to allow emergency updates should the need arise (new OS update introduces volatile changes, zero day mitigation, etc). FLARE checks are handled via `apnscp-flare-check` timer and its eponymous oneshot service.
+
+```bash
+systemctl list-timers apnscp-flare-check.timer
+# Outputs:
+# Sun 2020-02-23 14:36:50 EST  22min left Sun 2020-02-23 14:00:18 EST  14min ago apnscp-flare-check.timer apnscp-flare-check.service
+# 1 timers listed.
+```
+
+
 
 ## System updates
 
-System updates are delivered via Yum. It is recommended to NOT alter this default. Failing appropriate judgment, this may be changed via `yum_update_policy` in apnscp-vars.yml or using the `system.update-policy` scope,
+System updates are delivered via Yum. It is recommended to NOT alter this default. Failing appropriate judgment, this may be changed via `system.update-policy` Scope,
 
 ```bash
-cpcmd config:set system.update-policy security-severity
+cpcmd scope:set system.update-policy security-severity
 ```
 
-If system updates are disabled, then they may be applied from the command-line via `yum update`.
+If system updates are disabled, then they may be applied from the command-line via `yum update`. The default setting, `default`, always applies system updates when available and applies any filesystem replication as needed.
+
+### Manual FST updates
+
+Filesystem template ("FST") updates are managed by Yum Synchronizer, which is invoked as a yum postaction on update/install. Yum Synchronizer usage is covered in depth in [Filesystem.md](admin/Filesystem.md).

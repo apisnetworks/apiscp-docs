@@ -37,7 +37,7 @@ module.exports = {
     "GLOSSARY": "glossary"
   },
   title: "ApisCP Documentation",
-  description: "ApisCP · modern hosting platform",
+  description: "ApisCP · A modern hosting platform",
   head: [
     [
       "link",
