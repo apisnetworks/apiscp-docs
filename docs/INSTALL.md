@@ -105,12 +105,26 @@ This mode can be quickly toggled after setup using a [configuration scope](admin
 
 ### Provisioning failures
 
-In the event of failure, Bootstrapper can be easily restarted from the command-line,
+Bootstrapper will continuously retry in the event of failure, pulling down updated code from [ApisCP's repository](${themeConfig.repo}) before each attempt.
+
+In the event of failure, Bootstrapper automatic retries may be stopped restarting instead from the command-line,
 
 ```bash
+systemctl disable bootstrapper-resume
 cd /usr/local/apnscp/resources/playbooks
 ansible-playbook bootstrap.yml
 ```
+
+#### Examining the log
+
+Installation is logged to `/root/apnscp-bootstrapper.log`. In the event of a failure, the last 20 lines are sufficient to determine what went wrong.
+
+```bash
+grep -m1 failed=1 -B20 /root/apnscp-bootstrapper.log
+```
+
+If no lines are returned, then no failure has occurred and you may need to wait longer for installation to complete. Installation should complete within 60 minutes. If installation does not complete within 90 minutes, then tread carefully as the server performance may be impaired.
+
 
 #### Network failures
 
