@@ -39,20 +39,14 @@ module.exports = {
   title: "ApisCP Documentation",
   description: "ApisCP · A modern hosting platform",
   head: [
-    [
-      "link",
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/icon?family=Material+Icons"
-      }
-    ],
-    [
-      "link",
-      {
-        rel: "icon",
-        href: "/favicon.ico"
-      }
-    ],
+    ["link", { rel: "stylesheet", href: "https://fonts.googleapis.com/icon?family=Material+Icons"}],
+    ["link", { rel: "icon", href: "/favicon.ico" }],
+    ['meta', { name: 'theme-color', content: '#169a84' }],
+    ['meta', { name: 'apple-mobile-web-app-capable', content: 'yes' }],
+    ['meta', { name: 'apple-mobile-web-app-status-bar-style', content: 'black' }],
+    ['link', { rel: 'apple-touch-icon', href: '/images/touch/home152.png' }],
+    ['meta', { name: 'msapplication-TileImage', content: '/images/touch/home144.png' }],
+    ['meta', { name: 'msapplication-TileColor', content: '#2c3035' }],
     ['link', { rel: 'manifest', href: '/manifest.json' }],
   ],
   themeConfig: {
