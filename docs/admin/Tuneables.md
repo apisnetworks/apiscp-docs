@@ -219,6 +219,9 @@ unify_registration=1
 ; Attempt to request SSL certificates for all domains on an account up to n times
 ; Each attempt is delayed 12 hours to accommodate network changes.
 bootstrap_attempts=3
+; Disable certain challenge modes. Use a comma-delimited list for each
+; Challenges will still appear in letsencrypt:challenges but skipped during acquisition
+disabled_challenges=tls-alpn
 
 ;;;
 ;;; DNS + IP assignent
@@ -294,7 +297,7 @@ proxysql=false
 ; Limit connections per user to server. Setting to higher numbers
 ; may mask underlying problems (over quota, poorly optimized queries).
 ; 10 is suitable for sites serving > 250 GB/month
-concurrency_limit=10
+concurrency_limit=20
 
 [pgsql]
 ; Limit active connections to a database. Unlike MySQL, enforcement is per database
@@ -398,6 +401,15 @@ autotune=true
 ; Maximum memory consumption. Leave undefined for autodetection.
 ; When unit omitted, assumed MB.
 memory_consumption=
+; Perform routine compressions on metric data older than timespec
+; Values older than this are averaged out into COMPRESSION_CHUNK windows
+compression_threshold="7 days"
+; Chunk data older COMPRESSION_THRESHOLD
+compression_chunk='1 hour'
+; Archival compression prevents modification of data past 48 hours
+archival_compression=true
+; Merge duplicate records by value older than compression_chunk
+merge_duplicates=false
 
 ;;;
 ;;; Cron
