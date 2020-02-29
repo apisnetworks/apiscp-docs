@@ -174,7 +174,7 @@ module.exports = {
                 "admin/Fortification",
               ]
             },
-
+            "admin/phpMyAdmin",
             "admin/Troubleshooting",
 
             "admin/Maps",
