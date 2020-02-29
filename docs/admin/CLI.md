@@ -74,6 +74,26 @@ misc:list-commands "*pass*"
 
 `misc:i` is shorthand for this usage.
 
+### Arbitrary execution/interactive mode
+`cpcmd -r` creates an execution context after ApisCP has been loaded. It may be used to interact with panel state as a one-liner.
+
+```bash
+# Load Laravel configuration, get contents from config/laravel/mail.php
+cpcmd -r '$app = app("config"); var_dump($app["mail"]);'
+```
+
+`cpcmd --interactive` is similar to one-liner mode (-r), but launches an interactive shell. State is not maintained in between invocations.
+
+```bash
+cpcmd --interactive
+# now in shell
+var_dump(app('config')['mail']);
+echo $c->commom_whoami(), "\n";
+$i = 0;
+# This will not work...
+echo ++$i;
+```
+
 ### get_site
 
 Get site name from domain. Same as "site" + `get_site_id` 
@@ -84,7 +104,6 @@ Get internal site ID from domain. Returns 1 on failure otherwise 0.
 
 #### Example
 
-{:.no_toc}
 ```bash
 get_site_id example.com
 [[ $? -ne 0 ]] && echo "example.com doesn't exist"
@@ -110,12 +129,17 @@ Bulk change DNS for an account.
 
 Summarize apnscp changes.
 
-
 ### reissueAllCertificates.php
+
+Perform a bulk reissue of all certificates. See [SSL.md](SSL.md) for further information.
 
 ### transfersite.php
 
+Migrate an ApisCP site between servers. See [Migrations](Migrations - server.md) for further information.
+
 ### yum-post.php
+
+Synchronize a system back into FST.
 
 ## Build scripts
 
