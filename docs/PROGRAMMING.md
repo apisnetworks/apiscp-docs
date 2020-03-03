@@ -378,6 +378,8 @@ All apps are located under `apps/`. The "App ID" is the folder under which the a
 
 Controller/Model logic is located in apps/*\<APP NAME>*/*\<APP NAME>*.php and instantiated first. The class name must be named Page and placed in a namespace named after the app ID. An example app named "Test" is located under apps/test/.
 
+Interoperability with Laravel exists in the [Laravel](#laravel-integration) section.
+
 ::: warning
 Controllers will be subject to API changes in the near future.
 :::
@@ -393,11 +395,11 @@ ApisCP controllers provide a few attachment points for hooks.
 | _layout     | After on_postback() | Must call parent. Calculate head CSS/JS elements. Unavailable in AJAX requests. |
 | _render     | After _layout()     | Template engine is exposed. Recommended time to share Blade variables |
 
-## Templates
+## Laravel integration
 
-ApisCP uses [Laravel Blade](https://laravel.com/docs/5.4/blade) bundled with Laravel 5.5 for templates or basic "include()" if the template is named *\<APP NAME>*/*\<APP NAME>*.tpl
+ApisCP uses [Laravel Blade](https://laravel.com/docs/5.5/blade) bundled with Laravel 5.5 for templates or basic "include()" if the template is named *\<APP NAME>*/*\<APP NAME>*.tpl
 
-### Using Blade
+### Blade
 
 Create a file named under `apps/custom/`  named *\<APP NAME>*/views/index.blade.php. This will be the initial page index for the app. $Page will be exposed along with a helper method, \$Page->view() to get an instance of \Illuminate\View. All Blade syntax will work, including extending with new directives:
 
@@ -410,7 +412,6 @@ $blade->compiler()->directive('datetime', function ($expression) {
 ```
 
 #### Sharing variables
-
 Model variables can be exported to a Blade view in the "_render" hook. This feature is unavailable when using the built-in lean .tpl format.
 
 ```php
@@ -419,7 +420,7 @@ public function _render() {
 }
 ```
 
-### Using Blade outside apps
+#### Using Blade outside apps
 
 Blade templates may be overridden outside of apps, such as with email templates or provisioning templates, by copying the asset to `config/custom/`*\<NAMED PATH>*.
 
@@ -432,6 +433,28 @@ cd /usr/local/apnscp
 mkdir -p config/custom/resources/templates/apache
 cp -dp resources/templates/apache/virtualhost.blade.php config/custom/resources/templates/apache/
 ```
+
+##### Configuration templates
+
+`ConfigurationWriter` is a special instance of Blade that looks for Blade templates under resources/templates. The same resolution technique is used: first config/custom/&lt;PATH&gt; followed by &lt;PATH&gt;.
+
+```php
+// Create an authentication context that will be passed as $svc
+$ctx = SiteConfiguration::import($this->authContext)
+// Look for resources/mail/webmail-redirect.blade.php
+$config = (new \Opcenter\Provisioning\ConfigurationWriter("mail/webmail-redirect", $ctx))
+	->compile([
+		// pass $mailpath as '/some/path'
+		'mailpath' => '/some/path'
+	]);
+
+// Convert the template to a string, outputting its results
+echo (string)$config;
+```
+
+### Router
+
+If a file named *routes.php* is present in the application directory, Laravel routing will be used to handle requests. A sample app is available under */apps/template*.
 
 ## Configuring app visibility
 
@@ -470,7 +493,7 @@ composer require psr/log
 
 # Themes
 
-ApisCP comes with a separate [theme SDK](https://github.com/apisnetworks/apnscp-bootstrap-sdk) available on Github. Global themes can be inserted into `public/css/themes/`. Default theme is adjusted via **[style]** -> **theme**. Users can build and install their own themes if **[style]** -> **allow_custom** is enabled.
+ApisCP comes with a separate [theme SDK](https://github.com/apisnetworks/apnscp-bootstrap-sdk) available on Github. Global themes can be inserted into `public/css/themes/`. Default theme is adjusted via **[style]** => **theme**. Users can build and install their own themes if **[style]** => **allow_custom** is enabled.
 
 # Hooks
 
