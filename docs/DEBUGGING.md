@@ -48,6 +48,16 @@ When in debug mode, housekeeping and cron services are disabled as well as job r
 env DEBUG=1 cpcmd misc:debug-session aE2uNGVkvpathoXqhofnsKDDXGNBJL9r true
 ```
 
+`session.id` may be retrieved from a JavaScript console, cookie source ("esprit_id" de facto cookie name) or from the source.
+
+![Session ID embedded in page source](./images/debugging-session-id.png)
+
+::: tip
+Other morsels of information: *name* is the cookie name, *role* the authenticated role in the set [site, user, admin]. *appId* represents the current app whose structure corresponds to */apps/APPID*.
+:::
+
+Any unhandled exceptions will be converted from a placeholder page to the actual stack trace. Appending *?FULL_STACK* to the page request dumps the entire stack, which may be several thousand lines. By default, full stack dumps are disabled in lieu of abbreviated stringified traces.
+
 ## Log locations
 
 ApisCP logs messages in a few places. Respective services use their preferred logging locations. This table summarizes common services and their log locations.

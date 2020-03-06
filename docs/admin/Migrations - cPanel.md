@@ -172,7 +172,8 @@ ImportDomain --format=cpanel --no-create /mydomain-updated.tar.gz
 `--no-create` is intended to copy data from an already provisioned account on an ApisCP platform. Consequently, `--no-create` is intended to refresh data such that it:
 
 - **will not** remove or alter existing users on the import destination
-- **will** update email addresses present on destination and source to source
+- **will not** update email addresses present on both destination and source
+- **will** create email addresses present on source not present in destination
 - **will** replace database contents and user grants with source if destination and source exist
 - **will** update files present on both source and destination with source if changed
 - **will not** remove files on destination not present on source
