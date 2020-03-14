@@ -193,7 +193,9 @@ Log buffering is enabled to reduce the amount of I/O requests. [Buffered logs](h
 
 In Event MPM, a single child process can handle multiple requests concurrently. By default, a very conservative number of threads (20) is created per process. At most a child process can handle 20 concurrent connections. Active requests beyond this threshold spawn a new child process.
 
-Threads may be tuned to decrease the number of processes spawned
+![Summarizing parameter relationship](./images/http-server-client-relationship.svg)
+
+Threads may be tuned to decrease the number of processes spawned without changing the maximum number of concurrent connections (**MaxRequestWorkers**).
 
 ```text
 ThreadLimit 128
