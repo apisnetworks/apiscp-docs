@@ -3,6 +3,7 @@ module.exports = {
    plugins: [
     '@vuepress/active-header-links',
     '@vuepress/back-to-top',
+    '@vuepress/last-updated',
     [
       '@vuepress/pwa', {
         serviceWorker: true,
@@ -167,6 +168,7 @@ module.exports = {
             {
               title: "HTTP",
               children: [
+                "admin/Apache",
                 "admin/PHP-FPM",
                 "admin/Evasive",
                 "admin/ModSecurity",
