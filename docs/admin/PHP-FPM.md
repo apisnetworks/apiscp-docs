@@ -1,6 +1,6 @@
 # PHP-FPM configuration
 
-PHP-FPM is a high performance PHP daemon built on FastCGI and introduced in apnscp 3.1. On apnscp platforms PHP-FPM demonstrates a 2-3x higher throughput than mod_php ("ISAPI"), which integrates into Apache as a module. In PHP-FPM, a request is sent over a UNIX domain socket to a dedicated worker pool for processing. In ISAPI, PHP requests are handled by a separate VM integrated into Apache that must scaffold and tear down at the end of each request. ISAPI is ideal in low-memory environments but loses relevance outside the niche scenario.
+PHP-FPM is a high performance PHP daemon built on FastCGI and introduced in ApisCP 3.1. On ApisCP platforms PHP-FPM demonstrates a 2-3x higher throughput than mod_php ("ISAPI"), which integrates into Apache as a module. In PHP-FPM, a request is sent over a UNIX domain socket to a dedicated worker pool for processing. In ISAPI, PHP requests are handled by a separate VM integrated into Apache that must scaffold and tear down at the end of each request. ISAPI is ideal in low-memory environments but loses relevance outside the niche scenario.
 
 PHP-FPM offers several advantages over an ISAPI integration:
 
@@ -23,7 +23,7 @@ PHP-FPM offers several advantages over an ISAPI integration:
   **cgroup enforcement is strongly encouraged to prevent abuse**. Set `cgroup,memory` as a minimum to ensure that a user cannot define a static pool that could spawn an egregious number of workers to cause an out-of-memory condition.
 
 - **RewriteBase fixup**
-  `SCRIPT_FILENAME` is rewritten before being passed to proxy. Because of this, PHP scripts on a subdomain or addon domain no longer require `RewriteBase /` to be set greatly reducing confusion on migrating to an apnscp platform.
+  `SCRIPT_FILENAME` is rewritten before being passed to proxy. Because of this, PHP scripts on a subdomain or addon domain no longer require `RewriteBase /` to be set greatly reducing confusion on migrating to an ApisCP platform.
 
 - **Multi-tenancy** *PENDING*
   Users may spawn multiple PHP-FPM pools each with different users. For example, it would be possible to create a PHP pool for production and staging in which the production environment adheres to the principles of [Fortification](Fortification.md) and the staging environment is owned entirely by the developer account; both operate under different UIDs.
@@ -58,6 +58,18 @@ cpcmd scope:set cp.bootstrapper php74_build_flags "--enable-pcntl"
 cpcmd scope:set apache.php-version 7.4
 ```
 
+## Installing modules
+
+To install imagick off PECL for the system PHP build,
+
+```bash
+cd /usr/local/apnscp/resources/playbooks
+ansible-playbook bootstrap.yml  --tags=php/install-pecl-module --extra-vars=pecl_extensions=imagick
+```
+::: tip
+`--extra-vars=force_module_rebuild=true` may be specified to force a module update as well as module configuration in FST/siteinfo/etc/phpXX.d/.
+:::
+
 # Configuring sites
 
 Switching an account over is a breeze! Flip the `apache,jail` setting to enable jailing:
@@ -66,7 +78,7 @@ Switching an account over is a breeze! Flip the `apache,jail` setting to enable 
 EditDomain -c apache,jail=1 -D domain.com
 ```
 
-To set the default going forward, either make the adjustment in a plan via `./artisan opcenter:plan` or set the default FPM behavior, `cpcmd config:set apnscp.config httpd use_fpm true`. All new accounts created will use PHP-FPM by default.
+To set the default going forward, either make the adjustment in a plan via `./artisan opcenter:plan` or set the default FPM behavior, `cpcmd scope:set cp.config httpd use_fpm true`. All new accounts created will use PHP-FPM by default.
 
 To perform an en-masse edit:
 
@@ -117,7 +129,7 @@ systemctl status php-fpm-site1-domain.com
 
 ```
 
-apnscp manages pool groups, restarting as needed after the elision window expires. To restart or suspend the pool for a site, use the `php-fpm-siteXX` service wrapper.
+ApisCP manages pool groups, restarting as needed after the elision window expires. To restart or suspend the pool for a site, use the `php-fpm-siteXX` service wrapper.
 
 ```bash
 # Suspend all pools allocated to site1
@@ -170,7 +182,7 @@ systemctl restart php-fpm-site1-example.com
 
 # Single-user behavior
 
-apnscp supports a single-user behavior which disables the benefits of [Fortification](Fortification.md). This behavior is consistent with cPanel and competing panels that do not isolate web users. Set `apache,webuser` to match the account admin:
+ApisCP supports a single-user behavior which disables the benefits of [Fortification](Fortification.md). This behavior is consistent with cPanel and competing panels that do not isolate web users. Set `apache,webuser` to match the account admin:
 
 ```bash
 EditDomain -c apache,webuser=myadmin -D mydomain.com
@@ -178,7 +190,7 @@ EditDomain -c apache,webuser=myadmin -D mydomain.com
 EditDomain -c apache,webuser="$(get_config mydomain.com siteinfo admin_user)" -D mydomain.com
 ```
 
-apnscp will change ownership on all files matching the previous user ("apache") to the new user "myadmin". Ownership change from a system user to an account user is an irreversible process. Now, files created by the web server will be under the account username. *Should and weakness exist* in any web app on the account that allows an attacker to run arbitrary code, then the attacker now has unrestricted access to all users on the account.
+ApisCP will change ownership on all files matching the previous user ("apache") to the new user "myadmin". Ownership change from a system user to an account user is an irreversible process. Now, files created by the web server will be under the account username. *Should and weakness exist* in any web app on the account that allows an attacker to run arbitrary code, then the attacker now has unrestricted access to all users on the account.
 
 This is an extremely dangerous configuration that should be avoided at all costs.
 
@@ -332,7 +344,7 @@ Configuration may be overrode by account owners ("Site Administrators") by placi
 
 Modules may be installed as one would normally expect with regular PHP-FPM. The only difference is the presence of `multiphp_build=true` and `php_version` must be explicitly set to at least MAJOR.MINOR.
 
-To install imagick off PECL for PHP 7.4,,
+To install imagick off PECL for PHP 7.4,
 
 ```bash
 cd /usr/local/apnscp/resources/playbooks
@@ -427,7 +439,7 @@ su apis.com
 
 Do not attempt to install a module directly; it is already relocated. Once satisfied, you may run into permission issues if PHP-FPM runs as an unprivileged system user ("apache") rather than the account owner. `su -s /bin/bash -G ADMINUSER apache` would setup a similar environment to systemd prior to launch.
 
-## Remi vs source
+## Remi vs Native
 
 Remi is an easier system to manage when juggling a variety of PHP versions, but it comes at some cost to performance and potential dependency management.
 
