@@ -22,7 +22,7 @@ Watch out! If the next hop is bracketed, the brackets must be doubly quoted "'[s
 
 Create a new password via mailchannels.net's Customer Console. *username* is the MailChannels Account ID. Use the mail.smart-host Scope to configure MailChannels in one step:
 
-`cpcmd scope:set mail.smart-host smtp.mailchannels.net username:somepassword`
+`cpcmd scope:set mail.smart-host smtp.mailchannels.net username somepassword`
 
 All mail will relay through MailChannels now using the assigned credentials. SPF records may be altered by overriding the DNS template.
 
