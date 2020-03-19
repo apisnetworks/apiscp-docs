@@ -128,5 +128,32 @@ htpasswd /var/www/.htpasswd someuser
 
 Now "someuser" has access to the DAV location in which the above .htaccess is placed.
 
+## Client encryption
+
+SSLv2 and SSLv3 are disabled with all recent software releases in the last 5 years. TLS v1.0 and v1.1 have recently become deprecated with Mozilla removing TLSv1.0 and TLSv1.1 beginning March 30. TLSv1.2, released in 2008, is mature and well tolerated by many clients. Two notable exceptions: Internet Explorer did not adopt until v11 in 2013 and Android 5.0+ released in 2014. 
+
+TLSv1.0 became a PCI compliance violation as of  June 30, 2018. TLSv1.1 is still to be determined, but will indubitably fall under the same violation in due time. TLSv1.0 and TLSv1.1 are disabled in ApisCP as of March 30, 2020.
+
+To enable these insecure protocols (SSLv2, SSLv3 are always disabled), use the following scopes:
+
+```bash
+cpcmd scope:set apache.insecure-ssl true
+cpcmd scope:set mail.insecure-ssl true
+```
+
+TLS compatibility may be enabled on a service-by-service basis for mail using the following Bootstrapper variables:
+* **postfix_insecure_ssl**: enable TLSv1.0/v1.1 for SMTP/submission (25, 587)
+* **dovecot_insecure_ssl**: enable TLSv1.0/v1.1 for IMAP/POP3 (143, 110)
+* **haproxy_insecure_ssl**: enable TLSv1.0/v1.1 for SNI client termination (465, 993, 995)
+
+```bash
+# Same as mail.insecure-ssl Scope
+cpcmd scope:set cp.bootstrapper postfix_insecure_ssl true
+cpcmd scope:set cp.bootstrapper dovecot_insecure_ssl true
+cpcmd scope:set cp.bootstrapper haproxy_insecure_ssl true
+upcp -sb mail/configure-postfix mail/configure-dovecot software/haproxy
+```
+
 ## Previous disclosures
+
 - [AP-01/AP-07](https://hq.apiscp.com/ap-01-ap-07-security-vulnerability-update/) disclosures (July 2019; courtesy Rack911 Labs)
