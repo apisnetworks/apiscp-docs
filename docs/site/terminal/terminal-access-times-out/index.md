@@ -13,4 +13,4 @@ All servers use a 3-5-10 brute-force deterrent mechanism: **three** invalid logi
 
 ## Solution
 
-Use the right credentials, dummy! See KB: [Accessing terminal](https://kb.apiscp.com/terminal/accessing-terminal/ "Accessing terminal").
+Use the right credentials, dummy! See KB: [Accessing terminal](https://kb.apnscp.com/terminal/accessing-terminal/).

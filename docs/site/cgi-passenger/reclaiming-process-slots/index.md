@@ -9,13 +9,13 @@ When trying to redeploy a Passenger process, Passenger may refuse deployment, be
 
 ## Symptoms
 
-Upon launching an application after [restarting](https://kb.apiscp.com/ruby/restarting-passenger-processes/ "Restarting Passenger processes"), the app will hang and [log an error](https://kb.apiscp.com/cgi-passenger/viewing-launcher-errors/ "Viewing launcher errors") similar to:
+Upon launching an application after [restarting](https://kb.apnscp.com/ruby/restarting-passenger-processes/), the app will hang and [log an error](https://kb.apnscp.com/cgi-passenger/viewing-launcher-errors/) similar to:
 
 \[ 2015-03-03 14:36:46.2725 11560/7f728e250700 Pool2/Group.h:898 \]: Unable to spawn the the sole process for group /home/virtual/siteXXX/fst/var/subdomain/SUBDOMAIN/../../www/APPNAME#default because the max pool size has been reached. Trying to shutdown another idle process to free capacity...
 
 ## Solution
 
-Kill any resident processes from the [terminal](https://kb.apiscp.com/terminal/accessing-terminal/ "Accessing terminal"). You can accomplish this in one of two ways:
+Kill any resident processes from the [terminal](https://kb.apnscp.com/terminal/accessing-terminal/). You can accomplish this in one of two ways:
 
 ### Easy way
 
@@ -30,7 +30,7 @@ bash: kill: (17413) - Operation not permitted
 
 ### Hard way
 
-Don't know the process name? Use [ps](http://apiscp.com/linux-man/man1/ps.1.html) to pull up processes:
+Don't know the process name? Use [ps](http://apnscp.com/linux-man/man1/ps.1.html) to pull up processes:
 
 Example:
 
@@ -42,7 +42,7 @@ Example:
 
 _This is an abridged process list_
 
-Inspect the value under the _PID_ column. PIDs are process identifiers and are a globally unique way to identify a process running. Take the PID for the respective Passenger application, then [kill](http://apiscp.com/linux-man/man1/kill.1.html) it.
+Inspect the value under the _PID_ column. PIDs are process identifiers and are a globally unique way to identify a process running. Take the PID for the respective Passenger application, then [kill](http://apnscp.com/linux-man/man1/kill.1.html) it.
 
 kill -9 1898
 

@@ -17,7 +17,7 @@ A typical rejection e-mail consists of 3 parts:
 3. A reason embedded with the automated response, usually within the first few paragraphs. Like the first 2 components, there is no set format for how these reasons are formatted. Below are a few samples with reasons in bold for emphasis:
     - Sample 1:
         
-        This is the mail system at host sputnik.apiscp.com.
+        This is the mail system at host sputnik.apnscp.com.
         
         I'm sorry to have to inform you that your message could not
         be delivered to one or more recipients. It's attached below.
@@ -44,7 +44,7 @@ A typical rejection e-mail consists of 3 parts:
         
     - Sample 3:
         
-        Reporting-MTA: dns; apollo.apiscp.com
+        Reporting-MTA: dns; apollo.apnscp.com
         X-Postfix-Queue-ID: 27CCC184D7D3
         X-Postfix-Sender: rfc822; myaddress@mydomain.com
         Arrival-Date: Wed, 18 Feb 2015 13:00:41 -0500 (EST)
@@ -127,11 +127,11 @@ This is not an exhaustive list, but instead a list of common rejection notices 
 
 ### Relaying denied
 
-**Explanation:** when mail passes through a server, one of three things must happen: (1) the client sending mail must be [authenticated](https://kb.apiscp.com/e-mail/unable-send-e-mail/) with the server usually by sending a [login/password](https://kb.apiscp.com/e-mail/accessing-e-mail/ "Accessing e-mail"), (2) the receiving server must be configured to know its the final destination for the recipient, _or_ (3) the receiving server must be configured to pass the message off to another server en route to its final destination. If any of these conditions are not met, it is construed as an unapproved "relay", which is _case #3_ without proper configuration.
+**Explanation:** when mail passes through a server, one of three things must happen: (1) the client sending mail must be [authenticated](https://kb.apnscp.com/e-mail/unable-send-e-mail/) with the server usually by sending a [login/password](https://kb.apnscp.com/e-mail/accessing-e-mail/), (2) the receiving server must be configured to know its the final destination for the recipient, _or_ (3) the receiving server must be configured to pass the message off to another server en route to its final destination. If any of these conditions are not met, it is construed as an unapproved "relay", which is _case #3_ without proper configuration.
 
 1. Sample (case #2, recipient end is improperly configured as reported by _Remote-MTA_):
     
-    Reporting-MTA: dns; augend.apiscp.com 
+    Reporting-MTA: dns; augend.apnscp.com 
     X-Postfix-Queue-ID: CA05A216020E 
     X-Postfix-Sender: rfc822; Arrival-Date: Fri, 2 Jan 2015 07:15:58 -0500 (EST) 
     Final-Recipient: rfc822; information@somedomain.com
@@ -140,13 +140,13 @@ This is not an exhaustive list, but instead a list of common rejection notices 
     **Remote-MTA: dns; mx1.emailsrvr.com** 
     Diagnostic-Code: smtp; 550 5.7.1 <information@somedomain.com>: **Relay access denied.**
     
-2. Sample (case #1, destination e-mail elsewhere, resolve by [authenticating](https://kb.apiscp.com/e-mail/unable-send-e-mail/ "Unable to send e-mail") with the mail server):
+2. Sample (case #1, destination e-mail elsewhere, resolve by [authenticating](https://kb.apnscp.com/e-mail/unable-send-e-mail/) with the mail server):
     
     The message could not be sent because one of the recipients was rejected by the server. 
     
     The rejected e-mail address was 'user@anotherdomain.com'. Account: 'mail.mydomain.com', Server: 'mail.mydomain.com', Protocol: SMTP, Server Response: '550 5.7.1 <user@anotherdomain.com>... **Relaying denied. Proper authentication required.**', Port: 25, Secure(SSL): No, Server Error: 550, Error Number: 0x800CCC79
     
-3. Sample (case #2, if domain is part of your account, resolve by [authorizing server](https://kb.apiscp.com/e-mail/authorizing-hostnames-handle-e-mail/ "Authorizing hostnames to handle e-mail") to handle mail for domain):
+3. Sample (case #2, if domain is part of your account, resolve by [authorizing server](https://kb.apnscp.com/e-mail/authorizing-hostnames-handle-e-mail/) to handle mail for domain):
     
     Delivery to the following recipient failed permanently:
          info@mydomain.com
@@ -159,7 +159,7 @@ This is not an exhaustive list, but instead a list of common rejection notices 
 
 ### DNS blacklist
 
-**Explanation:** although uncommon, our mail servers end up on DNS blacklists for inappropriate behavior (account gets hacked, begins to disseminate spam). Open a ticket within the [control panel](https://kb.apiscp.com/control-panel/logging-into-the-control-panel/ "Logging into the control panel") under **Help** > **Trouble Tickets** and include a copy of the message for us to look into it and get the server delisted.
+**Explanation:** although uncommon, our mail servers end up on DNS blacklists for inappropriate behavior (account gets hacked, begins to disseminate spam). Open a ticket within the [control panel](https://kb.apnscp.com/control-panel/logging-into-the-control-panel/) under **Help** > **Trouble Tickets** and include a copy of the message for us to look into it and get the server delisted.
 
 1. Sample:
     

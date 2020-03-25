@@ -9,7 +9,7 @@ A redirect changes the URL, in browser, from one URL to another. A variety of re
 
 ## Usage
 
-All redirects are controlled through a [.htaccess](https://kb.apiscp.com/guides/htaccess-guide/) file in the [document root](https://kb.apiscp.com/web-content/where-is-site-content-served-from/) of your target [domain](https://kb.apiscp.com/control-panel/creating-addon-domain/) or [subdomain](https://kb.apiscp.com/web-content/creating-subdomain/). The following stanza is a common, and simple redirect if the URL is www.example.com, then redirect to example.com:
+All redirects are controlled through a [.htaccess](https://kb.apnscp.com/guides/htaccess-guide/) file in the [document root](https://kb.apnscp.com/web-content/where-is-site-content-served-from/) of your target [domain](https://kb.apnscp.com/control-panel/creating-addon-domain/) or [subdomain](https://kb.apnscp.com/web-content/creating-subdomain/). The following stanza is a common, and simple redirect if the URL is www.example.com, then redirect to example.com:
 
 RewriteEngine On
 RewriteBase /

@@ -5,7 +5,7 @@ date: "2015-04-28"
 
 ## Overview
 
-Accounts that purchase a separate IP address for SSL ($2.50/mo) may also, optionally, send outbound mail solely through that IP address. This feature is called **Private SMTP Routing**. Before doing so, please open a ticket within the [control panel](https://kb.apiscp.com/control-panel/logging-into-the-control-panel/). Include which domains are sending outbound e-mail to ensure proper configuration. Only these domains specified in the ticket will connect to other mail servers using your assigned account IP address.
+Accounts that purchase a separate IP address for SSL ($2.50/mo) may also, optionally, send outbound mail solely through that IP address. This feature is called **Private SMTP Routing**. Before doing so, please open a ticket within the [control panel](https://kb.apnscp.com/control-panel/logging-into-the-control-panel/). Include which domains are sending outbound e-mail to ensure proper configuration. Only these domains specified in the ticket will connect to other mail servers using your assigned account IP address.
 
 ### Benefits
 

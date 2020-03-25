@@ -9,7 +9,7 @@ HTTP2 is a next-generation binary protocol that supports multiplexing HTTP reque
 
 ## Activating HTTP2
 
-HTTP2 support requires a SSL certificate (and [IP address](https://kb.apiscp.com/ssl/do-i-have-an-ip-address-for-ssl/)) to activate. HTTP2 is available on [all v6.5+](https://kb.apiscp.com/platform/determining-platform-version/) and newer platforms. No further configuration besides a SSL certificate is necessary.
+HTTP2 support requires a SSL certificate (and [IP address](https://kb.apnscp.com/ssl/do-i-have-an-ip-address-for-ssl/)) to activate. HTTP2 is available on [all v6.5+](https://kb.apnscp.com/platform/determining-platform-version/) and newer platforms. No further configuration besides a SSL certificate is necessary.
 
 ## See also
 

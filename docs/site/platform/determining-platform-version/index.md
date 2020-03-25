@@ -15,11 +15,11 @@ Certain platforms come with release announcements providing an overview of featu
 - [Version 6.0](http://updates.apisnetworks.com/2014/09/sol-hosting-platform/) (Sol) - _launched 2014/09 - CentOS 7, any-version Python/Ruby, virtualized platform, MariaDB switch, Postgres 9.3_
 - [Version 6.5](http://updates.apisnetworks.com/2016/01/luna-launched-open-beta/) (Luna) _\- launched 2016/02 - PHP 7.0, any-version Node, http/2 introduced, MariaDB 10.1, OverlayFS, Postgres 9.4_
 - [Version 7.0](http://updates.apisnetworks.com/2017/01/atlas-launches/) (Atlas) - _launched 2017/01 - PHP 7.1, MariaDB 10.2, Postgres 9.6_
-- Version 7.5 (Delta) - _[coming Q2 2018](https://forums.apiscp.com/t/planning-v7-5-platform/27) - rspamd, PHP 7.2, MariaDB 10.3, stricter SELinux enforcement, full automation, any-version Go, Postgres 10.0, ProxySQL_
+- Version 7.5 (Delta) - _[coming Q2 2018](https://forums.apnscp.com/t/planning-v7-5-platform/27) - rspamd, PHP 7.2, MariaDB 10.3, stricter SELinux enforcement, full automation, any-version Go, Postgres 10.0, ProxySQL_
 
 ## Platform Migration
 
-If you're on an older platform, simply open a ticket within the control panel to request a [platform migration](https://kb.apiscp.com/platform/migrating-another-server/). Migrations are automated, take 24 hours to complete and have zero-impact on your day-to-day operations, so long as you continue to use our [nameservers](https://kb.apiscp.com/dns/nameserver-settings/).
+If you're on an older platform, simply open a ticket within the control panel to request a [platform migration](https://kb.apnscp.com/platform/migrating-another-server/). Migrations are automated, take 24 hours to complete and have zero-impact on your day-to-day operations, so long as you continue to use our [nameservers](https://kb.apnscp.com/dns/nameserver-settings/).
 
 ## EOL Platforms
 

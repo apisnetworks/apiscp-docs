@@ -5,7 +5,7 @@ date: "2015-01-30"
 
 ## Overview
 
-Additional MySQL databases, used for storing application data, may be created quickly within the [control panel](https://kb.apiscp.com/control-panel/logging-into-the-control-panel/ "Logging into the control panel") via **Databases** > **MySQL Manager**. When a database is created, grants are automatically setup to permit the primary user access to the database. In multi-user environments, you may wish to create a separate user to keep your master password confidential.
+Additional MySQL databases, used for storing application data, may be created quickly within the [control panel](https://kb.apnscp.com/control-panel/logging-into-the-control-panel/) via **Databases** > **MySQL Manager**. When a database is created, grants are automatically setup to permit the primary user access to the database. In multi-user environments, you may wish to create a separate user to keep your master password confidential.
 
 ## Solution
 
@@ -16,21 +16,21 @@ Additional MySQL databases, used for storing application data, may be created qu
     - Optionally deselect _Backup database_ if you wish for _no backups_ to be made. If the database becomes corrupted, then there is no way to restore it, so be careful.
 3. Optionally click **Advanced** to toggle the backup frequency, count, and a file to import from. For larger databases, you may wish to hold 2 database copies and backup every day. This would give you 48 hours of protection. Database import files may be plain-text or compressed.
     
-    [![Importing a database](images/db-sql-import-300x132.png)](https://kb.apiscp.com/wp-content/uploads/2015/01/db-sql-import.png)Importing a database
+    [![Importing a database](https://kb.apnscp.com/wp-content/uploads/2015/01/db-sql-import-300x132.png)](https://kb.apnscp.com/wp-content/uploads/2015/01/db-sql-import.png)Importing a database
     
 4. Click **Create**
 5. A database comprised of your _database prefix_ and _name_ will be created.
     - In the below example, this database will be named `dc_test`
         
-        \[caption id="attachment\_595" align="alignnone" width="300"\][![Database prefix illustration in MySQL Manager](images/db-prefix-illustration-300x125.png)](https://kb.apiscp.com/wp-content/uploads/2015/01/db-prefix-illustration.png) Database prefix illustration in MySQL Manager\[/caption\]
+        \[caption id="attachment\_595" align="alignnone" width="300"\][![Database prefix illustration in MySQL Manager](https://kb.apnscp.com/wp-content/uploads/2015/01/db-prefix-illustration-300x125.png)](https://kb.apnscp.com/wp-content/uploads/2015/01/db-prefix-illustration.png) Database prefix illustration in MySQL Manager\[/caption\]
         
          
 
 ### Connecting
 
-To connect to this database, use a hostname value of `localhost`, your username, and your database password. If this password is forgotten at any time, you must [reset it](https://kb.apiscp.com/mysql/resetting-mysql-password/ "Resetting MySQL password") unless it has been used elsewhere.
+To connect to this database, use a hostname value of `localhost`, your username, and your database password. If this password is forgotten at any time, you must [reset it](https://kb.apnscp.com/mysql/resetting-mysql-password/) unless it has been used elsewhere.
 
-**Note:** localhost should be used for all local connectivity, unless [connecting remotely](https://kb.apiscp.com/mysql/connecting-remotely-mysql/ "Connecting remotely to MySQL") or connecting using database connection pooling ("DBCP") in Java. With DBCP, use a hostname of `127.0.0.1` - TCP socket over localhost.
+**Note:** localhost should be used for all local connectivity, unless [connecting remotely](https://kb.apnscp.com/mysql/connecting-remotely-mysql/) or connecting using database connection pooling ("DBCP") in Java. With DBCP, use a hostname of `127.0.0.1` - TCP socket over localhost.
 
 ### Permitting access by other users
 

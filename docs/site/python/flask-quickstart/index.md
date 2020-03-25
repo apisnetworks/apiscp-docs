@@ -5,20 +5,20 @@ date: "2015-03-08"
 
 ## Overview
 
-[Flask](http://flask.pocoo.org/) is a Python microframework for building web sites with minimal overhead. Think of it as a lightweight version of Django with fewer features, but better speed. Flask is supported on [v6+](https://kb.apiscp.com/platform/determining-platform-version/ "Determining platform version") platforms using [Passenger](http://www.phusionpassenger.com).
+[Flask](http://flask.pocoo.org/) is a Python microframework for building web sites with minimal overhead. Think of it as a lightweight version of Django with fewer features, but better speed. Flask is supported on [v6+](https://kb.apnscp.com/platform/determining-platform-version/) platforms using [Passenger](http://www.phusionpassenger.com).
 
 ## Quickstart
 
-All steps are done from the [terminal](https://kb.apiscp.com/terminal/accessing-terminal/ "Accessing terminal"). While it may be possible to deploy a Flask application without using terminal, it is strongly recommended for ease.
+All steps are done from the [terminal](https://kb.apnscp.com/terminal/accessing-terminal/). While it may be possible to deploy a Flask application without using terminal, it is strongly recommended for ease.
 
-1. Prerequisite: create a [Passenger-compatible](https://kb.apiscp.com/cgi-passenger/passenger-application-layout/ "Passenger application layout") filesystem layout
+1. Prerequisite: create a [Passenger-compatible](https://kb.apnscp.com/cgi-passenger/passenger-application-layout/) filesystem layout
 2. Change directories to the base, we'll name the base directory `flask` in `/var/www`
     - `cd /var/www/flask`
-3. _Optional_: determine which [Python version](https://kb.apiscp.com/python/changing-python-versions/ "Changing Python versions") to use for Flask using pyenv
-4. Install flask using [pip](https://kb.apiscp.com/python/installing-packages/ "Installing packages"):
+3. _Optional_: determine which [Python version](https://kb.apnscp.com/python/changing-python-versions/) to use for Flask using pyenv
+4. Install flask using [pip](https://kb.apnscp.com/python/installing-packages/):
     - pip install flask
         
-5. Create a Passenger startup file to run Flask as a Python [WSGI application](https://kb.apiscp.com/python/using-wsgi/ "Using WSGI"):
+5. Create a Passenger startup file to run Flask as a Python [WSGI application](https://kb.apnscp.com/python/using-wsgi/):
     - from flask import Flask
         application = Flask(\_\_name\_\_)
          
@@ -35,11 +35,11 @@ All steps are done from the [terminal](https://kb.apiscp.com/terminal/accessing-
 
 ### Restarting a Flask app
 
-Since Flask runs using Passenger, it uses the same [restart method](https://kb.apiscp.com/ruby/restarting-passenger-processes/ "Restarting Passenger processes") as any Passenger-backed app.
+Since Flask runs using Passenger, it uses the same [restart method](https://kb.apnscp.com/ruby/restarting-passenger-processes/) as any Passenger-backed app.
 
 ## See also
 
 - [Explore Flask](https://exploreflask.com/) eBook
 - [Flask documentation](http://flask.pocoo.org/docs/latest/)
 - [Django vs Flask vs Pyramid](https://www.airpair.com/python/posts/django-flask-pyramid)
-- [Flask demo](http://flask.sandbox.apiscp.com/) running on a v6 account
+- [Flask demo](http://flask.sandbox.apnscp.com/) running on a v6 account

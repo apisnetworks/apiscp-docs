@@ -5,11 +5,11 @@ date: "2015-01-08"
 
 ## Overview
 
-Message filtering is done prior to delivery via maildrop. Each message goes through two levels of filters: (1) global -- processed first in `/etc/maildroprc` followed by (2) local per-user filters in `$HOME/.mailfilter`. Basic filtering recipes are provided below. Syntax and usage may be found in [mailfilter(7)](http://apiscp.com/linux-man/man7/maildropfilter.7.html).
+Message filtering is done prior to delivery via maildrop. Each message goes through two levels of filters: (1) global -- processed first in `/etc/maildroprc` followed by (2) local per-user filters in `$HOME/.mailfilter`. Basic filtering recipes are provided below. Syntax and usage may be found in [mailfilter(7)](http://apnscp.com/linux-man/man7/maildropfilter.7.html).
 
-**Important:** on [older platforms](https://kb.apiscp.com/platform/determining-platform-version/ "Determining platform version"), (less than v6), remember to always run [dos2unix](http://apiscp.com/linux-man/man1/dos2unix.1.html) or EOL conversion "Windows -> Unix" (**Files** > **File Manger** > **Properties** _action_) on the filter after making changes. maildrop will not read filter files written on Windows or Mac correctly. Consequently, mail cannot be delivered to the account until corrected.
+**Important:** on [older platforms](https://kb.apnscp.com/platform/determining-platform-version/), (less than v6), remember to always run [dos2unix](http://apnscp.com/linux-man/man1/dos2unix.1.html) or EOL conversion "Windows -> Unix" (**Files** > **File Manger** > **Properties** _action_) on the filter after making changes. maildrop will not read filter files written on Windows or Mac correctly. Consequently, mail cannot be delivered to the account until corrected.
 
-[SpamAssassin](http://wiki.apiscp.com/index.php/SpamAssassin "SpamAssassin") is invoked from the global maildrop filter, `/etc/maildroprc`. The following block of code passes the message off to SpamAssassin if it is smaller than 128 KB.
+[SpamAssassin](http://wiki.apnscp.com/index.php/SpamAssassin) is invoked from the global maildrop filter, `/etc/maildroprc`. The following block of code passes the message off to SpamAssassin if it is smaller than 128 KB.
 
 if ($SIZE < 131072)
 {
@@ -45,7 +45,7 @@ if (/^X-Spam-Flag: YES/)
         }
 }
 
-**Explanation:** if the message size is smaller than 128 KB, hand it off to SpamAssassin. `DELETE_THRESHOLD` is the maximum score an e-mail may have _if and only if_ it is labeled as spam. If the score is greater or equal to `DELETE_THRESHOLD`, then the message will be deleted by being sent to `/dev/null` otherwise deliver to the Spam mailbox on the server. [This mailbox](https://kb.apiscp.com/e-mail/accessing-spam-folder/ "Accessing Spam folder") may be accessed through [webmail](https://kb.apiscp.com/e-mail/accessing-e-mail/#webmail "Accessing e-mail") or IMAP.
+**Explanation:** if the message size is smaller than 128 KB, hand it off to SpamAssassin. `DELETE_THRESHOLD` is the maximum score an e-mail may have _if and only if_ it is labeled as spam. If the score is greater or equal to `DELETE_THRESHOLD`, then the message will be deleted by being sent to `/dev/null` otherwise deliver to the Spam mailbox on the server. [This mailbox](https://kb.apnscp.com/e-mail/accessing-spam-folder/) may be accessed through [webmail](https://kb.apnscp.com/e-mail/accessing-e-mail/#webmail) or IMAP.
 
 ### Globally disabling per-user filter files
 
@@ -88,7 +88,7 @@ Note that eq, lt, le, gt, ge, ne are used for string comparisons, while ==, <, <
 
 ### Deleting all messages marked spam
 
-Before the recipe is given bear in mind this is strongly discouraged for two reasons, (1) young e-mail accounts may have a lot of variability in scoring and (2) no failure notice is generated. Consequently, neither the sender nor you will know if the message had been deleted, because no delivery failure status is generated. This is very similar to the [default maildroprc](http://wiki.apiscp.com/index.php/SMTP#What_is_the_default_maildrop_filter.3F), except threshold scoring is removed and all spam is deleted.
+Before the recipe is given bear in mind this is strongly discouraged for two reasons, (1) young e-mail accounts may have a lot of variability in scoring and (2) no failure notice is generated. Consequently, neither the sender nor you will know if the message had been deleted, because no delivery failure status is generated. This is very similar to the [default maildroprc](http://wiki.apnscp.com/index.php/SMTP#What_is_the_default_maildrop_filter.3F), except threshold scoring is removed and all spam is deleted.
 
  
 if (/^X-Spam-Flag: YES/)
@@ -98,7 +98,7 @@ to /dev/null
 
 ### Filtering to an external program
 
-maildrop's [xfilter](http://apiscp.com/linux-man/man7/maildropfilter.7.html#lbBI) directive pipes the message to an external script for processing. A rudimentary example reverses the message text. Naturally, as this is a shell script it should be directly executable from the shell, so ensure the permissions are at least 700 (`chmod 700 reverse.sh`).
+maildrop's [xfilter](http://apnscp.com/linux-man/man7/maildropfilter.7.html#lbBI) directive pipes the message to an external script for processing. A rudimentary example reverses the message text. Naturally, as this is a shell script it should be directly executable from the shell, so ensure the permissions are at least 700 (`chmod 700 reverse.sh`).
 
 `.mailfilter`
 
@@ -117,7 +117,7 @@ exit 0
 
 ### Creating a spam trap
 
-Spam traps are useful addresses deliberately listed on Web pages hidden from public view. Spam bots harvest these addresses and deliver spam. You can use this knowledge to feed all e-mail destined to a particular address directly to [SpamAssassin](http://wiki.apiscp.com/index.php/SpamAssassin "SpamAssassin") with the `to` directive. In addition to delivering to mailboxes, `to` can forward outbound to another address (!) or to another program (|) with a simple prefix. The following assumes `spam@mydomain.com` maps to a virtual mailbox on the server owned by the user `myuser`
+Spam traps are useful addresses deliberately listed on Web pages hidden from public view. Spam bots harvest these addresses and deliver spam. You can use this knowledge to feed all e-mail destined to a particular address directly to [SpamAssassin](http://wiki.apnscp.com/index.php/SpamAssassin) with the `to` directive. In addition to delivering to mailboxes, `to` can forward outbound to another address (!) or to another program (|) with a simple prefix. The following assumes `spam@mydomain.com` maps to a virtual mailbox on the server owned by the user `myuser`
 
 **Mailbox Routes**
 
@@ -180,7 +180,7 @@ if ($SIZE < 131072)
 
 ### Complex filtering
 
-Additional filtering examples may be found in the [third installment](http://updates.apiscp.com/2007/09/weekly-tip-3-categorizing-e-mails-with-maildrop/) of the ephemeral Weekly Tip.
+Additional filtering examples may be found in the [third installment](http://updates.apnscp.com/2007/09/weekly-tip-3-categorizing-e-mails-with-maildrop/) of the ephemeral Weekly Tip.
 
 ## Forwarding
 

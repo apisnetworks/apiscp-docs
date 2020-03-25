@@ -5,9 +5,9 @@ date: "2015-04-09"
 
 ## Overview
 
-The [control panel](https://kb.apiscp.com/control-panel/logging-into-the-control-panel/ "Logging into the control panel") provides a comprehensive storage breakdown via **Files** > **Storage Usage**. A birds eye view is available in graphical form under _Storage Usage _as well as individual files via _File Listing_ > _Download File Listing_.
+The [control panel](https://kb.apnscp.com/control-panel/logging-into-the-control-panel/) provides a comprehensive storage breakdown via **Files** > **Storage Usage**. A birds eye view is available in graphical form under _Storage Usage _as well as individual files via _File Listing_ > _Download File Listing_.
 
-\[caption id="attachment\_947" align="aligncenter" width="300"\][![Sample storage usage overview](images/sample-storage-usage-300x144.png)](https://kb.apiscp.com/wp-content/uploads/2015/04/sample-storage-usage.png) Sample storage usage overview\[/caption\]
+\[caption id="attachment\_947" align="aligncenter" width="300"\][![Sample storage usage overview](https://kb.apnscp.com/wp-content/uploads/2015/04/sample-storage-usage-300x144.png)](https://kb.apnscp.com/wp-content/uploads/2015/04/sample-storage-usage.png) Sample storage usage overview\[/caption\]
 
 ## Storage contributors
 
@@ -31,7 +31,7 @@ Even though an account may have 10,000 small files, the storage usage may appear
 
 ## "apache" usage
 
-All PHP scripts run as a separate user, [for security](https://kb.apiscp.com/php/writing-to-files/ "Writing to files"), that is distinct to your account. This user is a reserved system user called, "apache" (named after the [web server](http://httpd.apache.org/)). Apache usage includes any file uploaded from a PHP application (WordPress, Drupal, Joomla, etc).
+All PHP scripts run as a separate user, [for security](https://kb.apnscp.com/php/writing-to-files/), that is distinct to your account. This user is a reserved system user called, "apache" (named after the [web server](http://httpd.apache.org/)). Apache usage includes any file uploaded from a PHP application (WordPress, Drupal, Joomla, etc).
 
 ### User separation benefits
 
@@ -64,7 +64,7 @@ Certain files should **never be removed** directly from the filesystem. These fi
 
 ### Removing files
 
-Files may be removed by the owner (_username_ field in "detailed storage user"). When removing a file via [FTP](https://kb.apiscp.com/ftp/accessing-ftp-server/ "Accessing FTP server") or [terminal](https://kb.apiscp.com/terminal/accessing-terminal/ "Accessing terminal"), if the username doesn't match your login, then access is denied. This can be overcome by either [switching users](https://kb.apiscp.com/terminal/switching-users/ "Switching users") (available on [v6+](https://kb.apiscp.com/platform/determining-platform-version/ "Determining platform version") platforms) or by using the control panel file manager (**Files** > **File Manager**).
+Files may be removed by the owner (_username_ field in "detailed storage user"). When removing a file via [FTP](https://kb.apnscp.com/ftp/accessing-ftp-server/) or [terminal](https://kb.apnscp.com/terminal/accessing-terminal/), if the username doesn't match your login, then access is denied. This can be overcome by either [switching users](https://kb.apnscp.com/terminal/switching-users/) (available on [v6+](https://kb.apnscp.com/platform/determining-platform-version/) platforms) or by using the control panel file manager (**Files** > **File Manager**).
 
 ### Incongruities between reported and used
 

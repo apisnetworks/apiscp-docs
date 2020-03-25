@@ -5,11 +5,11 @@ date: "2014-11-09"
 
 ## Overview
 
-An .htaccess file contains directives that the web server will apply to a collection of resources before a page is displayed. For example, a .htaccess file may change [PHP configuration](https://kb.apiscp.com/php/changing-php-settings/ "Changing PHP settings"), deny access, change the page displayed, and even redirect a resource to another URL. These are denoted by a _directive_. A directive consists of a directive name and value, such as `DirectoryOptions +Indexes` or `php_flag display_errors on`.
+An .htaccess file contains directives that the web server will apply to a collection of resources before a page is displayed. For example, a .htaccess file may change [PHP configuration](https://kb.apnscp.com/php/changing-php-settings/), deny access, change the page displayed, and even redirect a resource to another URL. These are denoted by a _directive_. A directive consists of a directive name and value, such as `DirectoryOptions +Indexes` or `php_flag display_errors on`.
 
 ## Directive precedence
 
-Before changing how the web server works, it's important to know how these rules are applied. Before a request is processed, the server looks for a file called `.htaccess` in the directory in which [content is served](https://kb.apiscp.com/web-content/where-is-site-content-served-from/ "Where is site content served from?"). Any directives in this file are applied. The server will then backtrack down each directory until it reaches `/var/www` applying whatever directives are present in whatever .htaccess files it finds along the way.
+Before changing how the web server works, it's important to know how these rules are applied. Before a request is processed, the server looks for a file called `.htaccess` in the directory in which [content is served](https://kb.apnscp.com/web-content/where-is-site-content-served-from/). Any directives in this file are applied. The server will then backtrack down each directory until it reaches `/var/www` applying whatever directives are present in whatever .htaccess files it finds along the way.
 
 > ### Example
 > 
@@ -19,9 +19,9 @@ Before changing how the web server works, it's important to know how these rules
 
 ## Setting directives
 
-Create a plain-text file named `.htaccess` that will be uploaded in the [document root](https://kb.apiscp.com/web-content/where-is-site-content-served-from/ "Where is site content served from?") for the subdomain or domain whose behavior you would like to modify.
+Create a plain-text file named `.htaccess` that will be uploaded in the [document root](https://kb.apnscp.com/web-content/where-is-site-content-served-from/) for the subdomain or domain whose behavior you would like to modify.
 
-> You may also create an empty plain-text file [within the control panel](https://kb.apiscp.com/control-panel/creating-empty-files/ "Creating empty files") under **Files** > **File Manager**. You may then edit the file by clicking on the **Edit** action in the _Actions_ column to make changes from your browser.
+> You may also create an empty plain-text file [within the control panel](https://kb.apnscp.com/control-panel/creating-empty-files/) under **Files** > **File Manager**. You may then edit the file by clicking on the **Edit** action in the _Actions_ column to make changes from your browser.
 
 Each directive is one-line long and placed on a separate line. For example, these are all _valid_ directives:
 
@@ -35,7 +35,7 @@ These are all _invalid:_
 - Options
     - Reason: missing option values
 - php\_value error\_reporting display\_errors on
-    - Reason: extraneous PHP [configuration directives](https://kb.apiscp.com/php/changing-php-settings/ "Changing PHP settings")
+    - Reason: extraneous PHP [configuration directives](https://kb.apnscp.com/php/changing-php-settings/)
 - RewriteCond %{HTTPS} ^ON$ RewriteRule ^(.\*)$ https://mydomain.com/$1 \[R,L\]
     - Reason: each directive (RewriteCond, RewriteRule) must reside on its own line
 - PassengerEnabled yes
@@ -43,7 +43,7 @@ These are all _invalid:_
 
 ## Handling Errors
 
-Sometimes a directive may be improperly entered into your .htaccess file. In such cases, the web site will fail to display and an _Internal Server Error_ will be generated. You can refer to `[error_log](https://kb.apiscp.com/web-content/accessing-page-views-and-error-messages/ "Accessing web page views and error messages")` for a detailed explanation of what directive was rejected and for what particular reason.
+Sometimes a directive may be improperly entered into your .htaccess file. In such cases, the web site will fail to display and an _Internal Server Error_ will be generated. You can refer to `[error_log](https://kb.apnscp.com/web-content/accessing-page-views-and-error-messages/)` for a detailed explanation of what directive was rejected and for what particular reason.
 
 ## Common Directives
 
@@ -61,7 +61,7 @@ Sets PHP runtime configuration
 
 php\_value upload\_max\_filesize 32M
 
-Apis Networks KB: [Changing PHP Settings](https://kb.apiscp.com/php/changing-php-settings/ "Changing PHP settings")
+Apis Networks KB: [Changing PHP Settings](https://kb.apnscp.com/php/changing-php-settings/)
 
 RewriteBase
 

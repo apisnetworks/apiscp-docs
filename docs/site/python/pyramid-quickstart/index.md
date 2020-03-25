@@ -5,16 +5,16 @@ date: "2015-03-18"
 
 ## Overview
 
-[Pyramid](http://www.pylonsproject.org/) is a Python framework that is the spiritual successor to Pylon and Zope, frameworks popular in the mid-to-late 2000s. Pyramid is supported with on [v6+ platforms](https://kb.apiscp.com/platform/determining-platform-version/ "Determining platform version") using [any Python version](https://kb.apiscp.com/python/changing-python-versions/ "Changing Python versions") from 2.7 onward with [Passenger](https://kb.apiscp.com/cgi-passenger/passenger-supported-apps/ "Passenger-supported apps").
+[Pyramid](http://www.pylonsproject.org/) is a Python framework that is the spiritual successor to Pylon and Zope, frameworks popular in the mid-to-late 2000s. Pyramid is supported with on [v6+ platforms](https://kb.apnscp.com/platform/determining-platform-version/) using [any Python version](https://kb.apnscp.com/python/changing-python-versions/) from 2.7 onward with [Passenger](https://kb.apnscp.com/cgi-passenger/passenger-supported-apps/).
 
 ## Quickstart
 
-All commands are done from the [terminal](https://kb.apiscp.com/terminal/accessing-terminal/ "Accessing terminal") for convenience.
+All commands are done from the [terminal](https://kb.apnscp.com/terminal/accessing-terminal/) for convenience.
 
-1. **PREREQUISITE**: create a suitable [Passenger-compatible](https://kb.apiscp.com/cgi-passenger/passenger-application-layout/ "Passenger application layout") filesystem layout
+1. **PREREQUISITE**: create a suitable [Passenger-compatible](https://kb.apnscp.com/cgi-passenger/passenger-application-layout/) filesystem layout
     - cd /var/www && mkdir -p pyramid/{tmp,public}
         
-2. OPTIONAL PREREQUISITE: determine a suitable Python version using [pyenv](https://kb.apiscp.com/python/changing-python-versions/ "Changing Python versions")
+2. OPTIONAL PREREQUISITE: determine a suitable Python version using [pyenv](https://kb.apnscp.com/python/changing-python-versions/)
     - cd pyramid && pyenv local 3.3.5
         
 3. Install Pyramid. _In the above example, using pyenv to set 3.3.5, Pyramid will be installed as a Python 3.3.5 egg._
@@ -38,7 +38,7 @@ All commands are done from the [terminal](https://kb.apiscp.com/terminal/accessi
      server = make\_server('0.0.0.0', 8080, app)
      server.serve\_forever()
     
-5. Connect `public/` to a [subdomain](https://kb.apiscp.com/web-content/creating-subdomain/ "Creating a subdomain")
+5. Connect `public/` to a [subdomain](https://kb.apnscp.com/web-content/creating-subdomain/)
 6. Inform Passenger to serve this as a Python application:
     - echo "PassengerPython /.socket/python/shims/python" > public/.htaccess
         
@@ -46,14 +46,14 @@ All commands are done from the [terminal](https://kb.apiscp.com/terminal/accessi
 
 ### Viewing launcher errors
 
-In the event an application fails to launch, errors will be logged to `passenger.log`. See KB: [Viewing launcher errors](https://kb.apiscp.com/cgi-passenger/viewing-launcher-errors/ "Viewing launcher errors").
+In the event an application fails to launch, errors will be logged to `passenger.log`. See KB: [Viewing launcher errors](https://kb.apnscp.com/cgi-passenger/viewing-launcher-errors/).
 
 ### Restarting
 
-Like any Passenger app, you can follow the general [Passenger guidelines](https://kb.apiscp.com/ruby/restarting-passenger-processes/ "Restarting Passenger processes") to restart an app.
+Like any Passenger app, you can follow the general [Passenger guidelines](https://kb.apnscp.com/ruby/restarting-passenger-processes/) to restart an app.
 
 ## See also
 
 - Pyramid [documentation](http://docs.pylonsproject.org/projects/pyramid/en/latest/)
 - [Django vs Flask vs Pyramid](https://www.airpair.com/python/posts/django-flask-pyramid)
-- [Demo](http://pyramid.sandbox.apiscp.com/hello/foo) running on Sol, a v6 platform
+- [Demo](http://pyramid.sandbox.apnscp.com/hello/foo) running on Sol, a v6 platform

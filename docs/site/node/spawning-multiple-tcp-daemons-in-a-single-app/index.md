@@ -5,7 +5,7 @@ date: "2016-01-13"
 
 ## Overview
 
-Node applications may bind to a TCP port using `[listen](https://nodejs.org/api/net.html#net_server_listen_port_hostname_backlog_callback)(_<PORT NUMBER>_)`, provided of course the _PORT NUMBER_ is one [allocated](https://kb.apiscp.com/terminal/listening-ports/) to your account. Passenger replaces this listen() method with a [built-in method](https://github.com/phusion/passenger/blob/stable-5.0/src/helper-scripts/node-loader.js) that, instead of listening on a TCP port, creates a local UNIX socket for communication with the web server (_see `installServer()` in [source](https://github.com/phusion/passenger/blob/stable-5.0/src/helper-scripts/node-loader.js)_).
+Node applications may bind to a TCP port using `[listen](https://nodejs.org/api/net.html#net_server_listen_port_hostname_backlog_callback)(_<PORT NUMBER>_)`, provided of course the _PORT NUMBER_ is one [allocated](https://kb.apnscp.com/terminal/listening-ports/) to your account. Passenger replaces this listen() method with a [built-in method](https://github.com/phusion/passenger/blob/stable-5.0/src/helper-scripts/node-loader.js) that, instead of listening on a TCP port, creates a local UNIX socket for communication with the web server (_see `installServer()` in [source](https://github.com/phusion/passenger/blob/stable-5.0/src/helper-scripts/node-loader.js)_).
 
 By creating a socket, no TCP ports are consumed, traffic may only be accessed from within the server, and the server must know the socket path. This is great for security, but if an app spawns another process, like a [Socket.IO](https://www.npmjs.com/package/socket.io), that also calls listen(), then the app fails with:
 

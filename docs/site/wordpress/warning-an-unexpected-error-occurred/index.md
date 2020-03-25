@@ -11,11 +11,11 @@ Warning: An unexpected error occurred. Something may be wrong with WordPress.org
 
 ## Cause
 
-Older [hosting platforms](https://kb.apiscp.com/platform/determining-platform-version/ "Determining platform version") (v4) do not support validating SHA256 certificates.
+Older [hosting platforms](https://kb.apnscp.com/platform/determining-platform-version/) (v4) do not support validating SHA256 certificates.
 
 ## Solution
 
-Request an automatic [server migration](https://kb.apiscp.com/platform/migrating-another-server/ "Migrating to another server") to a newer platform that supports SHA256 certificate validation, along with a slew of other improvements. This can be done within the [control panel](https://kb.apiscp.com/control-panel/logging-into-the-control-panel/ "Logging into the control panel") under **Help** > **Trouble Tickets**.
+Request an automatic [server migration](https://kb.apnscp.com/platform/migrating-another-server/) to a newer platform that supports SHA256 certificate validation, along with a slew of other improvements. This can be done within the [control panel](https://kb.apnscp.com/control-panel/logging-into-the-control-panel/) under **Help** > **Trouble Tickets**.
 
 ### Discouraged Quick fix
 

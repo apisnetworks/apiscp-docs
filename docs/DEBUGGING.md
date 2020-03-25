@@ -44,8 +44,10 @@ When in debug mode, housekeeping and cron services are disabled as well as job r
 `misc:debug-session(string $id, bool $mode = true)` enables debugging for a frontend session (DAV, UI, SOAP). Session identifier may be retrieved from a browser session by accessing the `session.id` property. `session.debug` encodes whether debug mode is enabled.
 
 ```bash
-# Enable debugging for active session aE2...JL9r in browser
-env DEBUG=1 cpcmd misc:debug-session aE2uNGVkvpathoXqhofnsKDDXGNBJL9r true
+# Enable debugging for active session Xqu...I1Z6 in browser
+env DEBUG=1 cpcmd misc:debug-session Xqu8WuGaaRHYLoPSdQh5ITi2ZuRkI1Z6
+# Disable debugging when you're done
+env DEBUG=1 cpcmd misc:debug-session Xqu8WuGaaRHYLoPSdQh5ITi2ZuRkI1Z6
 ```
 
 `session.id` may be retrieved from a JavaScript console, cookie source ("esprit_id" de facto cookie name) or from the source.

@@ -5,13 +5,13 @@ date: "2015-02-13"
 
 ## Overview
 
-[Passenger](https://www.phusionpassenger.com/) provides an intelligent polyglot launcher interface for managing Node.js, [Ruby](https://kb.apiscp.com/ruby/setting-rails-passenger/ "Setting up Rails with Passenger"), and Python processes. This can be teamed up with [pyenv](https://kb.apiscp.com/python/changing-python-versions/ "Changing Python versions") to effortlessly launch multiple Python applications with a single shell command and [.htaccess](https://kb.apiscp.com/guides/htaccess-guide/ ".htaccess Guide") directive.
+[Passenger](https://www.phusionpassenger.com/) provides an intelligent polyglot launcher interface for managing Node.js, [Ruby](https://kb.apnscp.com/ruby/setting-rails-passenger/), and Python processes. This can be teamed up with [pyenv](https://kb.apnscp.com/python/changing-python-versions/) to effortlessly launch multiple Python applications with a single shell command and [.htaccess](https://kb.apnscp.com/guides/htaccess-guide/) directive.
 
 These steps are only necessary to use supplementary Python versions available on the server. If the default version works satisfactorily, then no further changes are necessary.
 
 ## Usage
 
-Applying what has been learned from KB article: "[Changing python versions](https://kb.apiscp.com/python/changing-python-versions/ "Changing Python versions")", create a directory structure compatible with Passenger:
+Applying what has been learned from KB article: "[Changing python versions](https://kb.apnscp.com/python/changing-python-versions/)", create a directory structure compatible with Passenger:
 
 cd /var/www
 mkdir -p mypyapp/{public,tmp}

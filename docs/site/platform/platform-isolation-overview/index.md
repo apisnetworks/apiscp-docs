@@ -20,7 +20,7 @@ Every account is comprised of several layers of files. These layers are read-onl
 
 ### Benefits
 
-By keeping multiple layers shared between accounts, updates can be easily deployed, as well as new features. Separate layers also allow the primary user to manipulate system files without affecting other users or server integrity. In the event of an [account hack](https://kb.apiscp.com/platform/handling-a-hijacked-account/), damage is limited only to the account read-write layer, which is isolated from system layers.
+By keeping multiple layers shared between accounts, updates can be easily deployed, as well as new features. Separate layers also allow the primary user to manipulate system files without affecting other users or server integrity. In the event of an [account hack](https://kb.apnscp.com/platform/handling-a-hijacked-account/), damage is limited only to the account read-write layer, which is isolated from system layers.
 
 ## Pivot Roots
 
@@ -28,7 +28,7 @@ Every process, except for PHP, operates within a **pivot root**. A **pivot root*
 
 ### Benefits
 
-A pivot root provides a personalized experience for you comprised of your files. As you add, remove, and modify it, every application spawned from your account will inherit these changes. This ensures that your account will remain consistent and independent from its neighbors, like a virtual private server, as it ages. In the event of an [account hack](https://kb.apiscp.com/platform/handling-a-hijacked-account/), damage is limited only to the account read-write layer, which is isolated from other accounts.
+A pivot root provides a personalized experience for you comprised of your files. As you add, remove, and modify it, every application spawned from your account will inherit these changes. This ensures that your account will remain consistent and independent from its neighbors, like a virtual private server, as it ages. In the event of an [account hack](https://kb.apnscp.com/platform/handling-a-hijacked-account/), damage is limited only to the account read-write layer, which is isolated from other accounts.
 
 ## PHP
 
@@ -36,7 +36,7 @@ PHP is the exception to the rule. PHP operates as an interpreted language embedd
 
 ### PHP Security
 
-Since PHP requests operate outside of a **pivot root**, special care is necessary to ensure PHP can only access your files and run trusted code. A separate set of directory restrictions are in place restricting PHP from accessing files outside your [absolute root](https://kb.apiscp.com/php/open_basedir-restriction-messages/). A second pass restricts access to binaries non-conducive to PHP, including `rm`, `mv`, and `cp` via [access control lists](https://wiki.archlinux.org/index.php/Access_Control_Lists). A table below provides the PHP functions that provide similar functionality to the respective Linux commands:
+Since PHP requests operate outside of a **pivot root**, special care is necessary to ensure PHP can only access your files and run trusted code. A separate set of directory restrictions are in place restricting PHP from accessing files outside your [absolute root](https://kb.apnscp.com/php/open_basedir-restriction-messages/). A second pass restricts access to binaries non-conducive to PHP, including `rm`, `mv`, and `cp` via [access control lists](https://wiki.archlinux.org/index.php/Access_Control_Lists). A table below provides the PHP functions that provide similar functionality to the respective Linux commands:
 
 _PHP equivalents of shell functions_
 
@@ -66,4 +66,4 @@ touch
 
 ## See also
 
-- KB: [open\_basedir restriction message](https://kb.apiscp.com/php/open_basedir-restriction-messages/) (PHP)
+- KB: [open\_basedir restriction message](https://kb.apnscp.com/php/open_basedir-restriction-messages/) (PHP)

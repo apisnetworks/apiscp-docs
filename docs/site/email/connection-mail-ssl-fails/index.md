@@ -7,9 +7,9 @@ date: "2016-10-26"
 
 IMAP, POP3, and SSL that connect over SSL either via STARTTLS on port 143/110/587 or 993/995/465 respectively fail with a certificate warning without any symptoms prior to October 25, 2016. Symptoms include the following dialog from Thunderbird:
 
-\[caption id="attachment\_1375" align="aligncenter" width="300"\][![SSL certificate rejection on initial connection](images/ssl-mismatch-300x300.png)](https://kb.apiscp.com/wp-content/uploads/2016/10/ssl-mismatch.png) SSL certificate rejection on initial connection\[/caption\]
+\[caption id="attachment\_1375" align="aligncenter" width="300"\][![SSL certificate rejection on initial connection](https://kb.apnscp.com/wp-content/uploads/2016/10/ssl-mismatch-300x300.png)](https://kb.apnscp.com/wp-content/uploads/2016/10/ssl-mismatch.png) SSL certificate rejection on initial connection\[/caption\]
 
-\[caption id="attachment\_1376" align="aligncenter" width="286"\][![SSL certificate mismatch inspection after clicking "View" in the "Add Security Exception" dialog](images/ssl-mismatch-x509-286x300.png)](https://kb.apiscp.com/wp-content/uploads/2016/10/ssl-mismatch-x509.png) SSL certificate mismatch inspection after clicking "View" in the "Add Security Exception" dialog\[/caption\]
+\[caption id="attachment\_1376" align="aligncenter" width="286"\][![SSL certificate mismatch inspection after clicking "View" in the "Add Security Exception" dialog](https://kb.apnscp.com/wp-content/uploads/2016/10/ssl-mismatch-x509-286x300.png)](https://kb.apnscp.com/wp-content/uploads/2016/10/ssl-mismatch-x509.png) SSL certificate mismatch inspection after clicking "View" in the "Add Security Exception" dialog\[/caption\]
 
 ## Cause
 
@@ -17,7 +17,7 @@ With the proliferation of free SSL certificates via [Let's Encrypt](https://www.
 
 ## Solution
 
-Change your mail server name, both incoming and outgoing, to [match the server name](https://kb.apiscp.com/platform/what-is-my-server-name/) on which you are hosted. In the initial example, "_mail.futz.net_" would be changed to "_luna.apiscp.com_".
+Change your mail server name, both incoming and outgoing, to [match the server name](https://kb.apnscp.com/platform/what-is-my-server-name/) on which you are hosted. In the initial example, "_mail.futz.net_" would be changed to "_luna.apnscp.com_".
 
 ### Thunderbird
 

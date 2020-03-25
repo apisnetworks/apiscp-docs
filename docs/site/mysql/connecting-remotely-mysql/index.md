@@ -9,7 +9,7 @@ By default, MySQL permissions only permit same-server access for clients. This 
 
 ## Solution
 
-Create a new MySQL user within the [control panel](https://kb.apiscp.com/control-panel/logging-into-the-control-panel/ "Logging into the control panel") under **Databases** > **MySQL Manager**.
+Create a new MySQL user within the [control panel](https://kb.apnscp.com/control-panel/logging-into-the-control-panel/) under **Databases** > **MySQL Manager**.
 
 - Enter a user under _Name_
     - Remember: your newly-created user will be prefixed with your database prefix that precedes the input field
@@ -32,4 +32,4 @@ A user has been created, but now requires database privileges:
     - WRITE will permit _INSERT_, _UPDATE_, and _DELETE_
 - Click **Save**
 
-Connect to the database using your [server name](https://kb.apiscp.com/platform/what-is-my-server-name/ "What is my server name?") (or domain name), and corresponding username + password previously created. Port is the default port 3306.
+Connect to the database using your [server name](https://kb.apnscp.com/platform/what-is-my-server-name/) (or domain name), and corresponding username + password previously created. Port is the default port 3306.

@@ -9,7 +9,7 @@ Email that is sent over TCP via 127.0.0.1 or the server IP address is rejected w
 
 ## Cause
 
-All email that passes through TCP must be authenticated with a SASL-compatible [username and password](https://kb.apiscp.com/email/accessing-e-mail/), which is the login/password used to access email on the server.
+All email that passes through TCP must be authenticated with a SASL-compatible [username and password](https://kb.apnscp.com/email/accessing-e-mail/), which is the login/password used to access email on the server.
 
 ## Solution
 
@@ -57,4 +57,4 @@ via config/environments/$RAILS\_ENV.rb:
 
 ## See also
 
-- KB: [Accessing email](https://kb.apiscp.com/email/accessing-e-mail/)
+- KB: [Accessing email](https://kb.apnscp.com/email/accessing-e-mail/)

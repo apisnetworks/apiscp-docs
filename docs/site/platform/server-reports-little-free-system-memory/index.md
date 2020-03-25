@@ -5,7 +5,7 @@ date: "2016-05-03"
 
 ## Overview
 
-Accessing `free` from the [terminal](https://kb.apiscp.com/terminal/accessing-terminal/) or **Reports** > **Server Info** within the [control panel](https://kb.apiscp.com/control-panel/logging-into-the-control-panel/) reports a small sliver of total system memory as free or available. For example, below is the output from `free` on a [4th generation](https://kb.apiscp.com/platform/determining-platform-version/) server:
+Accessing `free` from the [terminal](https://kb.apnscp.com/terminal/accessing-terminal/) or **Reports** > **Server Info** within the [control panel](https://kb.apnscp.com/control-panel/logging-into-the-control-panel/) reports a small sliver of total system memory as free or available. For example, below is the output from `free` on a [4th generation](https://kb.apnscp.com/platform/determining-platform-version/) server:
 
                      total     used    free shared **buffers**   **cached**
 Mem:              16540796 13011700 3529096      0  135404 10609292

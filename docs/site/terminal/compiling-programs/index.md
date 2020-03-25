@@ -5,7 +5,7 @@ date: "2014-12-02"
 
 ## Overview
 
-Custom programs may be compiled on [Developer+](https://kb.apiscp.com/terminal/is-terminal-access-available/ "Is terminal access available?") accounts, which is also bundled with terminal access. Custom programs may be installed under `/usr/local`.
+Custom programs may be compiled on [Developer+](https://kb.apnscp.com/terminal/is-terminal-access-available/) accounts, which is also bundled with terminal access. Custom programs may be installed under `/usr/local`.
 
 ## Per-Language
 
@@ -33,4 +33,4 @@ This is automatically negotiated without further changes during the install proc
 
 ## See Also
 
-[Listening on ports](https://kb.apiscp.com/terminal/listening-ports/ "Listening on ports")
+[Listening on ports](https://kb.apnscp.com/terminal/listening-ports/)

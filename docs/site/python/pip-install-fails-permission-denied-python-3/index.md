@@ -5,7 +5,7 @@ date: "2015-03-03"
 
 ## Overview
 
-Python's integrated [package manager,](https://kb.apiscp.com/python/installing-packages/ "Installing packages") pip, fails to install packages when Python 3.0 and above is used raising a PermissionError. Below is an abbreviated sample output:
+Python's integrated [package manager,](https://kb.apnscp.com/python/installing-packages/) pip, fails to install packages when Python 3.0 and above is used raising a PermissionError. Below is an abbreviated sample output:
 
 \[myadmin@sol\]$ pip install django
 Downloading/unpacking django
@@ -25,7 +25,7 @@ pip bundled with Python 3.0 and above include support for [wheel](https://wheel.
 
 ## Solution
 
-Disable wheel processing with `--no-use-wheel` as an argument to `pip install` or add the following configuration within `~/.pip/pip.conf`, inside your [home directory](https://kb.apiscp.com/platform/home-directory-location/):
+Disable wheel processing with `--no-use-wheel` as an argument to `pip install` or add the following configuration within `~/.pip/pip.conf`, inside your [home directory](https://kb.apnscp.com/platform/home-directory-location/):
 
 \[global\]
 use-wheel = no

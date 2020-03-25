@@ -5,11 +5,11 @@ date: "2014-10-31"
 
 ## Overview
 
-An index page is the page a Web server pulls up for a given directory if a filename is not specified. For example, http://apiscp.com/ will scan the [document root](https://kb.apiscp.com/web-content/where-is-site-content-served-from/ "Where is Site Content Served From?") sequentially looking for the first file match. If found, that page will be displayed. By default, the directory index order of precedence is (in decreasing priority): `index.html`, `index.php`, `index.shtml`, `index.htm`, `index.cgi`, `index.pl`, and finally `index.jsp`. Going from left to right in the list, the first file found will serve as the directory index.
+An index page is the page a Web server pulls up for a given directory if a filename is not specified. For example, http://apnscp.com/ will scan the [document root](https://kb.apnscp.com/web-content/where-is-site-content-served-from/) sequentially looking for the first file match. If found, that page will be displayed. By default, the directory index order of precedence is (in decreasing priority): `index.html`, `index.php`, `index.shtml`, `index.htm`, `index.cgi`, `index.pl`, and finally `index.jsp`. Going from left to right in the list, the first file found will serve as the directory index.
 
 ## Changing Default Value
 
-To specify `home.html` as the index page such that when a user accesses http://apiscp.com/ it would be the same as accessing http://apiscp.com/home.html, add the following line to your [.htaccess file](https://kb.apiscp.com/guides/htaccess-guide/ ".htaccess Guide"):
+To specify `home.html` as the index page such that when a user accesses http://apnscp.com/ it would be the same as accessing http://apnscp.com/home.html, add the following line to your [.htaccess file](https://kb.apnscp.com/guides/htaccess-guide/):
 
 DirectoryIndex home.html
 

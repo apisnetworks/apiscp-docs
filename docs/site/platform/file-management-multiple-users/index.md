@@ -3,19 +3,19 @@ title: "File management with multiple users"
 date: "2017-02-14"
 ---
 
-Access control lists ([ACLs](https://wiki.archlinux.org/index.php/Access_Control_Lists)) may be used in multi-user environments to allow granular joint access to file management without allowing access by all users on the account. ACLs can be established either by the owner of the file or account admin using [Beacon](https://kb.apiscp.com/control-panel/scripting-with-beacon/).
+Access control lists ([ACLs](https://wiki.archlinux.org/index.php/Access_Control_Lists)) may be used in multi-user environments to allow granular joint access to file management without allowing access by all users on the account. ACLs can be established either by the owner of the file or account admin using [Beacon](https://kb.apnscp.com/control-panel/scripting-with-beacon/).
 
 ACLs come in two forms, an active entry and default. Active are actively applied to the file or directory whereas default ACL entries are applied on directories to files created in the future within that directory.
 
 ## Using setfacl
 
-ACLs may be set from the [terminal](https://kb.apiscp.com/terminal/accessing-terminal/) using `setfacl` on all [v5+ platforms](https://kb.apiscp.com/platform/determining-platform-version/). `setfacl` may only be applied on files owned by the current user. For files owned by another user, use `file_set_acls` in Beacon (below) or take ownership of the files first using [file\_chown](http://api.apiscp.com/docs/class-File_Module.html#_chown) in Beacon or [chown](https://kb.apiscp.com/terminal/elevating-privileges-with-sudo/) in sudo.
+ACLs may be set from the [terminal](https://kb.apnscp.com/terminal/accessing-terminal/) using `setfacl` on all [v5+ platforms](https://kb.apnscp.com/platform/determining-platform-version/). `setfacl` may only be applied on files owned by the current user. For files owned by another user, use `file_set_acls` in Beacon (below) or take ownership of the files first using [file\_chown](http://api.apnscp.com/docs/class-File_Module.html#_chown) in Beacon or [chown](https://kb.apnscp.com/terminal/elevating-privileges-with-sudo/) in sudo.
 
 Syntax to set an ACL entry is `setfacl -m [d:]_USERNAME_:_PERMISSIONS_ _FILE_` where:
 
 - `d:` is an optional specifier to apply the ACLs as default ACLs rather than active ACLs
 - _USERNAME_ is the user on the account to apply these ACLs to
-- _PERMISSIONS_ is an [octal bitmask](https://kb.apiscp.com/guides/permissions-overview/) between 0 and 7 or a collection of r,w,x representing read/write/execute permissions respectively
+- _PERMISSIONS_ is an [octal bitmask](https://kb.apnscp.com/guides/permissions-overview/) between 0 and 7 or a collection of r,w,x representing read/write/execute permissions respectively
 - The -m ... command may be repeated an infinite number of times to apply new rules to other users
 - \-R may be specified to apply the rules recursively
 
@@ -46,7 +46,7 @@ Check out the man page on both [setfacl](https://linux.die.net/man/1/setfacl) an
 
 ## Using Beacon
 
-[Beacon](https://kb.apiscp.com/control-panel/scripting-with-beacon/) provides an alternative interface to ACLs that can run from using [file\_set\_acls](http://api.apiscp.com/docs/class-File_Module.html#_set_acls) and [file\_get\_acls](http://api.apiscp.com/docs/class-File_Module.html#_get_acls). ACLs set via Beacon override traditional discretionary access checks when applied as the primary account holder; this means that as the primary user, you can alter any ACL on any file whereas using setfacl from the terminal requires that the file you are adjusting be owned by you.
+[Beacon](https://kb.apnscp.com/control-panel/scripting-with-beacon/) provides an alternative interface to ACLs that can run from using [file\_set\_acls](http://api.apnscp.com/docs/class-File_Module.html#_set_acls) and [file\_get\_acls](http://api.apnscp.com/docs/class-File_Module.html#_get_acls). ACLs set via Beacon override traditional discretionary access checks when applied as the primary account holder; this means that as the primary user, you can alter any ACL on any file whereas using setfacl from the terminal requires that the file you are adjusting be owned by you.
 
 $ beacon eval file\_set\_acls /var/www/html redline 7
 1
@@ -118,5 +118,5 @@ other::r-x
 
 ## See also
 
-- KB: [Permission overview](https://kb.apiscp.com/guides/permissions-overview/)
-- KB: [Scripting with Beacon](https://kb.apiscp.com/control-panel/scripting-with-beacon/)
+- KB: [Permission overview](https://kb.apnscp.com/guides/permissions-overview/)
+- KB: [Scripting with Beacon](https://kb.apnscp.com/control-panel/scripting-with-beacon/)

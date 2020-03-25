@@ -7,7 +7,7 @@ date: "2015-02-17"
 
 A home directory, cited very often in our knowledgebase, is the location in which all files for a particular user are stored. A home directory is located in `/home` and named after the user. For example, if your username is "_steve_", then a home directory for steve is `/home/steve`. If a user is named _example_, then the home directory for _example_ is `/home/example`, and so forth.
 
-This location is static and may not be changed per-user without renaming the user under **User** > **Manage Users** within the [control panel](https://kb.apiscp.com/control-panel/logging-into-the-control-panel/ "Logging into the control panel").
+This location is static and may not be changed per-user without renaming the user under **User** > **Manage Users** within the [control panel](https://kb.apnscp.com/control-panel/logging-into-the-control-panel/).
 
 ### Tilde (~) notation
 

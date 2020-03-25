@@ -9,7 +9,7 @@ In certain situations, an e-mail address that delivers to an account on the serv
 
 ## Solution
 
-1. Login to the [control panel](https://kb.apiscp.com/control-panel/logging-into-the-control-panel/ "Logging into the control panel")
+1. Login to the [control panel](https://kb.apnscp.com/control-panel/logging-into-the-control-panel/)
 2. Visit **Mail** > **Manage Mailboxes**
 3. Under _Change Mode_, select **View/Edit Mailboxes**
 4. Select the mailbox to edit by the **edit icon** within the _Actions_ column

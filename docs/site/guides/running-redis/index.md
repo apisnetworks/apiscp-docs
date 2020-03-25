@@ -5,17 +5,17 @@ date: "2015-01-13"
 
 ## Overview
 
-[Redis](http://redis.io/) is an advanced key-value cache and store, similar to memcached with [better performance](http://redis.io/topics/benchmarks). It is available on [newer platforms](https://kb.apiscp.com/platform/determining-platform-version/ "Determining platform version") (v6+) without any [additional compilation](https://kb.apiscp.com/terminal/compiling-programs/ "Compiling programs") from source. Accounts [with terminal access](https://kb.apiscp.com/terminal/is-terminal-access-available/ "Is terminal access available?") are eligible to use Redis.
+[Redis](http://redis.io/) is an advanced key-value cache and store, similar to memcached with [better performance](http://redis.io/topics/benchmarks). It is available on [newer platforms](https://kb.apnscp.com/platform/determining-platform-version/) (v6+) without any [additional compilation](https://kb.apnscp.com/terminal/compiling-programs/) from source. Accounts [with terminal access](https://kb.apnscp.com/terminal/is-terminal-access-available/) are eligible to use Redis.
 
 ## Quickstart
 
-From the [terminal](https://kb.apiscp.com/terminal/accessing-terminal/ "Accessing terminal"), run: `redis-server --bind 127.0.0.1 --port PORT` where PORT is a [preassigned port](https://kb.apiscp.com/terminal/listening-ports/ "Listening on ports") to the account.
+From the [terminal](https://kb.apnscp.com/terminal/accessing-terminal/), run: `redis-server --bind 127.0.0.1 --port PORT` where PORT is a [preassigned port](https://kb.apnscp.com/terminal/listening-ports/) to the account.
 
-**Note:** use 127.0.0.1 to prevent outside network activity. 127.0.0.1 will only allow traffic that originates from the same server. A better solution, if using CGI or a [Rails](https://kb.apiscp.com/ruby/setting-rails-passenger/ "Setting up Rails with Passenger") application, is to specify ---`unixsocket /tmp/redis.sock` instead of `--bind`/`--port` to specify a local UNIX domain socket instead of a TCP socket.
+**Note:** use 127.0.0.1 to prevent outside network activity. 127.0.0.1 will only allow traffic that originates from the same server. A better solution, if using CGI or a [Rails](https://kb.apnscp.com/ruby/setting-rails-passenger/) application, is to specify ---`unixsocket /tmp/redis.sock` instead of `--bind`/`--port` to specify a local UNIX domain socket instead of a TCP socket.
 
 ## Configuring & Daemonizing
 
-Now with Redis up and running, you can create a long-term solution that starts up with the server and always runs in the background. Start with either the [stock configuration](http://download.redis.io/redis-stable/redis.conf) or just copy and paste, making sure to update the `port` parameter to a [port assigned](https://kb.apiscp.com/terminal/listening-ports/ "Listening on ports") to your account.
+Now with Redis up and running, you can create a long-term solution that starts up with the server and always runs in the background. Start with either the [stock configuration](http://download.redis.io/redis-stable/redis.conf) or just copy and paste, making sure to update the `port` parameter to a [port assigned](https://kb.apnscp.com/terminal/listening-ports/) to your account.
 
 > **Note**: as with most configuration files, any line that begins with a octothorpe/pound/hash symbol (#) denotes a comment. These are never interpreted by an application, but serve as guidance. The following configuration omits these helpful comments for brevity.
 
@@ -58,7 +58,7 @@ Now to start Redis using the configuration, type: `redis-server ~/redis.conf`
 
 ### Starting on Start-up
 
-1. Visit **Dev** > **Task Scheduler** within the [control panel](https://kb.apiscp.com/control-panel/logging-into-the-control-panel/ "Logging into the control panel") to schedule a new task.
+1. Visit **Dev** > **Task Scheduler** within the [control panel](https://kb.apnscp.com/control-panel/logging-into-the-control-panel/) to schedule a new task.
 2. Under **Command**, enter `redis-server ~/redis.conf`
 3. Under _Scheduling_, select **Server Start**
 4. Click **Add**

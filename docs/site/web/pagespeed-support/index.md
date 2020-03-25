@@ -9,13 +9,13 @@ PageSpeed ([mod\_pagespeed](https://developers.google.com/speed/pagespeed/module
 
 ## Availability
 
-PageSpeed is available on all [v5+ platforms](https://kb.apiscp.com/platform/determining-platform-version/ "Determining platform version"). PageSpeed is enabled by default.
+PageSpeed is available on all [v5+ platforms](https://kb.apnscp.com/platform/determining-platform-version/). PageSpeed is enabled by default.
 
 ## Filter usage
 
-PageSpeed is built as modular filters. These filters, in turn, may be added and removed to a web site resulting in a variety of optimizations. Filters may be added or removed in a [.htaccess file](https://kb.apiscp.com/guides/htaccess-guide/ ".htaccess Guide").  By default, all filters listed in  `CoreFilters` (refer to Filter list) are enabled.
+PageSpeed is built as modular filters. These filters, in turn, may be added and removed to a web site resulting in a variety of optimizations. Filters may be added or removed in a [.htaccess file](https://kb.apnscp.com/guides/htaccess-guide/).  By default, all filters listed in  `CoreFilters` (refer to Filter list) are enabled.
 
-1. Create a file named `.htaccess` in your [document root](https://kb.apiscp.com/web-content/where-is-site-content-served-from/ "Where is site content served from?") if it does not already exist
+1. Create a file named `.htaccess` in your [document root](https://kb.apnscp.com/web-content/where-is-site-content-served-from/) if it does not already exist
     - **To add filters: ** `ModPagespeedEnableFilters filtera,filterb`
     - **To remove filters:** `ModPagespeedDisableFilters filtera,filterb`
 2. Once committed, these filters specified will be added or removed from `CoreFilters`

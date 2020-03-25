@@ -9,7 +9,7 @@ Forwarded e-mails are e-mails that arrive on the server, but instead of deliveri
 
 ## Setting up a forward
 
-1. Visit **Mail** > **Manage Mailboxes** within the [control panel](https://kb.apiscp.com/control-panel/logging-into-the-control-panel/ "Logging into the control panel")
+1. Visit **Mail** > **Manage Mailboxes** within the [control panel](https://kb.apnscp.com/control-panel/logging-into-the-control-panel/)
 2. Enter a new e-mail address name under _Add a New Address_
 3. Select one or more domains for which this e-mail is valid
 4. Select _Type:_** Forwarded or Multiple Users**
@@ -19,7 +19,7 @@ Forwarded e-mails are e-mails that arrive on the server, but instead of deliveri
 
 ## Editing existing forwards
 
-1. Visit **Mail** > **Manage Mailboxes** within the [control panel.](https://kb.apiscp.com/control-panel/logging-into-the-control-panel/ "Logging into the control panel")
+1. Visit **Mail** > **Manage Mailboxes** within the [control panel.](https://kb.apnscp.com/control-panel/logging-into-the-control-panel/)
 2. Under _Change Mode_, select **View/Edit Mailboxes**
 3. Browse to the row with the specified e-mail to edit
     - Actions will not display until mouse is hovered over column
@@ -34,5 +34,5 @@ Because forwarded e-mails are a touch-and-forward process, receiving mail server
 ## See Also
 
 - Google.com: [Check emails from other accounts using Gmail](https://support.google.com/mail/answer/21289?hl=en)
-- KB: [Mail forwarded to GMail is delayed](https://kb.apiscp.com/e-mail/mail-forwarded-to-gmail-is-delayed/)
-- KB: [Converting email address types](https://kb.apiscp.com/e-mail/converting-e-mail-address-types/)
+- KB: [Mail forwarded to GMail is delayed](https://kb.apnscp.com/e-mail/mail-forwarded-to-gmail-is-delayed/)
+- KB: [Converting email address types](https://kb.apnscp.com/e-mail/converting-e-mail-address-types/)

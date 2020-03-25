@@ -7,4 +7,4 @@ Account security is very important to us. To improve client safety and the safet
 
 Additionally, if the account admin username, password, or primary domain is changed on the account, then notifications are also generated for your safety.
 
-If you believe there is concern that your account may have been broken into, please contact us at help@apiscp.com or (319) GET-APIS as soon as possible to perform a security audit of your account.
+If you believe there is concern that your account may have been broken into, please contact us at help@apnscp.com or (319) GET-APIS as soon as possible to perform a security audit of your account.

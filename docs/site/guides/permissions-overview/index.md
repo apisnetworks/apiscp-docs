@@ -7,7 +7,7 @@ Every file is made up of a permission set. These permissions consists of 3 sets
 
 `-r--r--r--    root   root 1972 Oct 13 23:14 test.mail -rw-r--r--   admin  admin 4345 Aug 29 12:33 test.php -rwxr-xr-x  nobody  admin  592 Sep 25 10:20 test.py drwxrwxrwx   admin nobody 4096 Jul  9 10:28 tmp`
 
-Let's take a look at output from a [FTP client](https://kb.apiscp.com/ftp/accessing-ftp-server/#recommended "Accessing FTP server"). Three files and 1 directory exist in this example. A directory, tmp/, denoted by "**d**" is also called a folder: a place to stash files. Each file has different permission sets, which permit different interactions.
+Let's take a look at output from a [FTP client](https://kb.apnscp.com/ftp/accessing-ftp-server/#recommended). Three files and 1 directory exist in this example. A directory, tmp/, denoted by "**d**" is also called a folder: a place to stash files. Each file has different permission sets, which permit different interactions.
 
 ## Permissions
 
@@ -33,30 +33,116 @@ Permissions can be presented in set or octal form. Previously permissions were p
 
 `-rw----r--` becomes 604, `drwxr-xr-x` becomes 755, and so on. Whenever permissions are referred to as "777", this maps to `-rwxrwxrwx`.
 
-| 604 Conversion |       |       |      |      |      |      |      |      |
-| -------------- | ----- | ----- | ---- | ---- | ---- | ---- | ---- | ---- |
-| owner          | group | other |      |      |      |      |      |      |
-| r              | w     | –     | –    | –    | –    | r    | –    | –    |
-| 4              | 2     | 0     | 0    | 0    | 0    | 4    | 0    | 0    |
-| 6              | 0     | 4     |      |      |      |      |      |      |
+604 Conversion
 
-| 755 Conversion |       |       |      |      |      |      |      |      |
-| -------------- | ----- | ----- | ---- | ---- | ---- | ---- | ---- | ---- |
-| owner          | group | other |      |      |      |      |      |      |
-| r              | w     | x     | r    | –    | x    | r    | –    | x    |
-| 4              | 2     | 1     | 4    | 0    | 1    | 4    | 0    | 1    |
-| 7              | 5     | 5     |      |      |      |      |      |      |
+owner
 
- Permissions from now on will be referred to in octal for brevity.
+group
+
+other
+
+r
+
+w
+
+\-
+
+\-
+
+\-
+
+\-
+
+r
+
+\-
+
+\-
+
+4
+
+2
+
+0
+
+0
+
+0
+
+0
+
+4
+
+0
+
+0
+
+6
+
+0
+
+4
+
+755 Conversion
+
+owner
+
+group
+
+other
+
+r
+
+w
+
+x
+
+r
+
+\-
+
+x
+
+r
+
+\-
+
+x
+
+4
+
+2
+
+1
+
+4
+
+0
+
+1
+
+4
+
+0
+
+1
+
+7
+
+5
+
+5
+
+Permissions from now on will be referred to in octal for brevity.
 
 ## Changing Permissions
 
 Permissions may be edited in a variety of ways:
 
-- FTP client. See [FTP access](https://kb.apiscp.com/ftp/accessing-ftp-server/ "Accessing FTP server") KB article for details
-- Web-accessible FTP client via [ftp.apiscp.com](http://ftp.apiscp.com). Select _chmod_ operation.
+- FTP client. See [FTP access](https://kb.apnscp.com/ftp/accessing-ftp-server/) KB article for details
+- Web-accessible FTP client via [ftp.apnscp.com](http://ftp.apnscp.com). Select _chmod_ operation.
 - Within the control panel: **Files** > **File Manager** > **Properties** action
-- [Terminal](https://kb.apiscp.com/terminal/accessing-terminal/ "Accessing terminal"): [chmod](http://apiscp.com/linux-man/man1/chmod.1.html "Linux manual: chmod")
+- [Terminal](https://kb.apnscp.com/terminal/accessing-terminal/): [chmod](http://apnscp.com/linux-man/man1/chmod.1.html)
 
 Permissions may be applied to a single file or directory, or recursively to all files and directories within a directory. Files created after changes are applied will not inherit these new permissions and must be reapplied as necessary.
 
@@ -78,4 +164,4 @@ _Reduce your risk and impact by utilizing multiple users._
 
 ## See Also
 
-- [PHP: Writing to files](https://kb.apiscp.com/php/writing-to-files/ "Writing to files")
+- [PHP: Writing to files](https://kb.apnscp.com/php/writing-to-files/)

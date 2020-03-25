@@ -11,11 +11,11 @@ By default, apnscp will perform an IP check to ensure a hostname maps back to th
 
 Only certificate issues may be bypassed within apnscp. To bypass a DNS check on certificate issuance, disable the IP check option.
 
-\[caption id="attachment\_1501" align="aligncenter" width="300"\][![](images/bypass-le-check-300x134.png)](https://kb.apiscp.com/wp-content/uploads/2017/09/bypass-le-check.png) Bypassing DNS check for Let's Encrypt within apnscp\[/caption\]
+\[caption id="attachment\_1501" align="aligncenter" width="300"\][![](https://kb.apnscp.com/wp-content/uploads/2017/09/bypass-le-check-300x134.png)](https://kb.apnscp.com/wp-content/uploads/2017/09/bypass-le-check.png) Bypassing DNS check for Let's Encrypt within apnscp\[/caption\]
 
 ## Renewal - Beacon/API
 
-The API must be used to renew Let's Encrypt certificates if DNS bypass checks are necessary. This may change in the future. [Beacon](https://kb.apiscp.com/control-panel/scripting-with-beacon/) provides a frontend to the API, and for the sake of simplicity, will be used in this discussion. After configuring Beacon, access [letsencrypt\_renew](http://api.apiscp.com/source-class-Letsencrypt_Module.html) and pass false to the optional _verifyip_ parameter. This will disable IP verification checks that cascade into [letsencrypt\_request](http://api.apiscp.com/source-class-Letsencrypt_Module.html).
+The API must be used to renew Let's Encrypt certificates if DNS bypass checks are necessary. This may change in the future. [Beacon](https://kb.apnscp.com/control-panel/scripting-with-beacon/) provides a frontend to the API, and for the sake of simplicity, will be used in this discussion. After configuring Beacon, access [letsencrypt\_renew](http://api.apnscp.com/source-class-Letsencrypt_Module.html) and pass false to the optional _verifyip_ parameter. This will disable IP verification checks that cascade into [letsencrypt\_request](http://api.apnscp.com/source-class-Letsencrypt_Module.html).
 
 beacon eval letsencrypt\_renew 0
 

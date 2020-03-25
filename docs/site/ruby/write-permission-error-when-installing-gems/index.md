@@ -5,7 +5,7 @@ date: "2015-05-01"
 
 ## Overview
 
-On newer [v6+ platforms](https://kb.apiscp.com/platform/determining-platform-version/) with support for multiple Ruby interpreters, installing a gem may fail resulting in a similar error message:
+On newer [v6+ platforms](https://kb.apnscp.com/platform/determining-platform-version/) with support for multiple Ruby interpreters, installing a gem may fail resulting in a similar error message:
 
  \[user@sol ~\]$ gem install --no-rdoc --no-ri passenger rails
  Fetching: passenger-5.0.6.gem (100%)
@@ -18,7 +18,7 @@ The environment variable `GEM_HOME` is not configured until `rvm use` is execut
 
 ## Solution
 
-Select which [Ruby version to use](https://kb.apiscp.com/ruby/changing-ruby-versions/) with rvm use. This will install a rvm shim necessary to set GEM\_HOME.
+Select which [Ruby version to use](https://kb.apnscp.com/ruby/changing-ruby-versions/) with rvm use. This will install a rvm shim necessary to set GEM\_HOME.
 
 cd /var/www
 # rvm shim is installed under /var/www

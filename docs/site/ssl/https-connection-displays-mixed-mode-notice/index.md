@@ -7,7 +7,7 @@ date: "2016-04-29"
 
 Accessing a website, protected by SSL, yields a "mixed-mode" notice or the SSL indicator displays different than normal.
 
-\[caption id="attachment\_1279" align="aligncenter" width="83"\][![mixed-mode-indicator](images/mixed-mode-indicator.png)](https://kb.apiscp.com/wp-content/uploads/2016/04/mixed-mode-indicator.png) Mixed mode encountered on a website using Firefox\[/caption\]
+\[caption id="attachment\_1279" align="aligncenter" width="83"\][![mixed-mode-indicator](https://kb.apnscp.com/wp-content/uploads/2016/04/mixed-mode-indicator.png)](https://kb.apnscp.com/wp-content/uploads/2016/04/mixed-mode-indicator.png) Mixed mode encountered on a website using Firefox\[/caption\]
 
 ## Cause
 

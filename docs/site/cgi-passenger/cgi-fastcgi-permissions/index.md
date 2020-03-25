@@ -18,15 +18,15 @@ All CGI and FastCGI requests operate as the owner of the file and require heigh
 4. File must be executable from the shell
     - suEXEC runs script in its process space via a [execve](http://linux.die.net/man/2/execve) system call
 
-[Permission changes](https://kb.apiscp.com/guides/permissions-overview/#changing "Permissions overview") may be made either via FTP or **Files** > **File Manager** within the [control panel](https://kb.apiscp.com/control-panel/logging-into-the-control-panel/ "Logging into the control panel"). To evaluate whether a script works from the shell, it should consist of a shebang at the start of the file, generally in the form `#!/usr/bin/exec args`. Examples of common shebangs include:
+[Permission changes](https://kb.apnscp.com/guides/permissions-overview/#changing) may be made either via FTP or **Files** > **File Manager** within the [control panel](https://kb.apnscp.com/control-panel/logging-into-the-control-panel/). To evaluate whether a script works from the shell, it should consist of a shebang at the start of the file, generally in the form `#!/usr/bin/exec args`. Examples of common shebangs include:
 
 - Python: `#!/usr/bin/env python`
 - PHP: `#!/usr/bin/php -q`
 - Perl: `#!/usr/bin/perl`
 - Bash (shell script): `#!/bin/sh`
 
-Note: these all have #! in common on the first line. This notation is called the "shebang" and follows the pattern: <shebang><path to executable> followed by a Unix-style newline (\\n). If a shebang follows with a Mac or Windows-style EOL marker (\\r and \\r\\n respectively), the script will fail. EOL markers may be [changed](https://kb.apiscp.com/control-panel/changing-eol-markers/) within the control panel.
+Note: these all have #! in common on the first line. This notation is called the "shebang" and follows the pattern: <shebang><path to executable> followed by a Unix-style newline (\\n). If a shebang follows with a Mac or Windows-style EOL marker (\\r and \\r\\n respectively), the script will fail. EOL markers may be [changed](https://kb.apnscp.com/control-panel/changing-eol-markers/) within the control panel.
 
 ## See Also
 
-[Permission overview](https://kb.apiscp.com/guides/permissions-overview/ "Permissions overview")
+[Permission overview](https://kb.apnscp.com/guides/permissions-overview/)

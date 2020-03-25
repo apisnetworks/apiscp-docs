@@ -7,7 +7,7 @@ Laravel provides a static cache utility [via Artisan](https://laravel.com/docs/
 
 `php artisan config:cache`
 
-When run from [terminal](https://kb.apiscp.com/terminal/is-terminal-access-available/), the paths provided may be incorrectly referenced when the application is accessed from the web resulting in application errors.
+When run from [terminal](https://kb.apnscp.com/terminal/is-terminal-access-available/), the paths provided may be incorrectly referenced when the application is accessed from the web resulting in application errors.
 
 ## Solution
 
@@ -153,5 +153,5 @@ remote: Generating optimized class loader
 remote: Compiling common classes
 remote: Configuration cache cleared!
 remote: ===== DONE =====
-To ssh://apnscp#apiscp.com@luna.apiscp.com/var/www/git
+To ssh://apnscp#apnscp.com@luna.apnscp.com/var/www/git
  b7b99b8..d4f04a5 master -> master

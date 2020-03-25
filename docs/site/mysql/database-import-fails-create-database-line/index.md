@@ -11,7 +11,7 @@ Restoring a database backup within the control panel, mysqli CLI, or phpMyAdmin 
 
 ## Cause
 
-A _CREATE DATABASE_ query is issued during database import that cannot succeed due to limited permissions. All databases must be created within the [control panel](https://kb.apiscp.com/mysql/creating-database/) to ensure proper account namespacing is applied.
+A _CREATE DATABASE_ query is issued during database import that cannot succeed due to limited permissions. All databases must be created within the [control panel](https://kb.apnscp.com/mysql/creating-database/) to ensure proper account namespacing is applied.
 
 ## Solution
 
@@ -25,7 +25,7 @@ _<empty>_
 
 When importing a database in phpMyAdmin select the database in the left panel, then select _Import_ from the tabs in the right panel.
 
-When importing in mysql from the [terminal](https://kb.apiscp.com/terminal/accessing-terminal/), include the database name, e.g.
+When importing in mysql from the [terminal](https://kb.apnscp.com/terminal/accessing-terminal/), include the database name, e.g.
 
 ```
 mysql -u username -ppassword mynewdb < dbbackup.sql

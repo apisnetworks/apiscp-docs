@@ -13,7 +13,7 @@ The mail server, Dovecot, uses a few cache files to speed up mailbox access on 
 
 ## Solution
 
-1. Login to the [control panel](https://kb.apiscp.com/control-panel/logging-into-the-control-panel/ "Logging into the control panel")
+1. Login to the [control panel](https://kb.apnscp.com/control-panel/logging-into-the-control-panel/)
 2. Ensure the user has sufficient storage available via **User** >  **Manage Users**
     - If not, edit the storage limit for the user via the **Edit** action under _Actions_
 3. Under **Files** > **File Manager**, navigate to the user's home directory

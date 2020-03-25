@@ -3,13 +3,13 @@ title: "Scripting with Beacon"
 date: "2017-02-12"
 ---
 
-![](images/beacon.png)
+![](https://kb.apnscp.com/wp-content/uploads/2017/02/beacon.png)
 
-Beacon is a scripting companion to [apnscp](https://kb.apiscp.com/control-panel/logging-into-the-control-panel/) that provides a simple interface to interacting with more than [2,000 commands](http://api.apiscp.com/docs/) exposed in apnscp. If apnscp can do it so can you, minus a pretty interface of course! Beacon may also be downloaded from our [github repo](https://github.com/apisnetworks/beacon).
+Beacon is a scripting companion to [apnscp](https://kb.apnscp.com/control-panel/logging-into-the-control-panel/) that provides a simple interface to interacting with more than [2,000 commands](http://api.apnscp.com/docs/) exposed in apnscp. If apnscp can do it so can you, minus a pretty interface of course! Beacon may also be downloaded from our [github repo](https://github.com/apisnetworks/beacon).
 
 ## Getting Started
 
-Beacon requires an API key for authentication. Visit **Dev** > **API Keys** within [apnscp](https://kb.apiscp.com/control-panel/logging-into-the-control-panel/) to create your API key. On first use, specify `--key` to set the key:
+Beacon requires an API key for authentication. Visit **Dev** > **API Keys** within [apnscp](https://kb.apnscp.com/control-panel/logging-into-the-control-panel/) to create your API key. On first use, specify `--key` to set the key:
 
 `beacon exec --key=AAAA-BBBB-CCCC-DDDD common_get_web_server_name`
 
@@ -59,7 +59,7 @@ Iterate over all domains. Check each domain if WordPress is current, update if n
 
 ### Create an addon domain, then install WordPress or Drupal onto it
 
-Creates a new addon domain, then installs WordPress, Drupal, or any [web app](https://kb.apiscp.com/control-panel/detecting-a-web-application/). "${n,,}" takes the parameter _n _and converts to lowercase in bash v4+ using [case modifiers](http://tldp.org/LDP/abs/html/parameter-substitution.html#PARAMSUBREF).
+Creates a new addon domain, then installs WordPress, Drupal, or any [web app](https://kb.apnscp.com/control-panel/detecting-a-web-application/). "${n,,}" takes the parameter _n _and converts to lowercase in bash v4+ using [case modifiers](http://tldp.org/LDP/abs/html/parameter-substitution.html#PARAMSUBREF).
 
 function newdomain {
     domain=${1,,}

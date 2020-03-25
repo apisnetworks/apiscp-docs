@@ -5,7 +5,7 @@ date: "2017-02-12"
 
 ## Overview
 
-A forwarded website can be accomplished by first creating a [subdomain](https://kb.apiscp.com/web-content/creating-subdomain/) or [addon domain](https://kb.apiscp.com/control-panel/creating-addon-domain/) in the [control panel](https://kb.apiscp.com/control-panel/logging-into-the-control-panel/), then using an [.htaccess](https://kb.apiscp.com/guides/htaccess-guide/) in [document root](https://kb.apiscp.com/web-content/where-is-site-content-served-from/) to redirect all traffic to the new web site using [mod\_rewrite](http://httpd.apache.org/docs/current/mod/mod_rewrite.html).
+A forwarded website can be accomplished by first creating a [subdomain](https://kb.apnscp.com/web-content/creating-subdomain/) or [addon domain](https://kb.apnscp.com/control-panel/creating-addon-domain/) in the [control panel](https://kb.apnscp.com/control-panel/logging-into-the-control-panel/), then using an [.htaccess](https://kb.apnscp.com/guides/htaccess-guide/) in [document root](https://kb.apnscp.com/web-content/where-is-site-content-served-from/) to redirect all traffic to the new web site using [mod\_rewrite](http://httpd.apache.org/docs/current/mod/mod_rewrite.html).
 
 ### Important terminology
 
@@ -25,7 +25,7 @@ Add the following lines to your .htaccess file in the document root of the forwa
 
 ### Proxied Forward, Path Capture
 
-A proxied forward will attempt to keep the original domain in the Location bar of the browser and impersonate the target site as if it were hosted under the forwarded domain. There are **several limitations** to this approach that are only resolvable by manipulating the stream as it comes over the wire, which is also beyond the scope of this article but accomplished with reverse proxy middleware as is used in apnscp to [redirect](https://github.com/apisnetworks/cp-proxy/blob/master/app.js) cp.apiscp.com to each platform's control panel.
+A proxied forward will attempt to keep the original domain in the Location bar of the browser and impersonate the target site as if it were hosted under the forwarded domain. There are **several limitations** to this approach that are only resolvable by manipulating the stream as it comes over the wire, which is also beyond the scope of this article but accomplished with reverse proxy middleware as is used in apnscp to [redirect](https://github.com/apisnetworks/cp-proxy/blob/master/app.js) cp.apnscp.com to each platform's control panel.
 
 `RewriteEngine On` `RewriteRule ^(.*)$ http://DESTINATIONSITE/$1 [**P**,L,QSA]`
 

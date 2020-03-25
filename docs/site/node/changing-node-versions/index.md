@@ -5,13 +5,13 @@ date: "2016-01-27"
 
 ## Overview
 
-Platforms [v6.5+](https://kb.apiscp.com/platform/determining-platform-version/) and beyond support multiple Node versions that may be installed using [nvm](https://github.com/creationix/nvm).
+Platforms [v6.5+](https://kb.apnscp.com/platform/determining-platform-version/) and beyond support multiple Node versions that may be installed using [nvm](https://github.com/creationix/nvm).
 
 ## Usage
 
 ### Listing
 
-nvm is provided automatically. First, to list available node interpreters, execute `nvm ls` from the [terminal](https://kb.apiscp.com/terminal/accessing-terminal/):
+nvm is provided automatically. First, to list available node interpreters, execute `nvm ls` from the [terminal](https://kb.apnscp.com/terminal/accessing-terminal/):
 
 ```
 $ nvm ls
@@ -53,14 +53,14 @@ v5.4.1
 
 ### Path
 
-Once you have settled on a Node interpreter, the absolute path may be discovered using [which](http://apiscp.com/linux-man/man1/which.1.html):
+Once you have settled on a Node interpreter, the absolute path may be discovered using [which](http://apnscp.com/linux-man/man1/which.1.html):
 
 $ which node
 ~/.nvm/versions/node/v5.4.1/bin/node
 
-Be sure to expand ~ to your [home directory](https://kb.apiscp.com/platform/home-directory-location/). This location be used with [Passenger](https://kb.apiscp.com/guides/running-node-js/) via `PassengerNodejs` to use a different Node, other than the system default, to handle requests.
+Be sure to expand ~ to your [home directory](https://kb.apnscp.com/platform/home-directory-location/). This location be used with [Passenger](https://kb.apnscp.com/guides/running-node-js/) via `PassengerNodejs` to use a different Node, other than the system default, to handle requests.
 
 ## See also
 
 - [nvm documentation](https://github.com/creationix/nvm/blob/master/README.markdown) (github.org)
-- KB: [Running Node.js](https://kb.apiscp.com/guides/running-node-js/)
+- KB: [Running Node.js](https://kb.apnscp.com/guides/running-node-js/)

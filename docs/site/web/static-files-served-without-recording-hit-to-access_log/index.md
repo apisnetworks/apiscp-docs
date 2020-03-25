@@ -5,7 +5,7 @@ date: "2018-10-23"
 
 ## Overview
 
-Static files (index.html) can be served without logging a request in [access\_log](https://kb.apiscp.com/web-content/accessing-page-views-and-error-messages/).
+Static files (index.html) can be served without logging a request in [access\_log](https://kb.apnscp.com/web-content/accessing-page-views-and-error-messages/).
 
 ## Cause
 
@@ -13,4 +13,4 @@ This occurs when mod\_pagespeed is enabled. Pagespeed intercepts the request hig
 
 ## Solution
 
-Disable [mod\_pagespeed](https://kb.apiscp.com/web-content/disabling-pagespeed). If visitor statistics are necessary, then consider utilizing [Google Analytics](https://kb.apiscp.com/control-panel/linking-google-analytics/) which is accessible from within apnscp.
+Disable [mod\_pagespeed](https://kb.apnscp.com/web-content/disabling-pagespeed). If visitor statistics are necessary, then consider utilizing [Google Analytics](https://kb.apnscp.com/control-panel/linking-google-analytics/) which is accessible from within apnscp.

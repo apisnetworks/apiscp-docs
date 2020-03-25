@@ -5,13 +5,13 @@ date: "2015-03-15"
 
 ## Overview
 
-Memcached is an in-memory key-value store for small chunks of arbitrary data (strings, objects) from results of database calls, API calls, or page rendering. It is available on [newer platforms](https://kb.apiscp.com/platform/determining-platform-version/ "Determining platform version") (v6+) without any [additional compilation](https://kb.apiscp.com/terminal/compiling-programs/ "Compiling programs") from source. Accounts [with terminal access](https://kb.apiscp.com/terminal/is-terminal-access-available/ "Is terminal access available?") are eligible to use Memcached.
+Memcached is an in-memory key-value store for small chunks of arbitrary data (strings, objects) from results of database calls, API calls, or page rendering. It is available on [newer platforms](https://kb.apnscp.com/platform/determining-platform-version/) (v6+) without any [additional compilation](https://kb.apnscp.com/terminal/compiling-programs/) from source. Accounts [with terminal access](https://kb.apnscp.com/terminal/is-terminal-access-available/) are eligible to use Memcached.
 
 ## Quickstart
 
-From the [terminal](https://kb.apiscp.com/terminal/accessing-terminal/ "Accessing terminal"), run: `memcached -l 127.0.0.1 -p PORT` where PORT is a [preassigned port](https://kb.apiscp.com/terminal/listening-ports/ "Listening on ports") to the account.
+From the [terminal](https://kb.apnscp.com/terminal/accessing-terminal/), run: `memcached -l 127.0.0.1 -p PORT` where PORT is a [preassigned port](https://kb.apnscp.com/terminal/listening-ports/) to the account.
 
-**Note:** use 127.0.0.1 to prevent outside network activity. 127.0.0.1 will only allow traffic that originates from the same server. A better solution, if connecting solely from an app locally on the server ([WSGI](https://kb.apiscp.com/python/using-wsgi/ "Using WSGI")/PHP/CGI/[Rails](https://kb.apiscp.com/ruby/setting-rails-passenger/ "Setting up Rails with Passenger"), etc), is to specify -s` /tmp/memcached.sock` instead of `-l`/`-p` to specify a local UNIX domain socket instead of a TCP socket.
+**Note:** use 127.0.0.1 to prevent outside network activity. 127.0.0.1 will only allow traffic that originates from the same server. A better solution, if connecting solely from an app locally on the server ([WSGI](https://kb.apnscp.com/python/using-wsgi/)/PHP/CGI/[Rails](https://kb.apnscp.com/ruby/setting-rails-passenger/), etc), is to specify -s` /tmp/memcached.sock` instead of `-l`/`-p` to specify a local UNIX domain socket instead of a TCP socket.
 
 ## Configuring & Daemonizing
 
@@ -27,7 +27,7 @@ kill -9 $(cat /tmp/memcached.pid)
 
 ### Starting on Start-up
 
-1. Visit **Dev** > **Task Scheduler** within the [control panel](https://kb.apiscp.com/control-panel/logging-into-the-control-panel/ "Logging into the control panel") to schedule a new task.
+1. Visit **Dev** > **Task Scheduler** within the [control panel](https://kb.apnscp.com/control-panel/logging-into-the-control-panel/) to schedule a new task.
 2. Under **Command**, enter `memcached -l 127.0.0.1 -p PORT -d -P /tmp/memcached.pid`
 3. Under _Scheduling_, select **Server Start**
 4. Click **Add**

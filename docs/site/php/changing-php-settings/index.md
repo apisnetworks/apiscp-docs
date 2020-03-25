@@ -13,7 +13,7 @@ PHP settings may be changed 2 ways, each with varying scope. All settings except
 
 ### .htaccess
 
-Create a [.htaccess file](https://kb.apiscp.com/guides/htaccess-guide/ ".htaccess Guide") called `.htaccess` within the [document root](https://kb.apiscp.com/web-content/where-is-site-content-served-from/ "Where is Site Content Served From?") for a given domain. Rules will be applied recursively to all assets within that directory. If domains or subdomains are nested within that directory, then rules will apply to those additional domains as well.
+Create a [.htaccess file](https://kb.apnscp.com/guides/htaccess-guide/) called `.htaccess` within the [document root](https://kb.apnscp.com/web-content/where-is-site-content-served-from/) for a given domain. Rules will be applied recursively to all assets within that directory. If domains or subdomains are nested within that directory, then rules will apply to those additional domains as well.
 
 > A special-use case is creating a file called `.htaccess` in `/var/www` that will apply rules to all subdomains and domains located anywhere within `/var/www`. This is a great, effective way to make global adjustments to all web content and likewise toggle off with minimum effort.
 
@@ -45,4 +45,4 @@ At the start of a PHP script, `ini_set()` commands are injected to increase file
 ## See Also
 
 - PHP.net: [description of core php.ini directives](http://php.net/manual/en/ini.core.php)
-- KB: [Viewing PHP settings](https://kb.apiscp.com/php/viewing-php-settings/)
+- KB: [Viewing PHP settings](https://kb.apnscp.com/php/viewing-php-settings/)

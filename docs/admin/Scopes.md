@@ -1,6 +1,6 @@
 # Scopes
 
-Scopes are configuration-specific entry points to apnscp. They may tie into [config.ini](https://gitlab.com/apisnetworks/apnscp/blob/master/config/config.ini), [Bootstrapper](https://github.com/apisnetworks/apnscp-playbooks), or system configuration. A configuration scope abstracts a more complex operation that could be achieved with blood, sweat, tears, trial, and a bit of error.
+Scopes are configuration-specific entry points to ApisCP. They may tie into [config.ini](https://gitlab.com/apisnetworks/apnscp/blob/master/config/config.ini), [Bootstrapper](https://github.com/apisnetworks/apnscp-playbooks), or system configuration. A configuration scope abstracts a more complex operation that could be achieved with blood, sweat, tears, trial, and a bit of error.
 
 ## Listing scopes
 
@@ -15,3 +15,70 @@ A list of available scopes can be gathered with `cpcmd scope:list`. All scopes c
 ## Setting scopes
 
 `scope:set` reconfigures a scope and initiates any reconfiguration tasks associated with reassignment. Before altering a system value, check scopes first as these will be overwritten with `upcp -b` (run Bootstrapper).
+
+## Adding new Scopes
+
+Additional Scopes may be latched on at boot using the bootloader of ApisCP. Inside `config/custom`, create a file named `boot.php` if it does not exist already. We'll need to register two things, one an autoload path and second, the actual Scope association.
+
+```bash
+cd /usr/local/apnscp
+./artisan make:scope system hello-world
+```
+
+And in `config/custom/boot.php`:
+
+```php
+<?php
+apnscpFunctionInterceptor::register(
+	\Opcenter\Admin\Settings\System\HelloWorld::class,
+	'config/custom/scopes/Opcenter/Admin/Settings/System/HelloWorld.php'
+);
+\Opcenter\Admin\Settings\Setting::register(\Opcenter\Admin\Settings\System\HelloWorld::class);
+```
+
+In the above, we're creating a class mapping for **system.hello-world** to config/custom/scopes/Opcenter/Admin/Settings/System/HelloWorld.php. The Scope could just as easily be located in config/custom/scopes/system/hello-world.php.
+
+Now edit the scope in config/custom/scopes/Opcenter/Admin/Settings/System/HelloWorld.php:
+
+```php
+<?php declare(strict_types=1);
+
+	namespace Opcenter\Admin\Settings\System;
+
+	use Opcenter\Admin\Settings\SettingsInterface;
+
+	class HelloWorld implements SettingsInterface
+	{
+		public function set($val): bool
+		{
+			return error("Nothing to see here");
+		}
+
+		public function get()
+		{
+			return microtime(true);
+		}
+
+		public function getHelp(): string
+		{
+			return 'Dummy command example';
+		}
+
+		public function getValues()
+		{
+			return 'mixed';
+		}
+
+		public function getDefault()
+		{
+			return true;
+		}
+
+	}
+```
+
+Then run it!
+
+![Scope interaction](./images/scope-interaction.png)
+
+Or access it from within the panel, the choice is yours.

@@ -7,7 +7,7 @@ PageSpeed will make a best effort to expire its asset (.css, .js, .png, .gif, .j
 
 ## Expunging PageSpeed cache
 
-A `PURGE` header may be sent to the asset forcing PageSpeed to expunge its cached copy from memory. For example to accomplish this using cURL from the [terminal](https://kb.apiscp.com/terminal/is-terminal-access-available/):
+A `PURGE` header may be sent to the asset forcing PageSpeed to expunge its cached copy from memory. For example to accomplish this using cURL from the [terminal](https://kb.apnscp.com/terminal/is-terminal-access-available/):
 
 curl -v -X PURGE http://web.site/asset/style.css
 

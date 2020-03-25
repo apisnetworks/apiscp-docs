@@ -15,7 +15,7 @@ _<this list intentionally left blank>_
 
 ### When is a restart automated?
 
-Certain operations within the [control panel](https://kb.apiscp.com/control-panel/logging-into-the-control-panel/ "Logging into the control panel") may necessitate a restart or reload of the web server. During this time, configuration is rebuilt and requests are temporarily queued. A restart happens automatically in the control panel whenever these conditions are met:
+Certain operations within the [control panel](https://kb.apnscp.com/control-panel/logging-into-the-control-panel/) may necessitate a restart or reload of the web server. During this time, configuration is rebuilt and requests are temporarily queued. A restart happens automatically in the control panel whenever these conditions are met:
 
 - Domain name is changed under **Account** > **Settings**
     - web server must update the ServerName configuration with the new domain
@@ -30,7 +30,7 @@ No other condition will trigger a web server restart and no restart is necessary
 
 Peruse the list of common issues that are mistakenly interpreted as a need to restart the web server:
 
-- [Where to upload web site files](https://kb.apiscp.com/web-content/where-is-site-content-served-from/ "Where is site content served from?")
+- [Where to upload web site files](https://kb.apnscp.com/web-content/where-is-site-content-served-from/)
 - [Moving WordPress locations](http://codex.wordpress.org/Moving_WordPress#Moving_Directories_On_Your_Existing_Server)
 - [Moving Drupal locations](https://www.ostraining.com/blog/drupal/move-drupal-to-a-new-folder/)
 - [Moving phpBB and old connection details are used](https://www.phpbb.com/support/docs/en/3.0/kb/article/purging-the-phpbb-cache/)

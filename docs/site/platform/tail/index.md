@@ -5,7 +5,7 @@ date: "2016-01-30"
 
 ## Symptom
 
-tail when used on [v6.5+](https://kb.apiscp.com/platform/determining-platform-version/) platforms will successfully open a file, but elicit a warning similar to:
+tail when used on [v6.5+](https://kb.apnscp.com/platform/determining-platform-version/) platforms will successfully open a file, but elicit a warning similar to:
 
 tail: unrecognized file system type 0x794c7630 for ‘error\_log’. please report this to bug-coreutils@gnu.org. reverting to polling
 

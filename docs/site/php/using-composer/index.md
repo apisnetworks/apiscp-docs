@@ -7,11 +7,11 @@ date: "2016-01-07"
 
 [Composer](https://getcomposer.org/) is a dependency manager for PHP akin to npm for Node and Bundler for Ruby.
 
-Composer is provided with hosting accounts on all [v5+ platforms](https://kb.apiscp.com/platform/determining-platform-version/). On an older platform? Request a platform migration! This guide covers installing a local copy of Composer on your account.
+Composer is provided with hosting accounts on all [v5+ platforms](https://kb.apnscp.com/platform/determining-platform-version/). On an older platform? Request a platform migration! This guide covers installing a local copy of Composer on your account.
 
 ## Installing
 
-You may download the latest version from its web site using its installation process. Login to the [terminal](https://kb.apiscp.com/terminal/accessing-terminal/), and run the following command:
+You may download the latest version from its web site using its installation process. Login to the [terminal](https://kb.apnscp.com/terminal/accessing-terminal/), and run the following command:
 
 ```bash
 curl -sS https://getcomposer.org/installer | php

@@ -5,7 +5,7 @@ date: "2015-11-03"
 
 ## Overview
 
-Attempting to install the Ruby gem "pg" or other PostgreSQL-dependent gems on [v6+ platforms](https://kb.apiscp.com/platform/determining-platform-version/) fail with a similar sample response:
+Attempting to install the Ruby gem "pg" or other PostgreSQL-dependent gems on [v6+ platforms](https://kb.apnscp.com/platform/determining-platform-version/) fail with a similar sample response:
 
 Can't find the PostgreSQL client library (libpq)
 \*\*\* extconf.rb failed \*\*\*

@@ -5,17 +5,17 @@ date: "2015-03-01"
 
 ## Overview
 
-All Passenger [applications](https://kb.apiscp.com/cgi-passenger/passenger-supported-apps/ "Passenger-supported Apps") require a compatible filesystem layout to launch and manage a Passenger-backed application. A layout consists of 4 features:
+All Passenger [applications](https://kb.apnscp.com/cgi-passenger/passenger-supported-apps/) require a compatible filesystem layout to launch and manage a Passenger-backed application. A layout consists of 4 features:
 
 1. Startup file
     - Passenger loads this file to start the application
     - Startup file names differ by application type (_Python, Ruby, Node.js, Meteor_)
-2. [Document root](https://kb.apiscp.com/web-content/where-is-site-content-served-from/ "Where is site content served from?") folder called `public/`
+2. [Document root](https://kb.apnscp.com/web-content/where-is-site-content-served-from/) folder called `public/`
     - all static content goes here (images, JavaScript, CSS)
 3. Apache configuration file named `.htaccess`
-    - [htaccess rules](https://kb.apiscp.com/guides/htaccess-guide/ ".htaccess Guide") instruct the web server to treat this as a Passenger app
+    - [htaccess rules](https://kb.apnscp.com/guides/htaccess-guide/) instruct the web server to treat this as a Passenger app
 4. `tmp/` folder for miscellany
-    - tmp/ is used primarily to control Passenger process [restarts](https://kb.apiscp.com/cgi-passenger/restarting-passenger-processes/ "Restarting Passenger processes")
+    - tmp/ is used primarily to control Passenger process [restarts](https://kb.apnscp.com/cgi-passenger/restarting-passenger-processes/)
 
 This is an example layout for /var/www/nodejs, a sample Node.js application:
 

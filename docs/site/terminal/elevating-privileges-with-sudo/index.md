@@ -5,11 +5,11 @@ date: "2016-01-18"
 
 ## Overview
 
-Newer platforms, v6+, provide limited sudo support that allows you to remove, copy, and change ownership of files with elevated permissions (root). Depending upon the [platform version,](https://kb.apiscp.com/platform/determining-platform-version/) either  `rm` (v6) or `rm`, `cp`, and `chown` (v6.5+) commands are available.
+Newer platforms, v6+, provide limited sudo support that allows you to remove, copy, and change ownership of files with elevated permissions (root). Depending upon the [platform version,](https://kb.apnscp.com/platform/determining-platform-version/) either  `rm` (v6) or `rm`, `cp`, and `chown` (v6.5+) commands are available.
 
 ## Usage
 
-sudo follows a general syntax: `sudo` `command` `arguments`. Certain commands have restrictions on what arguments can be used. sudo may only be used within the [terminal](https://kb.apiscp.com/terminal/accessing-terminal/) and requires you to enter your password to confirm intention.
+sudo follows a general syntax: `sudo` `command` `arguments`. Certain commands have restrictions on what arguments can be used. sudo may only be used within the [terminal](https://kb.apnscp.com/terminal/accessing-terminal/) and requires you to enter your password to confirm intention.
 
 ### rm
 
@@ -25,7 +25,7 @@ copy a file or set of files from a source to destination path. cp may be invoked
 
 Example: `cp myfile.txt mynewfile.txt`
 
-Example: `cp -dR /home/bob/bobswebsite.com /var/www/bobstaging` Copy contents of bobswebsite.com to `/var/www/bobstaging`, which may be an [addon domain](https://kb.apiscp.com/control-panel/creating-addon-domain/) or [subdomain](https://kb.apiscp.com/web-content/creating-subdomain/) to test changes to bobswebsite.com
+Example: `cp -dR /home/bob/bobswebsite.com /var/www/bobstaging` Copy contents of bobswebsite.com to `/var/www/bobstaging`, which may be an [addon domain](https://kb.apnscp.com/control-panel/creating-addon-domain/) or [subdomain](https://kb.apnscp.com/web-content/creating-subdomain/) to test changes to bobswebsite.com
 
 Limitations
 
@@ -41,7 +41,7 @@ Change ownership of a file or set of files.
 
 Example: `chown -R myadmin /home/bob/bobsmysite` Change ownership of bobsmysite, recursively to user "myadmin" for easy file management by myadmin
 
-Example: `chown apache /var/www/wp/wp-config.php` Change ownership of `wp-config.php` in `wp/`, a [WordPress](https://kb.apiscp.com/wordpress/installing-wordpress/) directory, so the web server may write to it during a configuration change.
+Example: `chown apache /var/www/wp/wp-config.php` Change ownership of `wp-config.php` in `wp/`, a [WordPress](https://kb.apnscp.com/wordpress/installing-wordpress/) directory, so the web server may write to it during a configuration change.
 
 Limitations
 
