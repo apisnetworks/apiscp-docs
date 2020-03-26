@@ -19,27 +19,6 @@ On a fresh install, a user reported problems accessing /phpMyAdmin within the pa
 
 Remove the default, erroneous hostname configured for the system. In this case it's `129.19.16.12    vps12345.vps.ovh.ca    vps12345`
 
-## Apache DOCUMENT_ROOT usage on addon domains/subdomains
-
-`DOCUMENT_ROOT` refers to the site root for the configured domain. Subdomains and addon domains will not possess the correct `DOCUMENT_ROOT` server value. Instead, use `VPATH`, which is the final virtual document root for the URI.
-
-For example,
-
-```
-RewriteEngine on
-RewriteBase /
-RewriteCond %{DOCUMENT_ROOT}/site/path/index.html -f
-RewriteRule ^ /site/path/index.html
-```
-
-Should be rewritten as,
-
-```
-RewriteEngine on
-RewriteBase /
-RewriteCond %{VPATH}/site/path/index.html -f
-RewriteRule ^ /site/path/index.html
-```
 
 ## Quota ext4 vs xfs
 

@@ -176,7 +176,14 @@ module.exports = {
                 "admin/Fortification",
               ]
             },
-            "admin/phpMyAdmin",
+            {
+              title: "Databases",
+              children: [
+                "admin/MySQL",
+                "admin/phpMyAdmin"
+              ]
+            },
+            "admin/FTP",
             "admin/Troubleshooting",
 
             "admin/Maps",

@@ -220,6 +220,30 @@ grep 'Segmentation' /var/log/httpd/error_log{,.1}
 
 See [PHP-FPM.md](PHP-FPM.md).
 
+## Troubleshooting
+
+### DOCUMENT_ROOT usage on addon domains/subdomains
+
+`DOCUMENT_ROOT` refers to the site root for the configured domain. Subdomains and addon domains will not possess the correct `DOCUMENT_ROOT` server value. Instead, use `VPATH`, which is the final virtual document root for the URI.
+
+For example,
+
+```
+RewriteEngine on
+RewriteBase /
+RewriteCond %{DOCUMENT_ROOT}/site/path/index.html -f
+RewriteRule ^ /site/path/index.html
+```
+
+Should be rewritten as,
+
+```
+RewriteEngine on
+RewriteBase /
+RewriteCond %{VPATH}/site/path/index.html -f
+RewriteRule ^ /site/path/index.html
+```
+
 ## See also
 
 For supporting documentation, see also 
