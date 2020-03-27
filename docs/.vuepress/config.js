@@ -154,7 +154,7 @@ module.exports = {
             },
 
             "admin/Monitoring",
-
+            "admin/Resource enforcement",
             {
               title: "Mail",
               children: [
@@ -180,8 +180,9 @@ module.exports = {
               title: "Databases",
               children: [
                 "admin/MySQL",
-                "admin/phpMyAdmin"
-              ]
+                "admin/phpMyAdmin",
+                "admin/PostgreSQL"
+	      ]
             },
             "admin/FTP",
             "admin/Troubleshooting",

@@ -1,5 +1,5 @@
 ---
-title: Site and Plan Management
+title: Site and Plan management
 ---
 Plans are service presets that may be assigned to an account. ApisCP contains a default present named "basic" that is a good fit for non-power users to balance resource consumption and accessibility.
 
