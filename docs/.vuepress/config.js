@@ -21,7 +21,12 @@ module.exports = {
         notFoundPath: '/404.html',
       }
     ],
-    '@vuepress/medium-zoom'
+    '@vuepress/medium-zoom',
+    [
+      'disqus', {
+        shortname: 'apiscp'
+      }
+    ],
   ],
   markdown: {
     extendMarkdown: md => {
@@ -58,6 +63,7 @@ module.exports = {
     docsDir: "docs",
     editLinks: true,
     editLinkText: 'Help us improve this article!',
+    smoothScroll: true,
     algolia: {
       apiKey: 'd2f15fd1086962aaabb924f6aa693249',
       indexName: 'apnscp-docs',

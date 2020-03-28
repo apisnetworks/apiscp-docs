@@ -1,6 +1,18 @@
 ---
 home: true
 tagline: Managing an ApisCP plaform 
+actionText: Get Started →
+actionLink: /INSTALL/
+features:
+- title: Self-healing
+  details: >-
+   Period integrity checks ensure your platform configuration never deviates from optimal.
+- title: Batteries included
+  details: >-
+   ApisCP bundles 1-click installs, anti-spam, malware, and firewall protection through an in-house architecture.
+- title: API driven design
+  details: >-
+   Everything in ApisCP revolves around its API, which can be called from the panel, command-line, or remotely.
 footer: Copyright © 2020 Apis Networks
 ---
 

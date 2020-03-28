@@ -6,7 +6,7 @@ Storage is tracked using native quota facilities of the operating system. XFS an
 
 An account may not exceed its **hard quota** whereas a **soft quota** disposition is at the discretion of the application: it may be simply advisory or fail.
 
-Files are allocated in **blocks**. Each block is 4 KB. Files must always occupy the entire block size even if there is insufficient data to cover the 4 KB block. Thus a 7 KB file may appear as 7 KB on disk, but is charged for 8 KB of storage by the operating system.
+File data is allocated in **blocks**. Each block is 4 KB. Files must always occupy the entire block size even if there is insufficient data to cover the 4 KB block. Thus a 7 KB file may appear as 7 KB on disk, but is charged for 8 KB of storage by the operating system.
 
 ::: details
 `repquota -ua | sort -n --key=3` will show all files belonging to users ordered by size. Each number, with the exception of 0, is in KB and will always be perfectly divisible by the filesystem block size, 4 KB.
@@ -22,7 +22,7 @@ Before discussing inode quotas, let's talk about an inode. inodes provide metada
 
 Large inode sizes means that more information about a file. File size, creation time, modification time, owner, group are mandatory attributes one would find in an inode. Additional attributes include access control lists, granular access rights to a file; extended attributes, arbitrary data about a file; and SELinux security contexts, used by a separate subsystem that defines unambiguous operational boundaries of a file. 
 
-*File names are not included* in an inode, but instead a **dentry**, which is another storage block that contains information about what file names it contains as well as its inode structures. Each dentry is another 4 KB.
+*File names are not included* in an inode, but instead a **dentry**, which is another storage block that contains information about what file names it contains as well as its inode structures. Each dentry is stored in multiples of 4 KB.
 
 ***Bringing this together:***
 
@@ -51,13 +51,17 @@ In either situation you're liable to run out of storage before inodes. On XFS sy
 
 On Ext4/Ext3 platforms, CAP_SYS_RESOURCE allows bypass of quota enforcement. XFS does not honor quota bypass if a user or process has CAP_SYS_RESOURCE capability set. Thus it is possible for services that require creation of a file and are either root or CAP_SYS_RESOURCE to fail upon creation of these files. Do not sgid or suid a directory that may cause an essential service to fail on boot if quotas prohibit it, such as Apache.
 
+## Bandwidth
+
+Bandwidth is tallied every night during logrotation. Logrotation runs via `/etc/cron.daily/logrotate`. Its start time may be adjusted using *cron.start-range* [Scope](Scopes.md). A secondary task, `bwcron.service` runs every night at 12 AM server time (see *system.timezone* Scope).
+
 ## Memory
 
 ## CPU
 
 ## Process
 
-## Bandwidth
+
 
 ## Emergency stopgaps
 
