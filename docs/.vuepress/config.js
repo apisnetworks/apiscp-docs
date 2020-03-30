@@ -158,7 +158,7 @@ module.exports = {
                 "admin/SSL",
               ]
             },
-
+            "admin/Metrics",
             "admin/Monitoring",
             "admin/Resource enforcement",
             {

@@ -76,7 +76,7 @@ Where *MYHOSTNAME* is your hostname for the machine. For consistency reasons, it
 Once ApisCP is setup it can be reconfigured anytime with,
 
 ```bash
-scope:set net.hostname MYHOSTNAME
+cpcmd scope:set net.hostname MYHOSTNAME
 ```
 
 SSL will automatically reissue as well as impacted services restart.
