@@ -10,7 +10,20 @@ ApisCP follows semantic versioning beginning with 3.0.0. Versions are split into
 * Minor is the second number (0). Minor versions may introduce minor API changes or new services, however will not break anything in a meaningful way. Minor changes are considered safe for most environments.
 * Patch is the final number (0). Patch versions introduce non-destructive additions or bugfixes and are considered safe to always apply.
 
-ApisCP is configured to deploy patch and minor updates on update. This is controlled with `cp.update-policy` [Scope](admin/Scopes.md). Updates are checked automatically every night. This behavior can be changed via `cp.nightly-updates` Scope.
+ApisCP is configured to deploy patch and minor updates on update. This is controlled with `cp.update-policy` [Scope](admin/Scopes.md). Possible values include:
+
+- **all**: always apply official updates  
+    *Example: ✔️ 3.1.1 => 3.1.2, ✔️ 3.1.10 => 3.2.0, ✔️ 4.3.99 => 5.0.0, ❌ 3fcae012 => cefa3210*
+- **major**: apply official updates if major version does not change  
+    *Example: ✔️ 3.1.1 => 3.1.2, ✔️ 3.1.10 => 3.2.0, ❌ 4.3.99 => 5.0.0*
+- **minor**: apply official updates if minor version does not change  
+    *Example: ✔️ 3.1.1 => 3.1.2, 3.1.10 =>❌ 3.2.0*
+- **false**: never apply updates  
+    *Example: ❌ 3.1.1 => 3.1.2*
+- **edge**: always apply updates, official or experimental  
+    *Example: ✔️ 3.1.1 => 3.1.2, ✔️ 3.1.10 => 3.2.0, ✔️ 4.3.99 => 5.0.0, ✔️ 3fcae012 => cefa3210*
+
+Updates are checked automatically every night. This behavior can be changed via `cp.nightly-updates` Scope.
 
 Set the update policy to "edge" to help test new features. "edge" deploys code that is published to Gitlab before a formal release tag is defined for a commit.
 
@@ -20,6 +33,27 @@ For example, to disable update checks, but deploy the latest code on manual upda
 cpcmd scope:set cp.update-policy edge
 cpcmd scope:set cp.nightly-updates false
 ```
+
+### Switching to EDGE
+
+An EDGE update policy ensures you are the latest [commit](https://gitlab.com/apisnetworks/apnscp/-/commits/master), which may contain untested/experimental code. You may be asked to switch to EDGE to validate a fix before the next public release. Switching may be done using a [Scope](admin/Scopes) + upcp:
+
+```bash
+cpcmd scope:set cp.update-policy edge
+upcp
+```
+
+ApisCP will automatically merge new changes and restart itself. To switch back, reset the update policy ("**major**" is default), then reset the code.
+
+```bash
+cpcmd scope:set cp.update-policy major
+upcp --reset
+systemctl restart apiscp
+```
+
+::: tip
+`upcp --reset` is useful if you make changes to the panel code while debugging a problem. `--reset` will always return the panel code to its original state.
+:::
 
 ### upcp update helper
 
@@ -46,8 +80,6 @@ systemctl list-timers apnscp-flare-check.timer
 # Sun 2020-02-23 14:36:50 EST  22min left Sun 2020-02-23 14:00:18 EST  14min ago apnscp-flare-check.timer apnscp-flare-check.service
 # 1 timers listed.
 ```
-
-
 
 ## System updates
 
