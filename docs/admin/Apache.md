@@ -6,7 +6,9 @@
 
 A variety of locations exist under */etc/httpd*. Some locations may be freely altered. The table summarizes locations within /etc/httpd, whether they may be modified, and intention. 
 
-After making changes run `htrebuild` to rebuild and test configuration. Apache will restart once the configuration is validated. 
+:::tip
+After making changes run `htrebuild` to rebuild and test configuration. Apache will restart once the configuration is validated.
+:::
 
 | Modifiable? | File                           | Purpose                                                      |
 | ----------- | ------------------------------ | ------------------------------------------------------------ |
@@ -36,6 +38,10 @@ We'll cover a few below.
 ### Tolerating invalid configuration
 
 Invalid configuration may occur when transitioning between Apache platforms with different modules. Default behavior is to fail, returning a 550 Internal Server Error. This behavior can be changed using `apache.strict-mode`. 
+
+::: warning
+Strict mode does not change behavior of invalid directives inside `/etc/httpd`, only in `.htaccess` files. An invalid directive in `httpd.conf` or `siteXX/` will cause any reload requests to fail as well as prevent Apache from starting up.
+::: 
 
 ```bash
 # Allow invalid directives to exist in .htaccess
@@ -222,27 +228,22 @@ See [PHP-FPM.md](PHP-FPM.md).
 
 ## Troubleshooting
 
-### DOCUMENT_ROOT usage on addon domains/subdomains
+### Stacking domains and subdomains as separate accounts
 
-`DOCUMENT_ROOT` refers to the site root for the configured domain. Subdomains and addon domains will not possess the correct `DOCUMENT_ROOT` server value. Instead, use `VPATH`, which is the final virtual document root for the URI.
+Given *domain.com* and *sub.domain.com* as 2 separate accounts with *domain.com* assigned site10 and *sub.domain.com* assigned site12, when configuration is compiled into a single file, `/etc/httpd/conf/virtual-httpd-built`, the domain/subdomain configuration for *domain.com* will take precedence as it is lexicographically lower.
 
-For example,
+Configuration for site12 will not show as the [ServerAlias](https://httpd.apache.org/docs/2.4/vhosts/name-based.html) setting, \*.domain.com matches first. A quick fix is to relocate `site12` configuration to higher priority by renaming such that it is ordered before `site10`.
 
+```bash
+cd /etc/httpd/conf/virtual
+mv site12 priority-site12
+ln -s site12 priority-site12
+htrebuild
 ```
-RewriteEngine on
-RewriteBase /
-RewriteCond %{DOCUMENT_ROOT}/site/path/index.html -f
-RewriteRule ^ /site/path/index.html
-```
 
-Should be rewritten as,
-
-```
-RewriteEngine on
-RewriteBase /
-RewriteCond %{VPATH}/site/path/index.html -f
-RewriteRule ^ /site/path/index.html
-```
+:::details
+`site12` is renamed to `priority-site12` thus ensuring it comes `site10`. A symbolic link is created to `site12` to allow future panel edits to update the configuration now in `priority-site12`.  `htrebuild` will skip any symbolic links in `/etc/httpd/conf/virtual-built` as well. Deletion will delete both the regular file and symbolic link if encountered.
+:::
 
 ## See also
 
