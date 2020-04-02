@@ -153,9 +153,25 @@ module.exports = {
             {
               title: "Network",
               children: [
-                "admin/DNS",
                 "admin/NAT",
                 "admin/SSL",
+              ]
+            },
+            {
+              title: "DNS",
+              children: [
+                "admin/DNS",
+                {
+                  title: "Providers",
+                  children: [
+                    "admin/dns/AWS.md",
+                    "admin/dns/Cloudflare.md",
+                    "admin/dns/Digitalocean.md",
+                    "admin/dns/Linode.md",
+                    "admin/dns/PowerDNS.md",
+                    "admin/dns/Vultr.md", 
+                  ]
+                }
               ]
             },
             "admin/Metrics",
