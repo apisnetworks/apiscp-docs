@@ -76,7 +76,7 @@ Each site created generates its HTTP configuration from the template service pat
 
 Run `EditDomain --rebuild --all` after making changes to update configuration for all sites.
 
-### EditDomain reload delays
+### Reload delays
 
 Apache configuration is delayed by 2 minutes to allow for successive calls to \*Domain helpers to merge into a single call. Doing so reduces the risk of a self-induced denial of service attack when performing a bulk edit. Behavior may be adjusted via *[httpd]* => *reload_delay* [Tuneable](Tuneables.md).
 
@@ -133,7 +133,9 @@ Limits may be overriden on a per-site basis by setting `RequestReadTimeout` in *
 
 ### Resource monopolization
 
-cgroups are an optional service for accounts. 
+cgroups are an optional service to enforce [resource limits](Resource%20enforcements.md). Limits may be imposed by setting **cgroup**,**enabled**=1. CPU, memory, PID, and IO limits are tracked. Resource limits provide a secondary effect by stymying DDoS attacks that may fall under the threshold of [mod_evasive](Evasive.md). For example, consider a distributed attack of over 10,000 machines each sending 2 requests per second - 20,000 requests per second will quickly swamp a server without necessarily triggering Evasive limits.
+
+Resource enforcement, when applied, prevent a site from creating excessive PHP-FPM workers to cope with swells or monopolizing CPU time slices thus making the server more egalitarian and sometimes too, allowing other reactive protection to act.
 
 ## Security changes
 
@@ -169,6 +171,41 @@ Accessing https://example.com queries all `DirectoryIndex` files within the docu
 ### Disabling index negotiation
 
 `DirectoryIndex disabled` disables index negotiation for a directory. Disabling negotiation is necessary when passing all content to a backend proxy, such as with Passenger.
+
+### Proxying content
+
+Apache's `ProxyPass` directive sends requests to a standalone service, e.g. a PowerDNS API service or even Node web service. Placing a service behind a proxy protects it from direct, outside access through [firewalld](../FIREWALL.md) and confers benefits of typical website protection in ApisCP: end-to-end SSL encryption, brute-force protection by [mod_evasive](https://github.com/apisnetworks/mod_evasive), request logging, and connection/resource limiting. 
+
+Two alternatives exist for proxying content, either as a standalone site or a location in an existing site.
+
+#### Standalone proxy
+
+A standalone setup maps all requests for a domain to the proxy service. For example, say a service, [Jenkins](https://jenkins.io/), is running on port 8080 and we'd like to place it on a subdomain called "pipeline.mydomain.com".
+
+Create a new account named "pipeline.mydomain.com". If mydomain.com also exists on the server, relocate "pipeline.mydomain.com" it to a higher priority (see *Troubleshooting* => "*Stacking domains*" section below). From there, add the following to [siteXX/custom](Apache#configuration) in /etc/httpd/conf.
+
+```text
+ProxyPass http://127.0.0.1:8080/
+ProxyPassReverse http://127.0.0.1:8080/
+```
+::: warning
+Trailing "/" is significant when setting this configuration.
+:::
+
+Run `htrebuild` and now all requests for pipeline.mydomain.com will be sent to http://127.0.0.1:8080/. 
+
+#### Location-based proxy
+
+Taking the above example, what if we want to make the Jenkins service available on *mydomain.com/ci*? A `<Location>` block can accomplish this.
+
+In [siteXX/custom](Apache#configurationApache#configuration), the setup is the similar as with **Standalone proxy** above:
+
+```
+<Location /ci>
+ProxyPass http://127.0.0.1:8080/
+ProxyPassReverse http://127.0.0.1:8080/
+</Location>
+```
 
 ## Technical details
 

@@ -1,5 +1,5 @@
 ---
-title: HTTP brute-force protection
+title: Brute-force protection
 ---
 
 mod_evasive is a simple bean counter that tracks HTTP requests over a narrow window for use with brute-force deterrence in fail2ban. When an IP address exceeds the count limit within the duration, information is emitted via syslog to fail2ban, which determines how to dispose of the incident. Additionally a file named */tmp/dos-IP* is created marking the event.
