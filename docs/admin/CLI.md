@@ -5,7 +5,9 @@ ApisCP provides a variety of command-line helpers that allow you to interact wit
 
 All helpers live under `/usr/local/apnscp/bin`. All commands except for `cpcmd` must be run as root. `sudo su -` is a quick way to become root if you aren't already.
 
-> *Domain binaries: AddDomain, EditDomain, DeleteDomain, ActivateDomain, and SuspendDomain are covered in [Plans.md](Plans.md). ImportDomain and ExportDomain are covered in [Migrations.md](Migrations.md). This document covers other helpers.
+::: tip
+*Domain binaries: AddDomain, EditDomain, DeleteDomain, ActivateDomain, and SuspendDomain are covered in [Plans.md](Plans.md). ImportDomain and ExportDomain are covered in [Migrations.md](Migrations.md). This document covers other helpers.
+:::
 
 ## cpcmd
 
@@ -16,7 +18,9 @@ cpcmd -d mysite.com aliases_add_domain blog-site.com /var/www/blog-site.com
 cpcmd -d mysite.com aliases_synchronize_changes
 ```
 
-> Easy, huh? This adds a new domain named blog-site.com with the document root */var/www/blog-site.com*, then updates the web server configuration. Alternatively, `aliases_remove_domain blog-site.com` would remove the domain from the account.
+::: details
+This adds a new domain named blog-site.com with the document root */var/www/blog-site.com*, then updates the web server configuration. Alternatively, `aliases_remove_domain blog-site.com` would remove the domain from the account.
+:::
 
 Now let's configure Let's Encrypt for the addon domain and install Wordpress.
 
