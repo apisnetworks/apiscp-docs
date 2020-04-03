@@ -17,7 +17,7 @@ The following is a generalized checklist of prerequisites:
   *Confirm with:* `dig +short MX domain.com`
 * Resolvable DNS
   *Confirm with:* `dig +short "$(hostname)"`
-  *Set with:* `cpcmd scope:set system.hostname some.host.name`
+  *Set with:* `cpcmd scope:set net.hostname some.host.name`
   *Unless:* DNS for hostname pending setup (see below)
 
 ### Bootstrapping server SSL with a hosted domain
