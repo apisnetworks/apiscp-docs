@@ -119,7 +119,7 @@ module.exports = {
             "UPGRADING",
             "LICENSE",
             "FIREWALL",
-
+            "admin/NAT"
           ]
         },
         {
@@ -150,13 +150,7 @@ module.exports = {
             },
 
             "admin/Filesystem",
-            {
-              title: "Network",
-              children: [
-                "admin/NAT",
-                "admin/SSL",
-              ]
-            },
+            "admin/SSL",
             {
               title: "DNS",
               children: [

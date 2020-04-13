@@ -13,6 +13,23 @@ Additionally, module configuration may be inserted in `/etc/httpd/conf.d` to loa
 
 After making changes, `htrebuild` will compile Apache's modular configuration followed by `systemctl reload httpd` to reload the web server.
 
+### Placeholder page
+A placeholder page is created whenever an account, addon domain, or subdomain is created. Placeholders are always named "index.html" and reside in the respective [document root](https://kb.apnscp.com/web-content/where-is-site-content-served-from/). Content is generated from a Blade file, which allows for customization prior to rendering of the placeholder.
+
+Copy `/usr/local/apnscp/resources/templates/apache/placeholder.blade.php` to `/usr/local/apnscp/config/custom/resources/tempaltes/apache/placeholder.blade.php` creating parent directories as needed. index.html may not be updated once written.
+
+### Suspension page
+All suspended accounts via [SuspendDomain](Plans#suspenddomain) redirect to `/var/www/html/suspend.html`. Suspension rules may be modified by adjusting the rewrite rules.
+
+Copy `/usr/local/apnscp/resources/templates/apache/suspend-rules.blade.php` to `/usr/local/apnscp/config/custom/resources/tempaltes/apache/suspend-rules.blade.php` creating parent directories as needed.
+
+A site once suspended will compile these rules into `/etc/httpd/conf/siteXX/00-suspend`. Rules will not be updated unless suspended again. `admin:collect()` provides a convenient way to do this.
+
+```bash
+yum install -y jq
+cpcmd -o json admin:collect '[]' '[active:false]' | jq -r 'keys[]' | while read -r SITE ; do SuspendDomain $SITE ; done
+```
+
 ## ApisCP
 
 **⚠️ DO NOT TOUCH:** /usr/local/apnscp/config/*  
