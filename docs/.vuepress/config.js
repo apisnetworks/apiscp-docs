@@ -42,7 +42,7 @@ module.exports = {
   redirectionMapping: {
     "GLOSSARY": "glossary"
   },
-  title: "ApisCP Documentation",
+  title: "ApisCP Docs",
   description: "ApisCP · A modern hosting platform",
   head: [
     ["link", { rel: "stylesheet", href: "https://fonts.googleapis.com/icon?family=Material+Icons"}],
@@ -136,12 +136,7 @@ module.exports = {
                 "admin/Bootstrapper",
               ]
             },
-
-
-
-            "admin/Backups",
-
-             {
+            {
               title: "Migrations",
               children: [
                 "admin/Migrations - cPanel",
@@ -201,8 +196,9 @@ module.exports = {
 	      ]
             },
             "admin/FTP",
-            "admin/Troubleshooting",
 
+            "admin/Backups",
+            "admin/Troubleshooting",
             "admin/Maps",
             "admin/Benchmarking",
             "DEBUGGING",
