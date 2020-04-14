@@ -145,7 +145,6 @@ module.exports = {
             },
 
             "admin/Filesystem",
-            "admin/SSL",
             {
               title: "DNS",
               children: [
@@ -163,19 +162,7 @@ module.exports = {
                 }
               ]
             },
-            "admin/Metrics",
-            "admin/Monitoring",
-            "admin/Resource enforcement",
-            {
-              title: "Mail",
-              children: [
-                "admin/Smtp",
-                "admin/LDA",
-                "admin/Filtering",
-                "admin/Majordomo",
-              ]
-            },
-
+            "admin/SSL",
             {
               title: "HTTP",
               children: [
@@ -195,7 +182,19 @@ module.exports = {
                 "admin/PostgreSQL"
 	      ]
             },
+            {
+              title: "Mail",
+              children: [
+                "admin/Smtp",
+                "admin/LDA",
+                "admin/Filtering",
+                "admin/Majordomo",
+              ]
+            },
             "admin/FTP",
+            "admin/Monitoring",
+            "admin/Resource enforcement",
+            "admin/Metrics",
 
             "admin/Backups",
             "admin/Troubleshooting",
