@@ -29,13 +29,27 @@ A site once suspended will compile these rules into `/etc/httpd/conf/siteXX/00-s
 yum install -y jq
 cpcmd -o json admin:collect '[]' '[active:false]' | jq -r 'keys[]' | while read -r SITE ; do SuspendDomain $SITE ; done
 ```
+### Evasive
+**⚠️ DO NOT TOUCH**: n/aa  
+**Customization file**: /etc/httpd/conf.d/evasive.conf or httpd-custom.conf
+
+Alternatively consider the apache.evasive [Scope](Scopes.md), which provides error checking.
+
+### mod_security
+**⚠️ DO NOT TOUCH**: /etc/httpd/conf.d/mod_security.conf  
+**⚠️ DO NOT TOUCH**: /etc/httpd/modsecurity.d/activated_rules/clamav.conf  
+**Customization file**: /etc/httpd/modsecurity.d/ or httpd-custom.conf
+
+### Pagespeed
+**⚠️ DO NOT TOUCH**: /etc/httpd/conf.d/pagespeed.conf MANAGED BLOCK (#BEGIN/#END)  
+**Customization file**: /etc/httpd/conf.d/pagespeed.conf or httpd-custom.conf
 
 ## ApisCP
 
 **⚠️ DO NOT TOUCH:** /usr/local/apnscp/config/*  
 **Customization file:** /usr/local/apnscp/config/custom/*  
 
-ApisCP supports overriding views, apps, modules, and configuration.
+ApisCP supports overriding views, apps, modules, and configuration. Modification is covered in detail in [PROGRAMMING.md](../PROGRAMMING.md).
 
 ::: tip
 ApisCP was originally called APNSCP. Internally, in many places, the panel is still referred to as APNSCP. ApisCP is a bit easier to pronounce.
@@ -176,10 +190,20 @@ A few conflicting files in /etc/dovecot/conf.d are wiped as part of [Bootstrappe
 - 10-auth.conf
 - 10-mail.conf
 
+## fail2ban
+
+**⚠️ DO NOT TOUCH:** /etc/fail2ban/*.conf   
+**Customization file:** /etc/fail2ban/*.local, /etc/fail2ban/jail.d
+
+Any file in fail2ban may be overridden with a corresponding `.local` file. It takes the same name as the source file, except it ends in `.local`.
+
+*See also*
+- [MANUAL 0.8](https://www.fail2ban.org/wiki/index.php/MANUAL_0_8#Configuration) (fail2ban.org) - covers configuration/override in detail
+
 ## Postfix
 
 **⚠️ DO NOT TOUCH:** /etc/postfix/master.conf  
-**Customization file:** /etc/postfix/main.cf  
+**Customization file:** /etc/postfix/main.cf, /etc/postfix/master.d
 
 Postfix does not provide a robust interface to extend its configuration. /etc/postfix/master.cf, which is the service definition for Postfix, may not be updated as it is replaced with [package updates](https://github.com/apisnetworks/postfix).
 
@@ -193,6 +217,32 @@ postfix_custom_config:
   vmaildrop_destination_rate_delay: 15
 ```
 
+`postfix_custom_master_config` works similarly to `postfix_custom_config` except it is a string applied to /etc/postfix/master.cf. Additionally, per-site configurations, such as transports, may be added in `/etc/postfix/master.d`. Configuration **must end** in *.cf*. Any file prefixed with *siteXX-* is considered affiliated with the designated site and **will be removed** on site deletion. 
+
+Do not assume these templates will be capable of Jinja templating in Ansible. Instead, the template must be statically generated at account creation/edit.
+
+**Sample**
+
+```
+# Add SPF checking service, note this is for illustrative purposes and
+# largely obviated by SpamAssassin and rspamd spam filters
+postfix_custom_master_config: |-
+  policyd-spf  unix  -       n       n       -       0       spawn
+  	user=policyd-spf argv=/usr/bin/policyd-spf
+```
+
+**Sample**
+
+```
+# In /etc/postfix/master.d/site12.cf
+# Add a custom smtp transport
+mydomain.com-out unix  -       -       n       -       -       smtp
+        -o smtp_helo_name=mydomain.com
+        -o smtp_bind_address=64.22.68.2
+```
+
+Then to merge changes for both examples, run `upcp -sb mail/configure-postfix`.
+
 ## MySQL
 
 **⚠️ DO NOT TOUCH:** /etc/my.cnf.d/apnscp.conf  
@@ -205,7 +255,7 @@ postfix_custom_config:
 
 ## PHP
 
-**⚠️ DO NOT TOUCH:** /etc/php.ini (*managed block*)  
+**⚠️ DO NOT TOUCH:** /etc/php.ini MANAGED BLOCK (*# BEGIN/# END*)  
 **Customization file:** /etc/phpXX.d/*  
 
 ApisCP uses a managed block in /etc/php.ini. Any directives within this block will always be overwritten. To override any values within this block, make changes in /etc/phpXX.d/ where XX is the version major/minor of PHP. Note this affects global PHP settings. To change settings per site look into [php_value](https://kb.apiscp.com/php/changing-php-settings/) in either `.htaccess` or `siteXX/custom` mentioned above in Apache.
@@ -235,7 +285,7 @@ rspamd provides many configurables that don't require a direct override. Neural 
 
 ## SSH
 
-**⚠️ DO NOT TOUCH:** Managed block in /etc/ssh/sshd_config  (*# BEGIN/# END*)  
+**⚠️ DO NOT TOUCH:**  /etc/ssh/sshd_config MANAGED BLOCK (*# BEGIN/# END*)  
 **Customization file:** /etc/ssh/sshd_config  
 
 `sshd_config` may be modified. Do not edit the directives within `# BEGIN ApisCP MANAGED BLOCK` and `# END ApisCP MANAGED BLOCK`. Port and public key authentication may be modified with [Scopes](Scopes.md),
