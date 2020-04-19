@@ -39,7 +39,7 @@ Using the most recent value for monotonic series causes the oldest timestamp to 
 
 Compression chunk intervals are determined by *[telemetry]* => *compression_chunk*. Larger intervals require less storage but lose details. By default, 1 hour intervals are chosen for data older than 1 week, which reduces metric storage requirements by 10x. Once compressed, all data points in that window is replaced by a single data point.
 
-Additionally, **archival compression** is enabled for data older than 48 hours via *[telemetry]* => *archival_compression*. Archival compression formats data as a contiguous segments in PostgreSQL that *may not* be altered (INSERT, UPDATE) without first decompressing all data. Data may be removed while in archival compression. `telemetry:decompress_all()` synchronously inflates all archived chunks. Once updated, enable compression once again using `telemetry:reinitialize_compression()`.
+Additionally, **archival compression** may be enabled for data older than 48 hours via *[telemetry]* => *archival_compression*. Archival compression formats data as a contiguous segments in PostgreSQL that *may not* be altered (INSERT, DELETE, UPDATE) without first decompressing all data. Data may be removed while in archival compression. `telemetry:decompress_all()` synchronously inflates all archived chunks. Once updated, enable compression once again using `telemetry:reinitialize_compression()`.
 
 ```bash
 # Show metric storage usage
@@ -47,6 +47,10 @@ cpcmd telemetry:db-usage
 # Show metric archival compression usage
 cpcmd telemetry:db-compression-usage
 ```
+
+::: tip
+Archival compression is useful when hosting hundreds of sites, but also requires decompression before a site may be safely removed. This can add several seconds to a `DeleteDomain` task, which is unacceptable overhead when invoked manually. If enabling archival compression, be sure to configure periodic account removals via **opcenter.account-cleanup** [Scope](Scopes.md) that automatically removes suspended accounts in batch suspended more than *n* days ago.
+:::
 
 ## Adding metrics
 

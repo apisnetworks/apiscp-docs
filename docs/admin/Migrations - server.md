@@ -78,10 +78,10 @@ apnscp_php bin/scripts/transfersite.php --do=addon_domains --do=subdomains mydom
 
 ## Overriding configuration
 
-Site configuration can be overridden during stage 0 (account creation). This is useful for example if you are changing VPS providers, while retaining the respective provider's DNS service.
+Site configuration can be overridden during stage 0 (account creation). This is useful for example if you are changing VPS providers, while retaining the respective provider's DNS service. `-c` is used to specify site parameters as is commonly repeated in [cPanel imports](Migrations - cPanel) or [site creation](Plans#adddomain).
 
 ```bash
-apnscp_php bin/scripts/transfersite.php --override='dns,provider=linode' --override='dns,key=abcdef1234567890' mydomain.com
+apnscp_php bin/scripts/transfersite.php -c='dns,provider=linode' -c='dns,key=abcdef1234567890' mydomain.com
 ```
 
 On the source server, mydomain.com may continue to use DigitalOcean as its [DNS provider](https://bitbucket.org/apisnetworks/apnscp/src/master/lib/Module/Provider/Dns/Digitalocean.php?at=master&fileviewer=file-view-default) while the on the target server mydomain.com will use Linode's [DNS provider](https://bitbucket.org/apisnetworks/apnscp/src/master/lib/Module/Provider/Dns/Linode.php?at=master&fileviewer=file-view-default). Once mydomain.com completes its initial stage (stage 0), be sure to update the nameservers for mydomain.com.
@@ -96,6 +96,10 @@ An account after migration completes is automatically suspended on the source si
 ApisCP uses DNS + atd to manage migration stages. A TXT record named `__acct_migration` with the unix timestamp is created on the **source** server. This is used internally by ApisCP to track migration. ApisCP creates an API client on both the **target** and **source** servers. A 24 hour delay is in place between migration stages to allow DNS to [propagate](https://kb.apiscp.com/dns/dns-work/) and sufficiently prep, including [preview](https://kb.apiscp.com/dns/previewing-your-domain/), for a final migration. This delay can be bypassed by specifying `--force`. All resolvers obey TTL, so don't force a migration until the minimum TTL time has elapsed!
 
 Migration TTLs are adjusted on the **target** server to 60 seconds. If you are changing DNS providers during migration, this will allow you to make nameserver changes without affecting your site. On its inital migration (stage 0), ApisCP copies all DNS records verbatim to the **target**. At the end of the second migration stage (stage 1), all records that match your old hosting IP address are updated to your new IP address. All other records *are not* altered. Additionally, `__acct_migration` is removed from the **source** DNS server and account put into a suspended state. When both **source** and **target** share the same nameserver, only TTL is reflected at the end of stage 0 and IP address changed at the end of stage 1. At the end of stage 1, TTL is reset to the default TTL setting.
+
+::: tip
+Setting records, TTL adjustments on the target machine allows you to proactively update nameservers before a migration finalizes if you are unable to modify DNS records on the source machine. The initial records during stage 1 will reflect the *source* server while stage 2 records reflect the *target* server.
+:::
 
 ### Further reading
 
