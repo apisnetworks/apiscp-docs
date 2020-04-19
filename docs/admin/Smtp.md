@@ -1,6 +1,6 @@
 # SMTP
 
-SMTP provides outbound mail relaying for the server. This is typical low-hanging fruit for hackers and a frequent attack vector. apnscp provides a few means to secure SMTP, including denying outbound SMTP access to any non-mail process. Direct SMTP access is a common technique used to circumvent mail logs and TCP sockets are anonymous, which can make tracking down the origin quite difficult. [StealRat](https://www.abuseat.org/cmsvuln.html) for example uses this technique.
+SMTP provides outbound mail relaying for the server. This is typical low-hanging fruit for hackers and a frequent attack vector. ApisCP provides a few means to secure SMTP, including denying outbound SMTP access to any non-mail process. Direct SMTP access is a common technique used to circumvent mail logs and TCP sockets are anonymous, which can make tracking down the origin quite difficult. [StealRat](https://www.abuseat.org/cmsvuln.html) for example uses this technique.
 
 All TCP communication locally to 25 or 587 must be authenticated to preserve an audit trail. This behavior can be toggled with Bootstrapper, set `postfix_relay_mynetworks` to `true`. Be warned that if the machine were compromised and an attacker connects to 127.0.0.1:25 to relay mail there is no direct means to infer which process created the rogue connections.
 
@@ -57,11 +57,11 @@ Then replace the records created when mail is enabled for a domain. This example
 
 ```
 
-Restart apnscp after making changes. Altering SPF records for other outbound filters follows the same SPF logic as with the above MailChannels.
+Restart ApisCP after making changes. Altering SPF records for other outbound filters follows the same SPF logic as with the above MailChannels.
 
 ## Alternative transports
 
-apnscp contains two transports named *oneshot* and *relaylim* that affect Postfix's retry behavior. Transports may be configured via /etc/postfix/transport (see [transport(5)](http://www.postfix.org/transport.5.html)).
+ApisCP contains two transports named *oneshot* and *relaylim* that affect Postfix's retry behavior. Transports may be configured via /etc/postfix/transport (see [transport(5)](http://www.postfix.org/transport.5.html)).
 
 ### oneshot transport
 

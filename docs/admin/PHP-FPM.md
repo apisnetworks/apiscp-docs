@@ -220,6 +220,12 @@ IO and CPU weighting may be set via ioweight and cpuweight respectively. ioweigh
 EditDomain -c cgroup,ioweight=50 -c cgroup,cpuweight=200 domain.com
 ```
 
+See [Resource enforcement.md](Resource enforcement.md) for further details.
+
+::: warning
+Setting limits artificially low may create a connection backlog that can prevent consume more system resources than it strives to prevent. Resource limits should be used to prevent egregious abuse, not set firm boundaries based on average daily usage.
+:::
+
 ## PHP-FPM timeout
 
 The web server expects a request to complete within **60 seconds**. Any request outside this window will return a *504 Gateway Timeout* response. Alter the system-wide configuration in `/etc/httpd/conf/httpd-custom.conf` by setting `ProxyTimeout 180` to raise the limit to 3 minutes. Proxy timeout may be adjusted on a per-site basis by creating a file named `custom` in `/etc/httpd/conf/siteXX` with the same directive. When overriding per-site, be sure to rebuild the configuration:
@@ -248,6 +254,8 @@ Directives are assignment-based rather than directive similar to php.ini. Paths 
 PHP-FPM caches per-directory .user.ini files. By default the duration is 300 seconds (5 minutes). This can be altered by adding a FPM configuration to /etc/php-fpm.d/*file*.conf or by overriding the PHP-FPM template in templates/apache/php/.
 
 Then restart the affected pool, `systemctl restart php-fpm-siteXX` where siteXX is the site marker or do an en masse restart with `systemctl restart php-fpm`.
+
+Since v3.1.38, directives are migrated automatically for all known domain/subdomain parent document roots when a site is switched between jail/non-jail mode. `php:migrate-directives(string $host, string $path = '', string $from)` provides a migration interface for directives behind a subdirectory.
 
 ### Masquerading other file types as PHP
 
