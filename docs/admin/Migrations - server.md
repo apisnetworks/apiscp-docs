@@ -2,11 +2,11 @@
 title: Server transfers
 ---
 
-apnscp provides an automated migration system to assist you in moving accounts from system to system and platform to platform. There are a few prerequisites to confirm before migrating:
+ApisCP provides an automated migration system to assist you in moving accounts from system to system and platform to platform. There are a few prerequisites to confirm before migrating:
 
 - ✅ You have root (administrative) access on both servers
 - ✅ Public key authentication is configured on the destination server
-- ✅ Both source + destination run apnscp
+- ✅ Both source + destination run ApisCP
 - ✅ Source + destination server have DNS configured (*optional*)
 
 As long as the account fits this checklist, you're golden! To initiate migration, issue the following command:
@@ -21,7 +21,7 @@ Where is the destination server, a fully-qualified domain isn't necessary, and i
 apnscp_php /usr/local/apnscp/bin/scripts/transfersite.php -s newsvr.mydomain.com tedsite
 ```
 
-As long as DNS is configured for the site and the target server has the same DNS provider configured, then migration will be fully automated with an initial stage to prep files and give a 24 hour window to [preview the domain](https://kb.apnscp.com/dns/previewing-your-domain/). If DNS isn't configured for a site, (`dns`,`provider`=`builtin`), then an optional parameter, `--stage`, can be provided to set the migration stages.
+As long as DNS is configured for the site and the target server has the same DNS provider configured, then migration will be fully automated with an initial stage to prep files and give a 24 hour window to [preview the domain](https://kb.apiscp.com/dns/previewing-your-domain/). If DNS isn't configured for a site, (`dns`,`provider`=`builtin`), then an optional parameter, `--stage`, can be provided to set the migration stages.
 
 - Stage 0: initial creation
 - Stage 1: second sync
@@ -37,7 +37,7 @@ To skip creation as a site, for example if an intermediate stage fails, then `--
 
 ## Migration components
 
-apnscp migrates sites by component. Available components may be enumerated using, `--components`
+ApisCP migrates sites by component. Available components may be enumerated using, `--components`
 
 *Stages*
 
@@ -62,7 +62,7 @@ apnscp migrates sites by component. Available components may be enumerated using
 - mysql_schema
 - pgsql_schema
 
-Some components accept arguments, such as *files* in which case typical apnscp syntax applies. Component arguments are delimited by a comma:
+Some components accept arguments, such as *files* in which case typical ApisCP syntax applies. Component arguments are delimited by a comma:
 
 ```bash
 apnscp_php bin/scripts/transfersite.php --do=files,'[/var/www]' mydomain.com
@@ -78,20 +78,29 @@ apnscp_php bin/scripts/transfersite.php --do=addon_domains --do=subdomains mydom
 
 ## Overriding configuration
 
-Site configuration can be overridden during stage 0 (account creation). This is useful for example if you are changing VPS providers, while retaining the respective provider's DNS service.
+Site configuration can be overridden during stage 0 (account creation). This is useful for example if you are changing VPS providers, while retaining the respective provider's DNS service. `-c` is used to specify site parameters as is commonly repeated in [cPanel imports](Migrations - cPanel) or [site creation](Plans#adddomain).
 
 ```bash
-apnscp_php bin/scripts/transfersite.php --override='dns,provider=linode' --override='dns,key=abcdef1234567890' mydomain.com
+apnscp_php bin/scripts/transfersite.php -c='dns,provider=linode' -c='dns,key=abcdef1234567890' mydomain.com
 ```
 
 On the source server, mydomain.com may continue to use DigitalOcean as its [DNS provider](https://bitbucket.org/apisnetworks/apnscp/src/master/lib/Module/Provider/Dns/Digitalocean.php?at=master&fileviewer=file-view-default) while the on the target server mydomain.com will use Linode's [DNS provider](https://bitbucket.org/apisnetworks/apnscp/src/master/lib/Module/Provider/Dns/Linode.php?at=master&fileviewer=file-view-default). Once mydomain.com completes its initial stage (stage 0), be sure to update the nameservers for mydomain.com.
 
+## Skipping suspension
+An account after migration completes is automatically suspended on the source side. In normal operation, this poses no significant complications as DNS TTL is reduced to 2 minutes or less during stage one migration.
+
+`--no-suspend` disables suspension following a successful migration. 
+
 ## Migration internals
 
-apnscp uses DNS + atd to manage migration stages. A TXT record named `__acct_migration` with the unix timestamp is created on the **source** server. This is used internally by apnscp to track migration. apnscp creates an API client on both the **target** and **source** servers. A 24 hour delay is in place between migration stages to allow DNS to [propagate](https://kb.apnscp.com/dns/dns-work/) and sufficiently prep, including [preview](https://kb.apnscp.com/dns/previewing-your-domain/), for a final migration. This delay can be bypassed by specifying `--force`. All resolvers obey TTL, so don't force a migration until the minimum TTL time has elapsed!
+ApisCP uses DNS + atd to manage migration stages. A TXT record named `__acct_migration` with the unix timestamp is created on the **source** server. This is used internally by ApisCP to track migration. ApisCP creates an API client on both the **target** and **source** servers. A 24 hour delay is in place between migration stages to allow DNS to [propagate](https://kb.apiscp.com/dns/dns-work/) and sufficiently prep, including [preview](https://kb.apiscp.com/dns/previewing-your-domain/), for a final migration. This delay can be bypassed by specifying `--force`. All resolvers obey TTL, so don't force a migration until the minimum TTL time has elapsed!
 
-Migration TTLs are adjusted on the **target** server to 60 seconds. If you are changing DNS providers during migration, this will allow you to make nameserver changes without affecting your site. On its inital migration (stage 0), apnscp copies all DNS records verbatim to the **target**. At the end of the second migration stage (stage 1), all records that match your old hosting IP address are updated to your new IP address. All other records *are not* altered. Additionally, `__acct_migration` is removed from the **source** DNS server and account put into a suspended state. When both **source** and **target** share the same nameserver, only TTL is reflected at the end of stage 0 and IP address changed at the end of stage 1. At the end of stage 1, TTL is reset to the default TTL setting.
+Migration TTLs are adjusted on the **target** server to 60 seconds. If you are changing DNS providers during migration, this will allow you to make nameserver changes without affecting your site. On its inital migration (stage 0), ApisCP copies all DNS records verbatim to the **target**. At the end of the second migration stage (stage 1), all records that match your old hosting IP address are updated to your new IP address. All other records *are not* altered. Additionally, `__acct_migration` is removed from the **source** DNS server and account put into a suspended state. When both **source** and **target** share the same nameserver, only TTL is reflected at the end of stage 0 and IP address changed at the end of stage 1. At the end of stage 1, TTL is reset to the default TTL setting.
+
+::: tip
+Setting records, TTL adjustments on the target machine allows you to proactively update nameservers before a migration finalizes if you are unable to modify DNS records on the source machine. The initial records during stage 1 will reflect the *source* server while stage 2 records reflect the *target* server.
+:::
 
 ### Further reading
 
-- [Migrating to another server](https://kb.apnscp.com/platform/migrating-another-server/) (kb.apnscp.com)
+- [Migrating to another server](https://kb.apiscp.com/platform/migrating-another-server/) (kb.apiscp.com)

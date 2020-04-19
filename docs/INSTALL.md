@@ -6,36 +6,52 @@
 - 20 GB storage
 - 1 CPU
 - RHEL/CentOS 7.4+
-- Best with Linode, DigitalOcean, Vultr, AWS, or CloudFlare for DNS
 - Containers are not supported (Virtuozzo, OpenVZ)
 
 ## Bootstrapping
+[Bootstrapper](https://github.com/apisnetworks/apnscp-playbooks) is an idempotent tool to continuously update and correct your server. If things drift, Bootstrapper is designed to provide the **minimal set** of enforcing changes to make your server work. You will always have free rein of your server as long as it doesn't impede upon the responsibility of ApisCP. [Scopes](admin/Scopes) provide guarded management points that are jointly managed by Bootstrapper.
 
-Install the bootstrap utility. This can be downloaded from the [GitHub](https://github.com/apisnetworks/apnscp-bootstrapper) repository.
+Bootstrapping is performed during installation and during integrity checks, run monthly. To begin, run the stub script. This can be downloaded from the [GitHub](https://github.com/apisnetworks/apnscp-bootstrapper) repository. Customizations are provided through ApisCP's [Customization Tool](https://apiscp.com/#customizer).
 
 ```bash
 curl https://raw.githubusercontent.com/apisnetworks/apnscp-bootstrapper/master/bootstrap.sh | bash
 ```
 
-This arms ApisCP with a 15 day license (60 day for development releases). If you have purchased a license via [my.apiscp.com](https://my.apiscp.com), then the license may be provided at install by providing the token:
+This command arms ApisCP with a 30 day license. If you have purchased a license via [my.apiscp.com](https://my.apiscp.com), then the license may be provided at install by providing the token:
 
 ```bash
 curl https://raw.githubusercontent.com/apisnetworks/apnscp-bootstrapper/master/bootstrap.sh | bash -s - <api token>
 ```
 
-Before the bootstrap utility kicks off [stage 2](https://github.com/apisnetworks/apnscp-playbooks), you are given an opportunity to pause to edit variables. This is optional, but will allow you to immediately configure SSL. These values can be changed later with `scope:set` in the panel.
+## Installation
+
+Bootstrapping takes between 60 - 120 minutes depending upon provider capacity. Generally lower figures indicate a less oversold provider, but times can change as clients are housed on the server.
+
+Before the bootstrap utility kicks off [stage 2](https://github.com/apisnetworks/apnscp-playbooks), you are given one last chance to customize installation. This is optional, but will allow you to immediately configure SSL. These values can be changed later with `scope:set` in the panel. 
+
+::: warning
+All settings except for MariaDB and PostgreSQL may be changed after installation. Both MariaDB and PostgreSQL pose breaking changes between versions, e.g. 10.4 => 10.3 is impossible; all PostgreSQL minor changes require full dump + extension installation.
+::: 
 
 ![Bootstrap utility pause](./images/edit-option.png)
 
-## Server provision
-
-[Bootstrapper](https://github.com/apisnetworks/apnscp-playbooks) is an idempotent tool to continuously update and correct your server. If things drift, Bootstrapper is designed to provide the **minimal set** of enforcing changes to make your server work. You will always have free rein of your server as long as it doesn't impede upon the responsibility of ApisCP.
-
-Bootstrapping takes between 60 - 120 minutes depending upon provider capacity. Generally lower figures indicate a less oversold provider, but times can change as clients are housed on the server. Once installed, be sure to log out of the server and log back in or load a new shell with the correct ApisCP environment,
+ Once installed, be sure to log out of the server and log back in or load a new shell with the correct ApisCP environment,
 
 ```bash
 exec $SHELL -i
 ```
+
+::: danger
+A variety of failures can occur during installation. These are designed to help you make the right decision in selecting a server. Analyzed situations include:
+
+- Running experimental CentOS Plus kernels on stock images
+- Underreported memory (2048 MB = 2 GB), 1790 MB is the least accepted when "*has_low_memory*" is not enabled
+- Hardware problems
+- Rogue Yum repositories
+- Faulty sysctl parameters
+
+Failures are addressed in detail later. If you encounter one, do reach to us through [support](https://apiscp.com/support).
+:::
 
 ### Recommended configuration settings
 
@@ -178,9 +194,9 @@ nameserver 8.8.8.8
 Domains that have a properly qualified FQDN will receive notification once ApisCP is installed. If not, the admin username/password/contact can be reconfigured at anytime using ApisCP's API helper.
 
 ```bash
-cpcmd auth_change_username NEWUSER
-cpcmd auth_change_password NEWPASSWORD
-cpcmd common_set_email NEW@EMAIL.COM
+cpcmd auth:change-username 'NEWUSER'
+cpcmd auth:change-password 'NEWPASSWORD'
+cpcmd common:set-email 'NEW@EMAIL.COM'
 ```
 
 Setting all 3 will allow you to login to your new panel at <http://IPADDRESS:2082/.> If SSL has been setup, or you can trust a bespoke certificate, then use <https://IPADDRESS:2083/.> When logging in as admin, leave the domain field blank.
@@ -203,7 +219,9 @@ After logging into the panel as admin, visit **Nexus**. Services can be reconfig
 AddDomain -c siteinfo,domain=mydomain.com -c siteinfo,admin_user=myadmin
 ```
 
-> Creates a new domain named *mydomain.com* with an administrative user *myadmin*. The email address defaults to [blackhole@apiscp.com](mailto:blackhole@apiscp.com) and password is randomly generated.
+::: details
+Creates a new domain named *mydomain.com* with an administrative user *myadmin*. The email address defaults to [blackhole@apiscp.com](mailto:blackhole@apiscp.com) and password is randomly generated.
+:::
 
 ## Editing domains
 
@@ -270,5 +288,5 @@ Alternatively ApisCP can be updated manually with`upcp`. Playbooks can be run un
 
 # Further reading
 
-* [hq.apiscp.com](https://hq.apiscp.com) - apnscp blog, periodic how-tos are posted
-* [docs.apiscp.com](https://docs.apiscp.com) - apnscp documentation
+* [hq.apiscp.com](https://hq.apiscp.com) - ApisCP blog, periodic how-tos are posted
+* [docs.apiscp.com](https://docs.apiscp.com) - ApisCP documentation

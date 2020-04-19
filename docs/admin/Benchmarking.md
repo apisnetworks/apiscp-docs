@@ -69,13 +69,13 @@ ab -n 1000 -c 1 http://mydomain.com/
 Creating a test account to benchmark WordPress is simple with a few CLI commands. Once your done benchmarking, run `DeleteDomain benchmark.test` to remove it (or keep it around for a rainy day).
 
 ```bash
- AddDomain -c siteinfo,domain=benchmark.test -c dns,provider=null -c mail,provider=null -c siteinfo,admin_user=benchmark-user
- grep -Eq "benchmark.test\b" /etc/hosts || (echo "$(cpcmd -d benchmark.test site:ip-address) benchmark.test" >> /etc/hosts)
- cpcmd -d benchmark.test wordpress:install benchmark.test
- cpcmd scope:set apache.evasive enabled false
- cpcmd scope:set apache.block10 false
- sleep 120
- ab -n 1000 -c 1 http://benchmark.test/
+AddDomain -c siteinfo,domain=benchmark.test -c crontab,enabled=1 -c crontab,permit=1 -c ssh,enabled=1 -c dns,provider=null -c mail,provider=null -c siteinfo,admin_user=benchmark-user
+grep -Eq "benchmark.test\b" /etc/hosts || (echo "$(cpcmd -d benchmark.test site:ip-address) benchmark.test" >> /etc/hosts)
+cpcmd -d benchmark.test wordpress:install benchmark.test
+cpcmd scope:set apache.evasive enabled false
+cpcmd scope:set apache.block10 false
+sleep 120
+ab -n 1000 -c 1 http://benchmark.test/
 ```
 
 ::: details

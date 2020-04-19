@@ -1,5 +1,5 @@
 ---
-title: Programming Guide
+title: Programming guide
 ---
 
 # Basics

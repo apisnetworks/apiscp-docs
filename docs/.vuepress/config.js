@@ -42,7 +42,7 @@ module.exports = {
   redirectionMapping: {
     "GLOSSARY": "glossary"
   },
-  title: "ApisCP Documentation",
+  title: "ApisCP Docs",
   description: "ApisCP · A modern hosting platform",
   head: [
     ["link", { rel: "stylesheet", href: "https://fonts.googleapis.com/icon?family=Material+Icons"}],
@@ -119,7 +119,7 @@ module.exports = {
             "UPGRADING",
             "LICENSE",
             "FIREWALL",
-
+            "admin/NAT"
           ]
         },
         {
@@ -136,12 +136,7 @@ module.exports = {
                 "admin/Bootstrapper",
               ]
             },
-
-
-
-            "admin/Backups",
-
-             {
+            {
               title: "Migrations",
               children: [
                 "admin/Migrations - cPanel",
@@ -150,13 +145,6 @@ module.exports = {
             },
 
             "admin/Filesystem",
-            {
-              title: "Network",
-              children: [
-                "admin/NAT",
-                "admin/SSL",
-              ]
-            },
             {
               title: "DNS",
               children: [
@@ -174,19 +162,7 @@ module.exports = {
                 }
               ]
             },
-            "admin/Metrics",
-            "admin/Monitoring",
-            "admin/Resource enforcement",
-            {
-              title: "Mail",
-              children: [
-                "admin/Smtp",
-                "admin/LDA",
-                "admin/Filtering",
-                "admin/Majordomo",
-              ]
-            },
-
+            "admin/SSL",
             {
               title: "HTTP",
               children: [
@@ -206,9 +182,22 @@ module.exports = {
                 "admin/PostgreSQL"
 	      ]
             },
+            {
+              title: "Mail",
+              children: [
+                "admin/Smtp",
+                "admin/LDA",
+                "admin/Filtering",
+                "admin/Majordomo",
+              ]
+            },
             "admin/FTP",
-            "admin/Troubleshooting",
+            "admin/Monitoring",
+            "admin/Resource enforcement",
+            "admin/Metrics",
 
+            "admin/Backups",
+            "admin/Troubleshooting",
             "admin/Maps",
             "admin/Benchmarking",
             "DEBUGGING",

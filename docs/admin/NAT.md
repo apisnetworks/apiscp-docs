@@ -1,6 +1,6 @@
-## NAT + private network setup
+## NAT/Private networks
 
-apnscp will attempt to auto-detect your public IP address during installation. This process may fall short if the server is behind a firewall or on a private network.
+ApisCP will attempt to auto-detect your public IP address during installation. This process may fall short if the server is behind a firewall or on a private network.
 
 ---
 
@@ -20,10 +20,10 @@ When assigning IPs on a private network always use the internal IP address in th
 | storage/opcenter/namebased_ip_addrs  | Set namebased IPv4 address pool. "\n" delimited. |
 | storage/opcenter/namebased_ip6_addrs | Set namebased IPv6 address pool."\n" delimited.  |
 
-| [dns] config.ini tunables | cpcmd scope:set apnscp.config dns x y               |
+| [dns] config.ini tunables | cpcmd scope:set cp.config dns x y                    |
 | ------------------------- | ---------------------------------------------------- |
-| my_ip4                    | IPv4 address apnscp will report for remote access.   |
-| my_ip6                    | IPv6 address apnscp will report for remote access.   |
+| my_ip4                    | IPv4 address ApisCP will report for remote access.   |
+| my_ip6                    | IPv6 address ApisCP will report for remote access.   |
 | proxy_ip4                 | Override address used to provision A DNS records.    |
 | proxy_ip6                 | Override address used to provision AAAA DNS records. |
 
@@ -96,7 +96,7 @@ done
 cpcmd -d aws-test.apiscp.com letsencrypt:append '[www.aws-test.apiscp.com]' false
 ```
 
-apnscp performs an internal IP check to filter defunct domains from the SSL certificate prior to requesting. Failure to do so may result in hostnames being pruned from renewal.
+ApisCP performs an internal IP check to filter defunct domains from the SSL certificate prior to requesting. Failure to do so may result in hostnames being pruned from renewal.
 
 ```bash
 cpcmd -d site1 letsencrypt:append '[www.aws-test.apiscp.com]'
@@ -108,7 +108,7 @@ INFO    : reloading web server in 2 minutes, stay tuned!
 This check may be disabled permanently by setting [letsencrypt] => verify_ip to false in config.ini:
 
 ```bash
-cpcmd config:set apnscp.config letsencrypt verify_ip false
+cpcmd config:set cp.config letsencrypt verify_ip false
 ```
 
 This may result in domains that have expired to halt automatic SSL renewal.
