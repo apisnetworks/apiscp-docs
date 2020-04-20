@@ -78,7 +78,7 @@ apnscp_php bin/scripts/transfersite.php --do=addon_domains --do=subdomains mydom
 
 ## Overriding configuration
 
-Site configuration can be overridden during stage 0 (account creation). This is useful for example if you are changing VPS providers, while retaining the respective provider's DNS service. `-c` is used to specify site parameters as is commonly repeated in [cPanel imports](Migrations - cPanel) or [site creation](Plans#adddomain).
+Site configuration can be overridden during stage 0 (account creation). This is useful for example if you are changing VPS providers, while retaining the respective provider's DNS service. `-c` is used to specify site parameters as is commonly repeated in [cPanel imports](/admin/Migrations%20-%20cPanel) or [site creation](/admin/Plans/#adddomain).
 
 ```bash
 apnscp_php bin/scripts/transfersite.php -c='dns,provider=linode' -c='dns,key=abcdef1234567890' mydomain.com

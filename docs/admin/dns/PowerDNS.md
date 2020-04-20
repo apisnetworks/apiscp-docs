@@ -38,7 +38,7 @@ upcp -sb software/powerdns
 cpcmd scope:set dns.default-provider powerdns
 ```
 
-Proced with the setup in section "ApisCP DNS provider setup" below.  The API key will be sourced from your remote server.
+Proceed with the setup in section "ApisCP DNS provider setup" below.  The API key will be sourced from your remote server.
 
 ### Idempotently changing configuration
 
@@ -50,7 +50,7 @@ cd /usr/local/apnscp/resources/playbooks
 ansible-playbook addin.yml --extra-vars=addin=apnscp-powerdns
 ```
 
-allow-axfr-ips and also-notify directives will be set whenever the addin plays are run.
+`allow-axfr-ips` and `also-notify` directives will be set whenever the addin plays are run.
 
 ### Enabling ALIAS support
 ALIAS is a synthetic record that allows CNAME records to be set on the zone apex. ALIAS records require `powerdns_enable_recursion` to be enabled as well as an optional `powerdns_recursive_ns` to be set otherwise it will default to the system in `/etc/resolv.conf`.
@@ -141,6 +141,8 @@ pdns:
   uri: https://myserver.apiscp.com/dns/api/v1
   key: your_api_key_here
   type: native
+  # Optional SOA formatting, accepts "domain" format argument for current domain
+  soa: "hostmaster@%(domain)s"
   ns:
     - ns1.yourdomain.com
     - ns2.yourdomain.com
@@ -150,6 +152,7 @@ pdns:
 * `uri` value is the hostname of your master PowerDNS server running the HTTP API webserver (without a trailing slash)
 * `key` value is the **API Key** in `pdns.conf` on the master nameserver.
 * `type` value defines **domain type** for replication. It's usually set to `native` when using DB replication, and to `master` when using master-slave pdns replication (in such cluster the [slaves](https://doc.powerdns.com/authoritative/modes-of-operation.html#master-slave-setup-requirements) should set this value to `slave`, while [superslaves](https://doc.powerdns.com/authoritative/modes-of-operation.html#supermaster-automatic-provisioning-of-slaves) will do it automatically when creating ingested zones).
+* `soa` value overrides default SOA contact format (*hostmaster@DOMAIN*). An optional format specifier `domain` replaces the format string with the current domain.
 * `ns` value is a list of nameservers as in the example above.  Put nameservers on their own lines prefixed with a hyphen and indented accordingly.  There is not currently a limit for the number of nameservers you may use, 2-5 is typical and should be geographically distributed per RFC 2182.
 * `recursion` controls ALIAS records, which are CNAMEs on apex (RFC 1034). Enabling requires configuration of `resolver` and `expand-alias` in pdns.conf.
 
