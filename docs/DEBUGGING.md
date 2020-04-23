@@ -47,7 +47,7 @@ When in debug mode, housekeeping and cron services are disabled as well as job r
 # Enable debugging for active session Xqu...I1Z6 in browser
 env DEBUG=1 cpcmd misc:debug-session Xqu8WuGaaRHYLoPSdQh5ITi2ZuRkI1Z6
 # Disable debugging when you're done
-env DEBUG=1 cpcmd misc:debug-session Xqu8WuGaaRHYLoPSdQh5ITi2ZuRkI1Z6
+env DEBUG=1 cpcmd misc:debug-session Xqu8WuGaaRHYLoPSdQh5ITi2ZuRkI1Z6 false
 ```
 
 `session.id` may be retrieved from a JavaScript console, cookie source ("esprit_id" de facto cookie name) or from the source.
