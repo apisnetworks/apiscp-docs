@@ -1,9 +1,14 @@
 # WordPress
 
+::: tip
+Part of the Web Apps family, WordPress supports many familiar components shared by all other apps. See [WebApps.md](../WebApps.md) for preliminary information that covers the *update process*.
+:::
+
+## WP-CLI Toolkit
 [WP-CLI](https://wp-cli.org) is the official command-line utility for managing WordPress. It's available on all accounts and powers WordPress features in the panel.
 
-## Using from terminal
-WP-CLI is located as `wp-cli` from terminal. It may be aliased to `wp` by adding `alias wp=wp-cli` to ~/.bashrc:
+### Using from terminal
+WP-CLI is located as `wp-cli` from terminal. It may be aliased to `wp` by adding `alias wp=wp-cli` to `~/.bashrc`:
 
 ```bash
 echo -e "\nalias wp=wp-cli" >> ~/.bashrc
@@ -28,35 +33,33 @@ cd /home/brad/public_html
 wp-cli core version
 ```
 
-## Update process
-Core updates are checked every night. Packages are checked every Wednesday and Sunday night as defined by `cron.start-range` [Scope](../Scopes.md) and consistent with all [Web Apps](../Webapps.md). All non-suspended sites are checked for updates. *A core update triggers asset updates before the core update is applied.* 
+### Debugging updates
 
-Failure during a core update marks a WordPress installed as **failed**. **Failures will not be retried**. To reset a failure, login to ApisCP as the user, then navigate to **Web** > **Web Apps**, selecting the hostname (and optional path) to reset failure or as admin use `admin:reset-webapp-failure()`.
+::: tip
+See [WebApps.md](../WebApps.md) for general debugging information that applies to all Web Apps.
+:::
 
-`admin:reset-webapp-failure(array $constraints = [])` where `$constraints` is of the conjunctive set of the following parameters: `[site: <anything>, version: <operator> <version>, type: <type>]`.  For example, to reset only apps belonging to debug.com or reset all failures for WordPress > 4.0, use the following commands:
+In addition to general debugging, when DEBUG=1, WP-CLI will emit additional debugging information through the `--debug` flag.
+
+For example, let's say we want to debug a failed update for a plugin named *bad-plugin* to version *bad-version*. This can be replicated from command-line with additional debugging information available as follows:
 
 ```bash
-cpcmd admin:reset-webapp-failure '[site:debug.com]'
-cpcmd admin:reset-webapp-failure '[version:"> 4.0", type:wordpress]'
+env DEBUG=1 cpcmd -d domain.com wordpress:update-plugins domain.com '' '[[name:bad-plugin,version:bad-version]]'
+```
+
+WP-CLI may output something like,
+
+```
+Warning: The update cannot be installed because we will be unable to copy some files. This is usually due to inconsistent file permissions. "changelog.txt, astra-addon.php, includes, includes/view-white-label.php, includes/index.php, credits.txt, compatibility, compatibility/class-astra-ubermenu-pro.php, compatibility/class-astra-wpml-compatibility.php, languages, languages/astra-addon-fr_FR.mo, languages/astra-addon-nb_NO.mo, languages/astra-addon-nl_NL.mo, languages/astra-addon-ru_RU.mo, languages/astra-addon-fi.mo, languages/astra-addon-pl_PL.mo, languages/astra-addon-he_IL.mo, languages/astra-addon-pt_BR.mo, languages/astra-addon-uk.mo, languages/astra-addon-it_IT.mo, languages/astra-addon-sk_SK.mo, languages/astra-addon-hu_HU.mo, languages/astra-addon-ja.mo, languages/astra-addon-sv_SE.mo, languages/astra-addon-bg_BG.mo, languages/astra-addon-de_DE.mo, languages/astra-addon-es_ES.po, languages/astra-addon-ar.mo, languages/astra-addon-fa_IR.mo, languages/astra-addon-da_DK.mo, languages/astra-addon-es_ES.mo,
+```
+
+The above, for example, is caused by a permission mismatch and can be resolved by resetting permissions and reapplying [Fortification](../Fortification.md) in ApisCP or from command-line:
+
+```bash
+cpcmd -d domain.com file:reset-path /path/to/wp ''
+cpcmd -d domain.com wordpress:fortify domain.com '' max
 ```
 
 ::: tip
-When working with the version parameter, spacing is significant between the operator and version.
+Arguments differ due to module intent. Modules of the "webapp" family prefer *\$hostname*, *\$path* as opposed to a raw filesystem path as domains/subdomains can be relinked relatively easily. Doing so allows the API calls to remain stable even if the document root is not.
 :::
-
-Updates work in batches adhering to the following rules:
-
-1. Update to the largest **patch** release of current [MAJOR.MINOR](https://semver.org/) release.
-2. Increment **minor** release by the smallest increment.
-3. Repeat steps 1-2 until **minor** is at maximal version.
-4. Increment **major** release by the smallest increment.
-5. Repeat steps 3-4 until software is current.
-
-If at any time an update fails, the Web App will left at this version. Moving incrementally with updates ensures that maximum compatibility is taken into account with older software thus achieving the highest success rate in updates.
-
-![Web Apps update strategy](./images/webapps-update-strategy.png)
-
-### Debugging package updates
-
-Update reports are sent to the email associated with the account. If *[crm] => copy_admin* is also set in [config.ini](../Tuneables.md), then a report is sent to this address as well. 
-
