@@ -183,6 +183,12 @@ module.exports = {
 	      ]
             },
             {
+              title: "Web Apps",
+              children: [
+                "admin/webapps/WordPress",
+              ],
+            },
+            {
               title: "Mail",
               children: [
                 "admin/Smtp",
@@ -197,7 +203,6 @@ module.exports = {
             "admin/Metrics",
 
             "admin/Backups",
-            "admin/Troubleshooting",
             "admin/Maps",
             "admin/Benchmarking",
             "DEBUGGING",

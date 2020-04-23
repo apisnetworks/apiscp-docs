@@ -59,6 +59,74 @@ Remove the disk quota from the account temporarily to allow MySQL to repair the 
 4. Re-enable disk quota on the account or increase it:
     ```bash
     EditDomain -c diskquota,quota=20000 -c diskquota,unit=MB site34 
-    ​```bash
     ```
+
+### Row size too large
+
+#### Background
+Importing a database backup from an older MySQL version (before 2017) may throw an exception of the form,
+
+```
+ERROR 1118 (42000) at line 2289: Row size too large (> 8126). Changing some columns to TEXT or BLOB may help. In current row format, BLOB prefix of 0 bytes is stored inline.
+```
+
+This typically is caused by poor database design. Dynamic rows with a multitude of columns can create significant [performance impairment](https://www.percona.com/blog/2009/09/28/how-number-of-columns-affects-performance/) that is better addressed through proper normalization, which in turn allows for deduplication of data and higher cardinality.
+
+An example of such poor design is as follows,
+
+```
+CREATE TABLE `wp_bwg_theme` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `thumb_margin` int(4) NOT NULL,
+  `thumb_padding` int(4) NOT NULL,
+  `thumb_border_radius` varchar(32) NOT NULL,
+  `thumb_border_width` int(4) NOT NULL,
+  `thumb_border_style` varchar(16) NOT NULL,
+  `thumb_border_color` varchar(8) NOT NULL,
+  `thumb_bg_color` varchar(8) NOT NULL,
+  `thumbs_bg_color` varchar(8) NOT NULL,
+  `thumb_bg_transparent` int(4) NOT NULL,
+  `thumb_box_shadow` varchar(32) NOT NULL,
+  `thumb_transparent` int(4) NOT NULL,
+  `thumb_align` varchar(8) NOT NULL,
+  `thumb_hover_effect` varchar(128) NOT NULL,
+  `thumb_hover_effect_value` varchar(128) NOT NULL,
+  `thumb_transition` tinyint(1) NOT NULL,
+  `thumb_title_font_color` varchar(8) NOT NULL,
+  `thumb_title_font_style` varchar(16) NOT NULL,
+  `thumb_title_pos` varchar(8) NOT NULL,
+...
+150 more columns
+...
+  `carousel_rl_btn_width` int(4) NOT NULL,
+  `carousel_close_rl_btn_hover_color` varchar(8) NOT NULL,
+  `carousel_rl_btn_style` varchar(16) NOT NULL,
+  `carousel_mergin_bottom` varchar(8) NOT NULL,
+  `carousel_font_family` varchar(8) NOT NULL,
+  `carousel_feature_border_width` int(4) NOT NULL,
+  `carousel_feature_border_style` varchar(8) NOT NULL,
+  `carousel_feature_border_color` varchar(8) NOT NULL,
+  `carousel_caption_background_color` varchar(8) NOT NULL,
+  `carousel_caption_bottom` int(4) NOT NULL,
+  `carousel_caption_p_mergin` int(4) NOT NULL,
+  `carousel_caption_p_pedding` int(4) NOT NULL,
+  `carousel_caption_p_font_weight` varchar(8) NOT NULL,
+  `carousel_caption_p_font_size` int(4) NOT NULL,
+  `carousel_caption_p_color` varchar(8) NOT NULL,
+  `carousel_title_opacity` int(4) NOT NULL,
+  `carousel_title_border_radius` varchar(8) NOT NULL,
+  `default_theme` tinyint(1) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+```
+*Beyond storing things that could be represented numerically as non-numeric strings*, what if we want to add a new attribute such as the carousel's z-index or transform/skew property? Add a new column just for this specific purpose? It's a lot of wasted space and a lot of data to fetch for a simple query.
+
+#### Solution
+Avoid using such software. Would you live in a house that has failed its safety inspection? Seeing architecture like this hints there are deeper problems with the code because such design is easily avoidable with proper planning. As code grows so too does its complexity and with that complexity come new opportunities for vulnerabilities to exist.
+
+##### See also
+
+- [Troubleshooting Row Size Too Large Errors with InnoDB](https://mariadb.com/kb/en/troubleshooting-row-size-too-large-errors-with-innodb/) (mariadb.com)
 
