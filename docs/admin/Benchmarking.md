@@ -96,15 +96,10 @@ cpcmd -d benchmark.test redis:create wp-test '[unixsocket:/tmp/redis.sock]'
 # Switch to benchmark.test account to configure plugin
 su benchmark.test
 cd /var/www/html
+# Install Redis object cache plugin
 wp-cli plugin install --activate redis-cache
-# Edit wp-config.php using nano
-EDITOR=nano wp-cli config edit
-```
-
-Then after `$table_prefix` add:
-
-```php
-define('WP_REDIS_PATH', '/tmp/redis.sock');
+# Define Redis path
+wp-cli config set WP_REDIS_PATH /tmp/redis.sock
 ```
 
 ![Redis configuration](./images/wp-config-edit.png)
