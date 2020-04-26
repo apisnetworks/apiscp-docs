@@ -8,7 +8,7 @@ This is a drop-in provider for [apnscp](https://apnscp.com) to enable DNS suppor
 EditDomain -c dns,provider=cloudflare -c dns,key='[key:abcdef012456789,email:foo@bar.com,proxy:false]' domain.com
 ```
 
-Where the key is created within Cloudflare. See [Where do I find my Cloudflare API key](https://support.cloudflare.com/hc/en-us/articles/200167836-Where-do-I-find-my-Cloudflare-API-key-). `email` and `key` are mandatory variables. 
+Where the key is created within Cloudflare. See [Managing API Tokens and Keys](https://support.cloudflare.com/hc/en-us/articles/200167836-Managing-API-Tokens-and-Keys). `email` and `key` are mandatory variables. 
 
 * `proxy` (true/false)- optionally set all records created to proxy through CF, i.e. be behind CF's IP address. 
 
