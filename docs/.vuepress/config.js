@@ -148,7 +148,7 @@ module.exports = {
             {
               title: "DNS",
               children: [
-                "admin/DNS",
+                ["admin/DNS", "Overview"],
                 {
                   title: "Providers",
                   children: [
@@ -170,7 +170,6 @@ module.exports = {
                 "admin/PHP-FPM",
                 "admin/Evasive",
                 "admin/ModSecurity",
-                "admin/Webapps",
                 "admin/Fortification",
               ]
             },
@@ -181,6 +180,18 @@ module.exports = {
                 "admin/phpMyAdmin",
                 "admin/PostgreSQL"
 	      ]
+            },
+            {
+              title: "Web Apps",
+              children: [
+                ["admin/WebApps", "Overview"],
+                {
+                  title: "Apps",
+                  children: [
+                    "admin/webapps/WordPress",
+                  ]
+                }
+              ]
             },
             {
               title: "Mail",
@@ -197,7 +208,6 @@ module.exports = {
             "admin/Metrics",
 
             "admin/Backups",
-            "admin/Troubleshooting",
             "admin/Maps",
             "admin/Benchmarking",
             "DEBUGGING",

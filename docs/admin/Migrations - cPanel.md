@@ -38,6 +38,10 @@ alias: migrations
 ImportDomain --format=cpanel /path/to/cpmove-backup.tar.gz
 ```
 
+::: danger
+Never run ImportDomain where the decompressed backup source is in the current working directory. `ImportDomain --format=cpanel ./` will force a terminal logout as it relocates the backup and closes are open file handles to prevent tampering during restore.
+:::
+
 ## Account creation
 
 An import will faithfully restore whatever options were used in creation. Conflicts may arise and can be remedied by overriding creation options using `-c service,parameter=value`. For example to change the storage to 10 GB in a restore,

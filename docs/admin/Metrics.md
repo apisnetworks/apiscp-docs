@@ -6,7 +6,7 @@ Metrics periodically log a variety of attributes about your server that can be u
 
 ## Enabling metrics
 
-Enable *[telemetry]* => *enabled* using cp.config [Scope](Scopes.md).
+Metrics are enabled by default beginning in v3.1.40. Enable *[telemetry]* => *enabled* using cp.config [Scope](Scopes.md).
 
 ```bash
 cpcmd scope:set cp.config telemetry enabled true
