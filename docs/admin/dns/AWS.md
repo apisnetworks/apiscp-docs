@@ -1,6 +1,6 @@
 # AWS Route 53 DNS Provider
 
-This is a drop-in provider for [apnscp](https://apnscp.com) to enable DNS support for accounts that use AWS. This provider is built into apnscp.
+This is a drop-in provider for [ApisCP](https://apiscp.com) to enable DNS support for accounts that use AWS. This provider is built into apnscp.
 
 ## Configuring
 
