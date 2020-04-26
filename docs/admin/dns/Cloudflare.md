@@ -13,7 +13,7 @@ Where the key is created within Cloudflare. See [Managing API Tokens and Keys](h
 * `proxy` (true/false)- optionally set all records created to proxy through CF, i.e. be behind CF's IP address. 
 
 ### Using API tokens
-An restrictive API token may be used instead of the API key that grants unrestricted access to one's account. When creating an API token in Cloudflare, ensure that **Zone.Zone** and **Zone.DNS** privileges are enabled with *edit* access.
+A restrictive API token may be used instead of the API key that grants unrestricted access to one's account. When creating an API token in Cloudflare, ensure that **Zone.Zone** and **Zone.DNS** privileges are enabled with *edit* access.
 This token may be specified on a line by itself or mixed with additional options:
 
 ```bash
