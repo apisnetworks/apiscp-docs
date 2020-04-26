@@ -1,0 +1,7 @@
+<IfModule pagespeed_module>
+    ModPagespeed off
+</IfModule>
+RewriteEngine on
+RewriteBase /
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.+)(?:\.html)$ $1 [R,L]
