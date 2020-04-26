@@ -8,7 +8,8 @@ This is a drop-in provider for [ApisCP](https://apiscp.com) to enable DNS suppor
 EditDomain -c dns,provider=aws -c dns,key='[key:ABCDEF123,secret:AbCdEf12345]' domain.com
 ```
 
-Where the key is created within AWS. Your API key is available within your [AWS IAM Console](https://console.aws.amazon.com/iam/home?#/home). See also [Managing Access Keys for Your AWS Account Root User](https://docs.aws.amazon.com/general/latest/gr/managing-aws-access-keys.html).
+Where the key is created within AWS. Your API key is available within your [AWS IAM Console](https://console.aws.amazon.com/iam/home?#/home). See also [Managing access keys for the AWS account root user
+](https://docs.aws.amazon.com/general/latest/gr/managing-aws-access-keys.html).
 
 ### Configurables
 * key: IAM key
