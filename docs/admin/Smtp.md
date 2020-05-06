@@ -18,6 +18,26 @@ Likewise smart host support may be disabled by setting mail.smart-host to "false
 
 Watch out! If the next hop is bracketed, the brackets must be doubly quoted "'[some.place]'" to ensure it's not automatically parsed as an array. Brackets bypass additional MX lookups on the hostname.
 
+### Secure authentication
+ApisCP will determine the best authentication criteria using `mail.smart-host` Scope. You can adjust whether opportunistic TLS, required TLS, DANE, or no encryption is used by changing `postfix_smtp_tls_security_level`:
+
+| Setting     | Description                                                  |
+| ----------- | ------------------------------------------------------------ |
+| encrypt     | Required TLS. Communication requires STARTTLS. Safe for sending credentials. |
+| may         | Opportunistic TLS. Communicate in plain-text, but use TLS if server supports STARTTLS command. OK for sending credentials. |
+| none        | Disable encryption on SMTP communication. Unsafe for sending credentials. |
+| dane        | Acquire TLSA record to determine TLS policy. Fallback to "encrypt" if no suitable DNSSEC records exist. Fallback to "may" if no TLSA records exist. |
+| dane-only   | Mandatory DANE. No fallback to "encrypt" or "may".           |
+| fingerprint | Requires configuration of smtp_tls_fingerprint_cert_match. Implies "encrypt". |
+| verify      | Required TLS with peer name validation. See "[Mandatory server certificate verification](http://www.postfix.org/TLS_README.html#client_tls_verify)". |
+| secure      | Required TLS with peer name validation + DNSSEC validation. See "[Secure server certificate validation](http://www.postfix.org/TLS_README.html#client_tls_secure)". |
+
+```bash
+# require communication to be encrypted before *any* communication happens
+cpcmd scope:set cp.bootstrapper postfix_smtp_tls_security_level encrypt
+upcp -sb mail/configure-postfix
+```
+
 ### MailChannels integration
 
 Create a new password via mailchannels.net's Customer Console. *username* is the MailChannels Account ID. Use the mail.smart-host Scope to configure MailChannels in one step:
