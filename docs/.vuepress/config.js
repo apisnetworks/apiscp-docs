@@ -231,6 +231,7 @@ module.exports = {
             "AUTHORS",
             "admin/Tuneables",
             "admin/Scopes-list",
+            "admin/cpcmd-examples",
             {
               title: "Release notes",
               children: [
