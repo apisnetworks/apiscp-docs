@@ -168,6 +168,20 @@ Accessing https://example.com queries all `DirectoryIndex` files within the docu
 
 `DirectoryIndex index.htm` - this will append to the list of directory indexes. Before returning a 403 Forbidden error (or listing directory contents), all filenames are tried. 
 
+### Default index page order
+Setting `DirectoryIndex index.htm` will set the order in a `.htaccess` file but append to the list if added to `httpd-custom.conf` due to an unknown context rule in [DirectoryIndex parsing](https://httpd.apache.org/docs/2.4/mod/mod_dir.html#directoryindex):
+
+> Note: Multiple DirectoryIndex directives within the same context will add to the list of resources to look for rather than replace:
+
+If the default order of `index.html index.php index.cgi` is to be changed, perhaps placing index.php in front (*this order is determined for historical reasons*), then the index list must first be disabled, then set in `httpd-custom.conf`:
+
+```
+DirectoryIndex disabled
+DirectoryIndex index.php index.html index.php4 index.php3 default.html
+```
+
+Run `htrebuild` after making changes.
+
 ### Disabling index negotiation
 
 `DirectoryIndex disabled` disables index negotiation for a directory. Disabling negotiation is necessary when passing all content to a backend proxy, such as with Passenger.
@@ -226,7 +240,7 @@ Overrides are disabled below typical document root locations, siteXX/fst/home/us
 
 ```
 
-Failure to enable SymLinksIfOwnerMatch opens a system to attack. Details of the attacks are covered in [SECURITY.md](../SECURITY.md). This behavior is mandatory, but ameliorated greatly by SSD and NVMe-backed storage.
+Failure to enable `SymLinksIfOwnerMatch` opens a system to attack. Details of the attacks are covered in [SECURITY.md](../SECURITY.md). This behavior is mandatory, but ameliorated greatly by SSD and NVMe-backed storage.
 
 A posixsem mutex is used to serialize accept() requests. This has been determined to result in the fewest zombie/deadlock processes in the event of a service disruption.  
 

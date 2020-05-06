@@ -1,5 +1,21 @@
 # MySQL
 
+[MariaDB](https://mariadb.org), a drop-in MySQL replacement developed by the original author of MySQL is used instead of MySQL. This decision was motivated strongly by greater stability in the product over Oracle MySQL.  MariaDB is implied when referring to MySQL throughout this documentation. 
+
+MySQL version is determined at installation time via `mariadb_version`. Changing minor versions on a production server is ill-advised, instead consider migrating to another ApisCP platform using the [migration tool](Migrations%20-%20server.md). For example schema differences between 10.4 and 10.3 make a downgrade impossible ("user" is a view in 10.4 and table in 10.3). Officially, MariaDB [does not support](https://mariadb.com/kb/en/downgrading-between-major-versions-of-mariadb/) downgrading. Patch releases (10.3.1 => 10.3.2) are supported and deployed automatically without issue.
+
+## Namespacing
+All accounts are prefixed with a database namespace. In service metadata, this value is *mysql*,*dbaseprefix*. A prefix must end with an underscore ("_"). If not supplied, it will be automatically generated from the primary domain on the account. 
+
+A prefix can be adjusted a couple ways. First, if *[auth]* => *allow_database_change* is enabled ([Tuneables.md](Tuneables.md)), then Site Administrators may change it under **Account** > **Settings**. If this value is disabled, then the Appliance Administrator may change the prefix either in **Nexus** or from the command-line using [EditDomain](Plans.md#editdomain).
+
+```bash
+# Change the prefix to "foo_"
+EditDomain -c mysql,dbaseprefix=foo_ bar.com
+```
+
+When a prefix is changed, all authentication details must be updated to reference the new prefix. These **are not updated** on prefix change.
+
 ## Enabling remote connections
 
 `data_center_mode` is a [Bootstrapper](Bootstrapper.md) setting that opens remote access to MySQL. Once opened, MySQL is protected by [Rampart](Rampart.md). `data_center_mode` opens up remote MySQL access in addition to a slew of other features. If you'd like to just open MySQL, use the **mysql.remote-access** [Scope](Scopes.md).

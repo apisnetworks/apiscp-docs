@@ -1,8 +1,8 @@
 {
   "scripts": {
     "docs:check": "markdownlint docs/*.md docs/admin/**/*.md && prettier --list-different --write \"docs/admin/**/*.md docs/*.{js,json,css,scss,vue,md}\"",
-    "dev": "vuepress dev",
     "docs:dev": "vuepress dev docs --port=${PORT:-8080} --temp .temp --debug",
+    "dev": "npm run docs:dev",
     "docs:build": "vuepress build docs",
     "docs:link-check": "rbenv exec ruby .circleci/dead-links.rb -p docs/admin"
   },
@@ -27,6 +27,7 @@
     "vuepress-plugin-alias": "^1.0.0-beta",
     "vuepress-plugin-clean-urls": "^1.1",
     "vuepress-plugin-disqus": "^0.2.0",
-    "vuepress-theme-vuetify": "^1.0"
+    "vuepress-theme-vuetify": "^1.0",
+    "minimist": ">=1.2.3"
   }
 }
