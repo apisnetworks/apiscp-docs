@@ -146,7 +146,9 @@ Following migration, ApisCP will attempt to request SSL for each hostname as wel
 
 ### Quota disagreements
 
-Quotas are accounted and enforced by the kernel. When migrating from certain hosting platforms that employ quasi-quota accounting by software, such as cPanel, the reported quota for a user may be significantly more than what was previously reported. `--late-quota` will apply storage amnesty, which is a 2x storage boost for 12 hours. Storage amnesty is controlled in config.ini. The following [Scopes](Scopes.md) will change the boost from 2x to 3x and duration from 12 hours to 48 hours:
+Quotas are accounted and enforced by the kernel. When migrating from certain hosting platforms that employ quasi-quota accounting by software, such as cPanel, the reported quota for a user may be significantly more than what was previously reported. `--late-quota` will apply storage amnesty, which is a 2x storage boost for 12 hours. **Late quota is only triggered** after account creation. Thus when combined with `--no-create`, `--late-quota` has no effect. Call `site:storage-amnesty` against the account using [cpcmd](CLI.md#cpcmd).
+
+Storage amnesty is controlled in config.ini. The following [Scopes](Scopes.md) will change the boost from 2x to 3x and duration from 12 hours to 48 hours:
 
 ```bash
 cpcmd scope:set cp.config quota storage_boost 3

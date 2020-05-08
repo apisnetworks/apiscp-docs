@@ -8,7 +8,7 @@ apnscp 3.1 has been released! Codenamed "Business as Usual", 3.1 shifts focus ba
 
 PHP-FPM is implemented as a socket-activated service in systemd. Socket activation only spawns a worker pool on page activity, which mitigates a Thundering herd problem in mass deployments. PHP-FPM has been tested exhaustively on 500+ account platforms with minimal impact of service on startup.
 
-This implementation makes use of systemd's excellent dependency tracking to only start once MySQL and PostgreSQL further enhancing startup abilities of both database servers. Upon activation, PHP-FPM worker is chroot'd to the respective account either as an unprivileged system user or - as a cPanel behavior - the account user; however this practice is highly discouraged. Documentation is covered in [PHP-FPM.md](docs/admin/PHP-FPM.md).
+This implementation makes use of systemd's excellent dependency tracking to only start once MySQL and PostgreSQL further enhancing startup abilities of both database servers. Upon activation, PHP-FPM worker is chroot'd to the respective account either as an unprivileged system user or - as a cPanel behavior - the account user; however this practice is highly discouraged. Documentation is covered in [PHP-FPM.md](admin/PHP-FPM.md).
 
 ## TimescaleDB
 
