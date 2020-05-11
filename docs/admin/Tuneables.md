@@ -2,6 +2,7 @@
 title: Tuneables
 ---
 
+
 ```ini
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;   ApisCP master configuration   ;
@@ -28,6 +29,8 @@ debug = ${DEBUG}
 ; Set to -1 to disable backtrace on ApisCP-generated events,
 ; but continue to display PHP error/warning/notice backtraces
 debug_backtrace_qualifier=1
+
+; PROTECTED
 ; Global temp directory, reflected within virtual domains
 temp_dir = /tmp
 
@@ -36,27 +39,34 @@ temp_dir = /tmp
 ; See https://github.com/apisnetworks/cp-proxy
 ; One or more addresses may be listed each separated by a comma
 http_trusted_forward =
+; PROTECTED
 ; Root directory that stores all
 filesystem_virtbase = /home/virtual
+; PROTECTED
 ; Filesystem template location
 filesystem_template = /home/virtual/FILESYSTEMTEMPLATE
 
+; PROTECTED
 ; A path that is shared across all sites as read/write
 filesystem_shared = /.socket
 
+; PROTECTED
 ; Location for run files
 run_dir = storage/run
 
-;locale = 'en_US.UTF-8'
-; system default, overrides php.ini
-;timezone = 'America/New_York'
+; Force locale setting. Leave blank for system default
+locale =
+; Force timezone setting. Leave blank for system default, overrides php.ini
+timezone =
 ; Send a copy of all unhandled errors generated in ApisCP
-;bug_report =
+bug_report =
 
 ; Brand name for the panel, for white-label
 panel_brand="ApisCP"
+; PROTECTED
 ; ApisCP version
 apnscp_version="3.1"
+; PROTECTED
 ; ApisCP system user
 apnscp_system_user=nobody
 ; preload backend modules
@@ -88,7 +98,8 @@ gravatar=identicon
 ;;;
 [soap]
 ; Enable soap? Disabling also disables server-to-server migrations
-enabled = 1
+enabled = true
+; PROTECTED
 ; WSDL name, located under htdocs/html/
 wsdl = "apnscp.wsdl"
 
@@ -96,6 +107,7 @@ wsdl = "apnscp.wsdl"
 ;;; Backend
 ;;;
 [apnscpd]
+; PROTECTED
 ; Location for apnscpd backend socket
 ; specify an absolute path to store outside of ApisCP
 socket = storage/run/apnscp.sock
@@ -117,11 +129,11 @@ headless = false
 ;;; ApisCP brute-force deterrent
 ;;;
 [anvil]
-; max auth attempts before all auth is rejected
+; Max authentication attempts before all further authentication is rejected
 limit = 20
-; duration to retain anvil statistics
+; Duration to retain anvil statistics
 ttl = 900
-; minimum number of permitted logins before anvil kicks in
+; Minimum number of permitted logins before anvil kicks in
 min_attempts = 3
 ; Whitelist for Anvil attempts
 ; Accepts networks and single IP addresses, separate with a comma
@@ -132,11 +144,11 @@ whitelist = 127.0.0.1
 ;;;
 [dav]
 ; Enable DAV
-enabled = 1
+enabled = true
 ; Allow non-DAV browser requests + interface
-browser = 1
+browser = true
 ; Allow DAV in Apache. All resources must be secured separately
-apache = 0
+apache = false
 
 ;;;
 ;;; Ticket system + system generated emails
@@ -187,8 +199,10 @@ socket_perms = 0600
 [letsencrypt]
 ; When signing a certificate use LE staging server
 debug=true
+; PROTECTED
 ; X1 X509 authority key identifier - shouldn't change
 keyid=A8:4A:6A:63:04:7D:DD:BA:E6:D1:39:B7:A6:45:65:EF:F3:A8:EC:A1
+; PROTECTED
 ; X1 X509 staging authority key identifier - shouldn't change
 staging_keyid=C0:CC:03:46:B9:58:20:CC:5C:72:70:F3:E1:2E:CB:20:A6:F5:68:3A
 ; Perform a DNS check on each hostname to ensure it is reachable
@@ -213,15 +227,17 @@ additional_certs=
 lookahead_days=10
 lookbehind_days=0
 ; Send a notification email to [crm] => copy_admin on certificate renewal failure
-notify_failure=1
+notify_failure=true
 ; Use a single account manged by server admin (cpcmd common:get-email)
-unify_registration=1
+unify_registration=true
 ; Attempt to request SSL certificates for all domains on an account up to n times
 ; Each attempt is delayed 12 hours to accommodate network changes.
 bootstrap_attempts=3
 ; Disable certain challenge modes. Use a comma-delimited list for each
 ; Challenges will still appear in letsencrypt:challenges but skipped during acquisition
 disabled_challenges=tls-alpn
+; Maximum time to wait for record propagation for DNS checks
+dns_validation_wait=30
 
 ;;;
 ;;; DNS + IP assignent
@@ -252,23 +268,34 @@ my_ip6=
 proxy_ip4=
 ; Default remote IPv6 address for DNS. See docs/NAT.md
 proxy_ip6=
+; PROTECTED
 ; Use provider if dns,provider is not set for domain.
 ; Specifying "DEFAULT" as DNS provider will use this inherited configuration.
+; Use "dns.default-provider" Scope to change this value.
 provider_default="null"
+; PROTECTED
 ; Optional global provider key, same form as dns,provider
-; If set in bootstrap.sh, use cpcmd config_set dns.default-provider-key
+; Use "dns.default-provider-key" Scope to change this value.
 provider_key=
 ; UUID to assign this server. UUIDs are used to collaborate with different servers
 ; to determine whether to remove a DNS zone, e.g. moving server -> server with different
 ; UUIDs will persist the records when the domain is deleted from Server A so long as the DNS UUID
 ; differs
 uuid=
+; PROTECTED
+; UUID record name for white-labeling. When changing UUID, in-place UUID records are NOT renamed.
+; Changing this record may be an easy way to protect a cluster of domains from deletion,
+; but so too is changing the uuid= value.
+uuid_name=_apnscp_uuid
 ; Default TTL value for newly created DNS records
 default_ttl=43200
 ; For NAT'd systems, when connecting to the public IPv4/IPv6
 ; determine if router is capable of looping back public => private IP
 ; -1 performs an autodetection, 0 router lacks capability, 1 router supports
 hairpin=-1
+; Maximum time to wait for zone propagation checks. Set to 0 to disable
+; zone propagation wait checks.
+validation_wait = 10
 
 [mail]
 ; SMTP/IMAP/POP3 uses proxied content handler
@@ -317,19 +344,24 @@ storage_wait=2592000
 ; to be added. Enable on multi-user setups to prevent a user
 ; from adding google.com and routing all server mail for
 ; google.com to the user account.
-dns_check=1
+dns_check=true
 ; Notify admin whenever a domain is added to any account.
 ; Setting dns_check and notify to false is only recommended
 ; on a single-user installation.
-notify=0
+notify=false
 
 [ssh]
 ; Include embedded Terminal for users
-embed_terminal=1
+embed_terminal=true
 ; Enable users to run daemons
 user_daemons=true
 ; Default theme to use for shellinabox
 theme=default
+; Enable a limited set of sudo actions (/bin/rm) for account admins to run
+; Doing so would give access to remove multiPHP interpreters + system sockets
+; linked/shared in /.socket.
+; Only enable if you can absolutely trust your users are not malicious.
+sudo_support=false
 
 [auth]
 ; When using a multi-server reverse proxy, use this URL
@@ -347,7 +379,7 @@ server_format=
 ; Minimum acceptable password length
 min_pw_length=7
 ; Force password requirements check, implies min_pw_length
-pw_check=1
+pw_check=true
 ; Allow admin API commands, add/delete/edit/suspend/activate/hijack
 ; Disable to provide added security if a permission exploit were discovered
 admin_api=true
@@ -373,6 +405,11 @@ allow_database_change = true
 ; Includes range and single addresses. Set to -1 to cap
 ; to global limit (50). Set to 0 to disallow users from setting
 ip_restriction_limit=50
+; On password reset, implicitly update an IP restriction.
+; Valid options are true or false.
+; A hijacked email account on the same account allows an attacker
+; unlimited control when true.
+update_restrictions_on_reset=false
 
 [billing]
 ; All accounts attached with this invoice are considered "demo" and restricted.
@@ -393,23 +430,45 @@ cp_proxy=
 ; See https://cachethq.io and set to URL before api/
 sys_status=
 
+[screenshots]
+; chromedriver is installed and can capture website screenshots to facilitate visual recognition
+; Run yum install -y chromedriver chromium
+; adds ~400 MB files
+enabled=false
+; Acquisition method, self-hosted or remote. "self" for now.
+acquisition=self
+; Duration a screenshot should be retained before being recaptured
+ttl=86400
+; Run at most n screenshots every cron period. Primarily intended to deflect self-induced DoS
+batch=20
+; chromedriver host. Leave %RAND% for a random port
+chromedriver="http://127.0.0.1:%RAND%"
+
 [telemetry]
 ; Enable platform learning
-enabled=0
-; Auto-tune database on extension update
+enabled=true
+; Auto-tune database on extension update. Autotuning invokes
+; timescaledb-tune on each package update, adjusting WAL and memory
 autotune=true
 ; Maximum memory consumption. Leave undefined for autodetection.
 ; When unit omitted, assumed MB.
 memory_consumption=
+; Maximum WAL consumption. Leave undefined for autodetection.
+; Used for durability/replication across nodes
+max_wal=
 ; Perform routine compressions on metric data older than timespec
 ; Values older than this are averaged out into COMPRESSION_CHUNK windows
 compression_threshold="7 days"
 ; Chunk data older COMPRESSION_THRESHOLD
 compression_chunk='1 hour'
 ; Archival compression prevents modification of data past 48 hours
-archival_compression=true
+; Requires decompression before sites may be deleted
+archival_compression=false
 ; Merge duplicate records by value older than compression_chunk
 merge_duplicates=false
+; Maximum number of chunks to archive in one batch. Adjust lower if metricscron
+; report "(54000) ERROR: too many range table entries"
+archival_chunk_size=100
 
 ;;;
 ;;; Cron
@@ -432,7 +491,8 @@ load_limit=0.75
 default_plan="basic"
 ; Configuration directives not listed in plans/default/<svc>
 ; will terminate execution
-strict_svc_config = 1
+strict_svc_config = true
+; PROTECTED
 ; Relative to resources/ or an absolute path
 plan_path = templates/plans
 ; require IP addresses be bound to the server before allocating to site
@@ -442,28 +502,42 @@ ip_bind_check=true
 ;;; Server brute-force deterrent
 ;;;
 [rampart]
-; Default jail prefix for all fail2ban jails`
+; Default jail prefix for all fail2ban jails
 prefix = "f2b-"
 ; Default driver for rampart, iptables or ipset
 driver = ipset
 ; Allow up to n whitelisted IPs per site.
 ; -1 allows unlimited, 0 disables, n > 0 to cap
 delegated_whitelist = 0
+; Show reason why client is banned from logfile
+show_reason = true
 
 ;;;
 ;;; Enable FTP services
 ;;;
 [ftp]
-enabled = 1
+; FTP is enabled. Triggered via ftp.enabled Scope
+enabled = true
 
 ;;;
 ;;; Account resource enforcement
 ;;;;
 [cgroup]
+; PROTECTED
 ; location for cgroup controllers
 home="/sys/fs/cgroup"
+; PROTECTED
 ; default controller support
 controllers=memory,cpu,cpuacct,pids,blkio
+; Time in seconds to cache "admin:get-usage cgroup"
+; On a 650 account server aggregating 24 hour data,
+; ~1.5m records, takes ~45 seconds. cron periodically checks for
+; cache presence and freshens as necessary.
+; Setting to "0" effectively disables this
+prefetch_ttl=3600
+; Enable showing of cgroup usage in Nexus. Affects
+; prefetch task in cron.
+show_usage=true
 
 ;;;
 ;;; Apache
@@ -474,10 +548,13 @@ controllers=memory,cpu,cpuacct,pids,blkio
 all_interfaces=true
 ; Window to allow multiple HTTP build/reload requests
 ; to coalesce. Set to "now" to disable.
-reload_delay='2 minutes'
+reload_delay=2 minutes'
 ; Place all sites in PHP-FPM jails by default
 ; Each account occupies approximately 40 MB
 use_fpm=true
+; Strip non-jailed path when converting site from mod_php to PHP-FPM
+; Controls migrating php_value to .user.ini as well
+fpm_migration=true
 ; Allow users to switch between system user and self
 fpm_user_change=true
 ; Default port for non-SSL connections. Leave empty disable
@@ -486,12 +563,16 @@ nossl_port=80
 ; Default port for SSL connections. Leave empty disable
 ; Secondary configuration in httpd-custom.conf required
 ssl_port=443
-
+; Enable per-site storage for Pagespeed in siteXX/fst/var/cache/pagespeed
+; If enabled, all Pagespeed optimizations are charged to a site otherwise
+; optimizations are charged anonymously to "apache"
+pagespeed_persite=false
 
 ;;;
 ;;; Server-to-server xfer
 ;;;
 [migration]
+; During migrations from "transfersite.php", send notices from this email.
 status_email = apnscp@${HOSTNAME}
 
 ;;;
@@ -517,4 +598,5 @@ stopgap = 125
 ; As a sanity check, bandwidth_notify <= bandwidth_stopgap
 ; Setting 0 would effectively notify every night
 notify = 90
+
 ```
