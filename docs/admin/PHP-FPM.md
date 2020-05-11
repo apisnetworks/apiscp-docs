@@ -60,14 +60,35 @@ cpcmd scope:set apache.php-version 7.4
 
 ## Installing modules
 
-To install imagick off PECL for the system PHP build,
+To install `imagick` off PECL for the system PHP build,
 
 ```bash
 cd /usr/local/apnscp/resources/playbooks
-ansible-playbook bootstrap.yml  --tags=php/install-pecl-module --extra-vars=pecl_extensions=imagick
+ansible-playbook bootstrap.yml --tags=php/install-pecl-module --extra-vars=pecl_extensions=imagick
 ```
 ::: tip
 `--extra-vars=force_module_rebuild=true` may be specified to force a module update as well as module configuration in FST/siteinfo/etc/phpXX.d/.
+:::
+
+Modules may be set per version and permanently applied for all PHP builds by setting either `pecl_phpXX` or `pecl_extensions` variables.
+
+```bash
+# Always build imagick + igbinary + redis extensions
+cpcmd scope:set cp.bootstrapper pecl_extensions '[imagick,igbinary,redis]'
+# Build all modules
+upcp -sb php/install-pecl-module
+```
+
+### Building non-PECL modules
+git and archive sources are also supported. If we want to add mailparse (from PECL), memcached (from GitHub), and inotify:
+
+```bash
+cpcmd scope:set cp.bootstrapper pecl_extensions '["mailparse","https://github.com/php-memcached-dev/php-memcached.git","https://pecl.php.net/get/inotify-2.0.0.tgz"]'
+upcp -sb php/install-pecl-module
+```
+
+::: danger
+This task runs as root. Be sure you trust module sources.
 :::
 
 # Configuring sites
@@ -359,6 +380,14 @@ cd /usr/local/apnscp/resources/playbooks
 ansible-playbook bootstrap.yml  --tags=php/install-pecl-module --extra-vars=pecl_extensions=igbinary --extra-vars=php_version=7.4 --extra-vars=multiphp_build=true
 ```
 
+Likewise `pecl_php74` could be set as a list with `['igbinary']` to automatically build for PHP 7.4:
+
+```bash
+cpcmd scope:set cp.bootstrapper pecl_php74 '[igbinary]'
+cd /usr/local/apnscp/resources/playbooks
+ansible-playbook bootstrap.yml --tags=php/install-pecl-module --extra-vars=php_version=7.4 --extra-vars=multiphp_build=true
+```
+
 ## Remi PHP
 
 For easier package-based multiPHP management, ApisCP includes support for [Remi PHP](https://rpms.remirepo.net/). If installing on CentOS or RedHat 8, change "7" to "8".
@@ -370,7 +399,7 @@ yum install http://rpms.remirepo.net/enterprise/remi-release-7.rpm
 Then to install say PHP 7.4 with ionCube loader, MySQL, OPCache PECL:
 
 ```bash
-yum install -y php72-php-ioncube-loader php72-php-pecl-mysql php72-php-opcache
+yum install -y php74-php-ioncube-loader php74-php-pecl-mysql php74-php-opcache
 ```
 
 A site may be reconfigured to utilize the Remi PHP release by manually adding an override. There is no direct means to switch versions in the panel yet.
@@ -396,12 +425,16 @@ systemctl restart php-fpm-site1-apis.com
 This is very similar to default configuration with a few key differences:
 
 1. SCL is used to shim a new path, "php-fpm" is picked up in this shimmed path. /usr/sbin/php-fpm would be incorrect.
-2. An empty ExecStart= clears any previous ExecStart directives. Without this, ExecStart would be appended to the inherited ExecStart= command that starts PHP-FPM.
-3. --nodaemonize changes to --daemonize to ensure systemd picks up the scl to php-fpm process image change.
+2. An empty `ExecStart=` clears any previous ExecStart directives. Without this, ExecStart would be appended to the inherited ExecStart= command that starts PHP-FPM.
+3. `--nodaemonize` changes to `--daemonize` to ensure systemd picks up the scl to php-fpm process image change.
 
 PHP runtimes are located in `php<MAJOR><MINOR>-runtime` packages. `php<MAJOR><MINOR>` is a dummy package that pulls in dependency packages, including runtime.
 
 SCL collection configuration is defined in /etc/scl/conf. Remi PHP versions are named php\<MAJOR>\<MINOR>.
+
+### Installing modules
+
+Remi does not support manual installation of modules. Use packages provided through the public RPM repository. `yum list 'php*-pecl-*'` will give an indication of packages available for install.
 
 ### Adding non-PHP Remi packages
 

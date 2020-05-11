@@ -5,8 +5,8 @@ This is a drop-in provider for [ApisCP](https://apiscp.com) to enable DNS suppor
 ## Nameserver installation
 
 ::: warning
-CentOS 8 is limited to PowerDNS 4.3 from EPEL due to library dependencies when MySQL is used
-as a backend. Use PostgreSQL to avoid this limitation.
+CentOS 8 is restricted to PowerDNS 4.3 from EPEL due to library dependencies when MySQL is used
+as a backend. Use PostgreSQL to avoid this restriction.
 
 ```
 cpcmd scope:set cp.bootstrapper powerdns_driver pgsql
