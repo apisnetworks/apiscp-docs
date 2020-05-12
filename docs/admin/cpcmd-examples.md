@@ -9,11 +9,85 @@
 - Command introspection
 
 ## Collections
-`admin:collect()` is a powerful supertype command that filters accounts. When iterating over a collection, use `-o json` to force JSON output and `jq` to reliably parse results. `jq` may be installed with Yum:
+`admin:collect()` is a powerful command that aggregates and filters accounts. When iterating over a collection, use `-o json` to force JSON output and `jq` to reliably parse results. `jq` may be installed with Yum:
 
 ```bash
 yum install -y jq
 ```
+Let's look at admin:collect() using `cpcmd misc:i admin:collect`
+
+```php
+  /**
+  * Collect account info
+  *
+  * "active" is a special $query param that picks active/inactive (true/false) sites
+  *
+  * @param array|null $params null cherry-picks all services, [] uses default service list
+  * @param array|null $query  pull sites that possess these service values
+  * @param array      $sites  restrict selection to sites
+  * @return array
+  */
+```
+
+```yaml
+parameters:
+  - 'Parameter #0 [ <optional> array or NULL $params = Array ]'
+  - 'Parameter #1 [ <optional> array or NULL $query = NULL ]'
+  - 'Parameter #2 [ <optional> array $sites = Array ]'
+min: 0
+max: 3
+return: array
+signature: 'admin_collect([array $params,[array $query,[array $sites]]])'
+```
+
+`admin:collect([?array $params, [array $query, [array $sites]]])` where 
+
+- `$params` is the fields to fetch. `null` may be specified to retrieve all service metadata while `[]` returns *siteinfo,email*, *siteinfo,admin_user*, *aliases,aliases*, *billing,invoice*, and *billing,parent_invoice*
+- `$query` are the fields, in dot-notation, to match against. Matches are inclusive of all $query parameters.
+- `$sites` allows you to restrict the match to a collection of sites, domains, or invoices. 
+
+All results, keyed by site, contain **domain** and **active** fields that represent *siteinfo,domain* and whether the account is in a suspended state. These may also be queried in the `$query` parameter. 
+
+For example, to filter all sites that have SSH enabled,
+
+```bash
+cpcmd admin:collect null '[ssh.enabled:1]'
+```
+
+Or fetch *cgroup,** + *apache,jail* results for accounts that have SSH enabled *and* cgroup enabled:
+
+```bash
+cpcmd admin:collect '[cgroup,apache.jail]' '[ssh.enabled:1,cgroup.enabled:1]'
+```
+
+And so on. `admin:collect()` allows you to build arbitrary collections on any service metadata that can be processed by jq, a powerful tool that allows us to build pipelines of input => output using JavaScript.
+
+`--output=json` or `-o json` is necessary to format output as JavaScript. By default it formats as Yaml for readability. For the above command, we rewrite it as,
+
+```bash
+cpcmd -o json admin:collect '[cgroup,apache.jail]' '[ssh.enabled:1,cgroup.enabled:1]' | jq -r '[]keys' 
+```
+
+Which will allow is to loop over each site that has both ssh,enabled=1 and cgroup,enabled=1. Or a more convoluted example that we'll touch on shortly.
+
+```bash
+cpcmd -o json admin:collect '[cgroup,apache.jail]' '[ssh.enabled:1,cgroup.enabled:1]' | jq -r 'to_entries[] | (.key + " " + (.value.apache.jail | tostring), .value.cgroup)
+```
+
+This renders an output similar to the following.
+
+![jq output](./images/cpcmd-admin-collect-output.png)
+
+Let's talk about this command briefly,
+
+**to_entries[]** takes the input from `admin:collect` and converts it to an array of key/value pairs for each match. This allows referencing **.key** and **.value** in the next pipeline phase. **+ " " +** allows us to conconatenate parts of the data into one string and while **| tostring** is a filter that converts the number (*1* or *0*) into a string that may be concatenated onto the result. Comma ("**,**") separates output records so that all values in **.value.cgroup** may be printed.
+
+::: tip
+If none of the above made sense, don't worry! Seldom do you ever go off into such a complex pipeline. Besides, most queries can be rewritten by either masquerading as a site in `cpcmd` as in *Blanket grants* example below or by piping the site as the third parameter (`$sites`) to another  `admin:collect()` call.
+
+jq has a [rich manual](https://stedolan.github.io/jq/manual/) to explore if you are of the masochist variety.
+:::
+
 The following list is not an exaustive list of things that can be done using admin:collect(), but rather serve as a starting point for ideas.
 
 ### Database
