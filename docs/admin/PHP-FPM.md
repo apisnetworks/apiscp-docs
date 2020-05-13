@@ -251,7 +251,7 @@ IO and CPU weighting may be set via ioweight and cpuweight respectively. ioweigh
 EditDomain -c cgroup,ioweight=50 -c cgroup,cpuweight=200 domain.com
 ```
 
-See [Resource enforcement.md](Resource enforcement.md) for further details.
+See [Resource enforcement.md](./Resource%20enforcement.md) for further details.
 
 ::: warning
 Setting limits artificially low may create a connection backlog that can prevent consume more system resources than it strives to prevent. Resource limits should be used to prevent egregious abuse, not set firm boundaries based on average daily usage.
