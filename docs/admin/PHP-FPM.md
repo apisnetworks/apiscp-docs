@@ -46,7 +46,9 @@ PHP-FPM offers several advantages over an ISAPI integration:
 
 All PHP-FPM pools are managed through systemd using socket activation. When a request is received by Apache, it writes to a Unix domain socket, outside the account chroot, managed by systemd. systemd spawns the worker pool to handle subsequent requests, which solves the [Thundering herd problem](https://en.wikipedia.org/wiki/Thundering_herd_problem) to a certain extent. Each request is jailed to the account through systemd. cgroup assignment is done prior to pool initialization, which extends to all child processes spawned from within the pool ensuring fair resource treatment. Configuration may be overriden on a per-pool level with pool configuration at the discretion of (and of consequence to) the account owner.
 
-# Configuring builds
+## Building
+
+### Configuring
 
 The default PHP interpreter may be changed using the `apache.php-version` [Scope](Scopes.md). Additional configuration flags may be specified by setting `phpXX_build_flags` in Bootstrapper where XX is \<MAJOR>\<MINOR> (`cp.bootstrapper`is a Scope to facilitate interaction). Alternatively `php_build_flags` may be set, which applies to all PHP builds.
 
@@ -58,7 +60,7 @@ cpcmd scope:set cp.bootstrapper php74_build_flags "--enable-pcntl"
 cpcmd scope:set apache.php-version 7.4
 ```
 
-## Installing modules
+### Installing modules
 
 To install `imagick` off PECL for the system PHP build,
 
@@ -79,7 +81,7 @@ cpcmd scope:set cp.bootstrapper pecl_extensions '[imagick,igbinary,redis]'
 upcp -sb php/install-pecl-module
 ```
 
-### Building non-PECL modules
+#### Non-PECL modules
 git and archive sources are also supported. If we want to add mailparse (from PECL), memcached (from GitHub), and inotify:
 
 ```bash
@@ -91,7 +93,7 @@ upcp -sb php/install-pecl-module
 This task runs as root. Be sure you trust module sources.
 :::
 
-# Configuring sites
+## Configuring sites
 
 Switching an account over is a breeze! Flip the `apache,jail` setting to enable jailing:
 
@@ -120,7 +122,21 @@ done
 
 There will be an elision delay configured in *[httpd]* => *reload_delay* designed to allow multiple HTTP reload calls to merge into a single call to prevent a denial of service attack. By default, this is 2 minutes.
 
-# Grouped management
+### Single-user behavior
+
+ApisCP supports a single-user behavior which disables the benefits of [Fortification](Fortification.md). This behavior is consistent with cPanel and competing panels that do not isolate web users. Set `apache,webuser` to match the account admin:
+
+```bash
+EditDomain -c apache,webuser=myadmin -D mydomain.com
+# Or for simplicity...
+EditDomain -c apache,webuser="$(get_config mydomain.com siteinfo admin_user)" -D mydomain.com
+```
+
+ApisCP will change ownership on all files matching the previous user ("apache") to the new user "myadmin". Ownership change from a system user to an account user is an irreversible process. Now, files created by the web server will be under the account username. *Should and weakness exist* in any web app on the account that allows an attacker to run arbitrary code, then the attacker now has unrestricted access to all users on the account.
+
+This is an extremely dangerous configuration that should be avoided at all costs.
+
+## Service management
 
 Worker throughput may be examined via systemd. FPM workers are watchdog-aware, which means they automatically report health back to systemd within a deadline window to improve reliability, recovering as needed. Worker metrics may be examined via `systemctl status`,
 
@@ -173,7 +189,7 @@ However this is seldom useful as suspending the account achieves a similar resul
 SuspendDomain site1
 ```
 
-## Bulk update
+### Bulk update
 
 `php-fpm` is a composite unit to manage all PHP-FPM instances on a server. For example, it may be necessary to propagate configuration changes from a lower filesystem layer.
 
@@ -184,7 +200,15 @@ systemctl reload fsmount
 systemctl start php-fpm
 ```
 
-## Overriding service definitions
+### Service relationship
+Both `php-fpm` and `php-fpm-siteXX` represent one-way bindings to the respective pools. The full service name, `php-fpm-siteXX-domain` consists of 2 parts, a socket-activated service ending in `.socket` that spawns the PHP-FPM pool that shares the same name once activity arrives on that socket from Apache.
+
+Restarting `php-fpm.service` will restart all PHP-FPM pools previously running, however, will leave dormant pools inactive. Likewise the same treatment is applied to `php-fpm-siteXX.service` but only to pools belonging to that site. Restarting `php-fpm-siteXX-domain.socket` will restart the similarly named service if it was previously listening or re-enable the socket listener if previously deactivated via a `stop` command (`systemctl stop php-fpm`). Starting `php-fpm-siteXX-domain.service` will unconditionally start the PHP-FPM pool without waiting for activity from the named .socket.
+
+![Propagation relation between different services](./images/php-fpm-service-relationship.svg)
+
+
+### Overriding service definitions
 
 Overriding configuration follows systemd [convention](https://wiki.archlinux.org/index.php/systemd#Editing_provided_units). Create a directory in /etc/systemd/system/ named after the service. Any .conf within the directory will be merged into the service definition thus making it possible, for example, to change the PHP-FPM worker or set environment variables prior to pool startup. Further, overrides are non-destructive and guaranteed to not be overwritten.
 
@@ -201,21 +225,7 @@ systemctl daemon-reload
 systemctl restart php-fpm-site1-example.com
 ```
 
-# Single-user behavior
-
-ApisCP supports a single-user behavior which disables the benefits of [Fortification](Fortification.md). This behavior is consistent with cPanel and competing panels that do not isolate web users. Set `apache,webuser` to match the account admin:
-
-```bash
-EditDomain -c apache,webuser=myadmin -D mydomain.com
-# Or for simplicity...
-EditDomain -c apache,webuser="$(get_config mydomain.com siteinfo admin_user)" -D mydomain.com
-```
-
-ApisCP will change ownership on all files matching the previous user ("apache") to the new user "myadmin". Ownership change from a system user to an account user is an irreversible process. Now, files created by the web server will be under the account username. *Should and weakness exist* in any web app on the account that allows an attacker to run arbitrary code, then the attacker now has unrestricted access to all users on the account.
-
-This is an extremely dangerous configuration that should be avoided at all costs.
-
-# Resource enforcement
+## Resource enforcement
 
 All `cgroup` service directives apply to PHP-FPM workers, including blkio IO throttling. To set a 2 MB/s write throttle on all PHP-FPM tasks use `blkio,writebw` or throttle IOPS use the "iops" equivalent, `blkio,writeiops`:
 
@@ -246,19 +256,6 @@ See [Resource enforcement.md](Resource enforcement.md) for further details.
 ::: warning
 Setting limits artificially low may create a connection backlog that can prevent consume more system resources than it strives to prevent. Resource limits should be used to prevent egregious abuse, not set firm boundaries based on average daily usage.
 :::
-
-## PHP-FPM timeout
-
-The web server expects a request to complete within **60 seconds**. Any request outside this window will return a *504 Gateway Timeout* response. Alter the system-wide configuration in `/etc/httpd/conf/httpd-custom.conf` by setting `ProxyTimeout 180` to raise the limit to 3 minutes. Proxy timeout may be adjusted on a per-site basis by creating a file named `custom` in `/etc/httpd/conf/siteXX` with the same directive. When overriding per-site, be sure to rebuild the configuration:
-
-```bash
-# Get XX via get_site_id domain.com
-echo 'ProxyTimeout 180' >> /etc/httpd/conf/siteXX/custom
-htrebuild
-systemctl reload httpd
-```
-
-Granular per-proxy configuration is covered in "[Apache proxy configuration](#apache-proxy-configuration)" below.
 
 ## Converting ISAPI to PHP-FPM
 
@@ -297,7 +294,23 @@ security.limit_extensions=.php .phar .html .htm
 
 Then restart the affected pool, `systemctl restart php-fpm-siteXX` where siteXX is the site marker or do an en masse restart with `systemctl restart php-fpm`.
 
-# Apache proxy configuration
+## HTTP configuration
+
+### PHP-FPM timeout
+
+The web server expects a request to complete within **60 seconds**. Any request outside this window will return a *504 Gateway Timeout* response. Alter the system-wide configuration in `/etc/httpd/conf/httpd-custom.conf` by setting `ProxyTimeout 180` to raise the limit to 3 minutes. Proxy timeout may be adjusted on a per-site basis by creating a file named `custom` in `/etc/httpd/conf/siteXX` with the same directive. When overriding per-site, be sure to rebuild the configuration:
+
+```bash
+# Get XX via get_site_id domain.com
+echo 'ProxyTimeout 180' >> /etc/httpd/conf/siteXX/custom
+htrebuild
+systemctl reload httpd
+```
+
+Granular per-proxy configuration is covered in "[Apache proxy configuration](#apache-proxy-configuration)" below.
+
+
+### Worker limits
 
 Apache uses an Event MPM, which consists of 1 or more processes (called "children") consisting of 1 or more threads. By default, each child consists of 20 threads. *THREADS* x *CHILDREN* gives the **maximum number of concurrent connections**. See [Apache.md](Apache.md) for more information on configuration.
 
@@ -328,11 +341,11 @@ After making changes, edit all domains that use PHP-FPM to effect changes.
 EditDomain --all
 ```
 
-# Multiversion PHP
+## Multiversion PHP
 
 Multiversion comes in two flavors, native (also called "multiPHP") and Remi, named after the eponymous author that maintains the Remi build system.
 
-## Native builds
+### Native builds
 
 ApisCP ships with 1 PHP release for simplicity, but can support multiple versions as necessary. Additional versions may be built using Bootstrapper. A Scope is provided, *apache.php-multi*, that facilitates building new versions.
 
@@ -369,7 +382,7 @@ systemctl restart php-fpm-site1-apis.com
 
 Configuration may be overrode by account owners ("Site Administrators") by placing  accompanying configuration in /etc/phpXX.d.
 
-### Installing modules
+#### Installing modules
 
 Modules may be installed as one would normally expect with regular PHP-FPM. The only difference is the presence of `multiphp_build=true` and `php_version` must be explicitly set to at least MAJOR.MINOR.
 
@@ -388,7 +401,7 @@ cd /usr/local/apnscp/resources/playbooks
 ansible-playbook bootstrap.yml --tags=php/install-pecl-module --extra-vars=php_version=7.4 --extra-vars=multiphp_build=true
 ```
 
-## Remi PHP
+### Remi PHP
 
 For easier package-based multiPHP management, ApisCP includes support for [Remi PHP](https://rpms.remirepo.net/). If installing on CentOS or RedHat 8, change "7" to "8".
 
@@ -432,11 +445,11 @@ PHP runtimes are located in `php<MAJOR><MINOR>-runtime` packages. `php<MAJOR><MI
 
 SCL collection configuration is defined in /etc/scl/conf. Remi PHP versions are named php\<MAJOR>\<MINOR>.
 
-### Installing modules
+#### Installing modules
 
 Remi does not support manual installation of modules. Use packages provided through the public RPM repository. `yum list 'php*-pecl-*'` will give an indication of packages available for install.
 
-### Adding non-PHP Remi packages
+#### Adding non-PHP Remi packages
 
 Additional packages may be installed first from Remi, then replicated into the FST. Yum Synchronizer ("Synchronizer") located in `bin/scripts/yum-post.php` provides a set of tools to manage RPM replication into FST.
 
@@ -454,7 +467,7 @@ cd /usr/local/apnscp
 
 `-d` calculates dependencies necessary to satisfy operation and installs those packages into the named service layer. When mixing packages between different services that may be satisfied by a union of service layers, it is permissible to omit "-d". Installing packages without installing the dependencies, however, may cause PHP or any binary to fail to load.
 
-### Solving dependencies
+#### Solving dependencies
 
 Install the ImageMagick extension from PECL, then attempt to load PHP-FPM from the account, it will fail:
 
@@ -480,7 +493,7 @@ su apis.com
 
 Do not attempt to install a module directly; it is already relocated. Once satisfied, you may run into permission issues if PHP-FPM runs as an unprivileged system user ("apache") rather than the account owner. `su -s /bin/bash -G ADMINUSER apache` would setup a similar environment to systemd prior to launch.
 
-## Remi vs Native
+### Remi vs Native
 
 Remi is an easier system to manage when juggling a variety of PHP versions, but it comes at some cost to performance and potential dependency management.
 
