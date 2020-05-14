@@ -1,4 +1,4 @@
-# PHP-FPM configuration
+# PHP-FPM
 
 PHP-FPM is a high performance PHP daemon built on FastCGI and introduced in ApisCP 3.1. On ApisCP platforms PHP-FPM demonstrates a 2-3x higher throughput than mod_php ("ISAPI"), which integrates into Apache as a module. In PHP-FPM, a request is sent over a UNIX domain socket to a dedicated worker pool for processing. In ISAPI, PHP requests are handled by a separate VM integrated into Apache that must scaffold and tear down at the end of each request. ISAPI is ideal in low-memory environments but loses relevance outside the niche scenario.
 
@@ -93,7 +93,7 @@ upcp -sb php/install-pecl-module
 This task runs as root. Be sure you trust module sources.
 :::
 
-## Configuring sites
+## Enabling sites
 
 Switching an account over is a breeze! Flip the `apache,jail` setting to enable jailing:
 
@@ -201,9 +201,9 @@ systemctl start php-fpm
 ```
 
 ### Service relationship
-Both `php-fpm` and `php-fpm-siteXX` represent one-way bindings to the respective pools. The full service name, `php-fpm-siteXX-domain` consists of 2 parts, a socket-activated service ending in `.socket` that spawns the PHP-FPM pool that shares the same name once activity arrives on that socket from Apache.
+Both *php-fpm* and *php-fpm-siteXX* represent one-way bindings to the respective pools. The full service name, *php-fpm-siteXX-domain* consists of 2 parts, a socket-activated service ending in *.socket* that spawns the PHP-FPM pool that shares the same name once activity arrives on that socket from Apache.
 
-Restarting `php-fpm.service` will restart all PHP-FPM pools previously running, however, will leave dormant pools inactive. Likewise the same treatment is applied to `php-fpm-siteXX.service` but only to pools belonging to that site. Restarting `php-fpm-siteXX-domain.socket` will restart the similarly named service if it was previously listening or re-enable the socket listener if previously deactivated via a `stop` command (`systemctl stop php-fpm`). Starting `php-fpm-siteXX-domain.service` will unconditionally start the PHP-FPM pool without waiting for activity from the named .socket.
+Restarting *php-fpm.service* will restart all PHP-FPM pools previously running, however, will leave dormant pools inactive. Likewise the same treatment is applied to *php-fpm-siteXX.service* but only to pools belonging to that site. Restarting *php-fpm-siteXX-domain.socket* will restart the similarly named service if it was previously listening or re-enable the socket listener if previously deactivated via a `stop` command (`systemctl stop php-fpm`). Starting *php-fpm-siteXX-domain.service* will unconditionally start the PHP-FPM pool without waiting for activity from the named *.socket*.
 
 ![Propagation relation between different services](./images/php-fpm-service-relationship.svg)
 
@@ -257,11 +257,77 @@ See [Resource enforcement.md](./Resource%20enforcement.md) for further details.
 Setting limits artificially low may create a connection backlog that can prevent consume more system resources than it strives to prevent. Resource limits should be used to prevent egregious abuse, not set firm boundaries based on average daily usage.
 :::
 
-## Converting ISAPI to PHP-FPM
+## PHP configuration
 
-### .htaccess => .user.ini
+### Override precedence
 
-Directives are assignment-based rather than directive similar to php.ini. Paths are jailed and respect the synthetic root layout. For example,
+ApisCP uses a composition filesystem called [BoxFS](Filesystem.md) that allows files inheritance from lower levels and remain on these levels until changed. Once changed, these files copy upward to the account layer. Utilizing this approach, files can be shared upward or [templated](Customizating.md) out to sites.
+
+- `FILESYSTEMTEMPLATE/siteinfo/etc/php.ini` is the base configuration that may be edited by Site Administrators and copied up to their respective account layer. 
+- `FILESYSTEMTEMPLATE/siteinfo/etc/phpXX.d` is a version-specific configuration directory also editable that follows propagation rules. 
+- `siteXX/fst/etc/php-fpm.d/sites/` may not be edited directly and instead relies on inclusion of `fpm-config-custom.blade.php` template. Any `php_admin_value`/`php_admin_flag` directive trumps all other matching directive settings. 
+- Site Administrators can apply additional directives in `siteXX/etc/php-fpm.d/` that apply to all pools of the site.
+- `.user.ini` in each document root allows for additional configuration. This configuration is cached for 300 seconds per `user_ini.cache_ttl`.
+
+### System-wide configuration
+
+System-wide changes may be made to `/home/virtual/FILESYSTEM/siteinfo/etc/php.ini`. In single-mount installations, this is linked directly to `/etc/php.ini`. Once edited, layer cache must be flushed upward.
+
+```bash
+systemctl reload fsmount
+systemctl restart php-fpm
+```
+
+**This fails if** a site has modified /etc/php.ini within their account root (copy-up semantics of BoxFS). In such situations, an override may be applied either in `/home/virtual/FILESYSTEMTEMPLATE/siteinfo/etc/phpXX.d/file.ini` or by overriding the PHP-FPM service template. When applied in etc/phpXX.d/, a site owner may remove or edit the file from the account. For a permanent, uneditable solution, see **Site templates** below.
+
+::: warning
+`/etc/phpXX.d` is not the same as `/home/virtual/FILESYSTEMTEMPLATE/siteinfo/etc/phpXX.d`. Files placed in /etc/phpXX.d are not propagated like in /etc/php.ini.
+:::
+
+### Service configuration
+
+Next layer of customization is in the pool or systemd service declaration. Pool configuration is located in `siteXX/fst/etc/php-fpm.d/sites/` where each configuration is named after the pool. These files may not be directly edited by Site Administrators and are regenerated from template.  Files in `siteXX/fst/etc/php-fpm.d/` may be edited by Site Administrators.
+
+`php_value` and `php_flag` allows these values to be overrode. `php_admin_value` and `php_admin_flag` disallow override.
+
+For example, in siteXX/fst/etc/php-fpm.d/memory.conf
+
+```ini
+php_value[upload_max_filesize] = 64m
+php_value[post_max_size] = 64m
+```
+
+Then restart the pool, `systemctl restart php-fpm-siteXX` 
+
+### Service templates
+
+Customizations are applied inline to all PHP-FPM pools defined in sites/ if an override exists in `config/custom/resources/templates/apache/php/partials/fpm-config-custom.blade.php`:
+
+```ini
+mkdir -p /usr/local/apnscp/config/custom/resources/templates/apache/php/partials/
+
+cat <<EOF >> /usr/local/apnscp/config/custom/resources/templates/apache/php/partials/fpm-config-custom.blade.php
+
+# Note, this is better serviced by cgroup,memory resource enforcement
+php_admin_value[memory_limit] = 384m
+php_value[upload_max_filesize] = 64m
+php_value[post_max_size] = 64m
+# Load redis.so from /usr/lib64/<ZENDAPIVERSION>
+php_value[extension] = redis
+EOF
+```
+
+Once set, rebuild PHP-FPM for all sites:
+
+```bash
+EditDomain --reconfig --all
+```
+
+### User overrides
+
+PHP-FPM uses `.user.ini` in each document root to set PHP configuration at runtime.
+
+Configuration in PHP-FPM is assignment-based, similar to php.ini, rather than directive. Paths are jailed and respect the synthetic root layout. For example,
 
 **.htaccess**
 `php_value auto_prepend_file /home/virtual/site12/fst/var/www/html/heading.php`
@@ -269,11 +335,13 @@ Directives are assignment-based rather than directive similar to php.ini. Paths 
 **.user.ini**
 `auto_prepend_file = /var/www/html/heading.php`
 
-PHP-FPM caches per-directory .user.ini files. By default the duration is 300 seconds (5 minutes). This can be altered by adding a FPM configuration to /etc/php-fpm.d/*file*.conf or by overriding the PHP-FPM template in templates/apache/php/.
+PHP-FPM caches per-directory `.user.ini` files. By default the duration is 300 seconds (5 minutes). This can be altered by adding a FPM configuration to /etc/php-fpm.d/*file*.conf or by overriding the PHP-FPM template in templates/apache/php/.
 
 Then restart the affected pool, `systemctl restart php-fpm-siteXX` where siteXX is the site marker or do an en masse restart with `systemctl restart php-fpm`.
 
 Since v3.1.38, directives are migrated automatically for all known domain/subdomain parent document roots when a site is switched between jail/non-jail mode. `php:migrate-directives(string $host, string $path = '', string $from)` provides a migration interface for directives behind a subdirectory.
+
+Directives may be applied pool-wide by the Site Administrator by creating a new file in /etc/php-fpm.d/,  by editing /etc/php.ini directly, or creating a drop-in in /etc/phpXX.d/. Pools may be restarted by the Site Administrator in **Web** > **PHP Pools**.
 
 ### Masquerading other file types as PHP
 
