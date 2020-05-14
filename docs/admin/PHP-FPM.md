@@ -329,10 +329,10 @@ PHP-FPM uses `.user.ini` in each document root to set PHP configuration at runti
 
 Configuration in PHP-FPM is assignment-based, similar to php.ini, rather than directive. Paths are jailed and respect the synthetic root layout. For example,
 
-**.htaccess**
+**.htaccess**  
 `php_value auto_prepend_file /home/virtual/site12/fst/var/www/html/heading.php`
 
-**.user.ini**
+**.user.ini**  
 `auto_prepend_file = /var/www/html/heading.php`
 
 PHP-FPM caches per-directory `.user.ini` files. By default the duration is 300 seconds (5 minutes). This can be altered by adding a FPM configuration to /etc/php-fpm.d/*file*.conf or by overriding the PHP-FPM template in templates/apache/php/.
