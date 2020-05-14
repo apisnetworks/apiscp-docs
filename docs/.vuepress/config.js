@@ -200,6 +200,13 @@ module.exports = {
                 "admin/LDA",
                 "admin/Filtering",
                 "admin/Majordomo",
+                {
+                  title: "Providers",
+                  children: [
+                    "admin/mail/Gmail.md",
+                    "admin/mail/Mxroute.md"
+                  ]
+                },
               ]
             },
             "admin/FTP",
