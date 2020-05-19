@@ -1,5 +1,9 @@
 # Resource enforcement
 
+Before discussing resource enforcement, a preface on **load average** is necessary, or more pedantically: *run-queue size* (both are used interchangeably). Run-queue size is the total amount of work parcels enqueued across all logical processors at any given instance. For example, if there are 4 logical processors bound to a server it means - assuming equal assignment - that each logical processor is processing 1 parcel of work and 3/4 have another parcel of work immediately behind it. Parcels compute on the microsecond scale, so momentary spikes - what's reported as a 1-minute load average - only indicate there's a spike and nothing more. A 15-minute load average paints a better picture of the typical server load, which can potentially hint at deeper issues such as insufficient hardware.
+
+Logical processors are the number of processes listed in `/proc/cpuinfo`. ApisCP precomputes this number on start and applies it to any CPU calculations (as well as user hz). 
+
 ## Storage
 
 Storage is tracked using native quota facilities of the operating system. XFS and Ext4 [filesystems](Filesystem.md) are supported, which provide equivalent tracking abilities. This tracking facility is called a "quota". Quotas exist as **hard** and **soft**. 
@@ -135,10 +139,20 @@ sys     0m1.336s
 ------ ----------- ----------- --------- --------- ----------------
 100.00    1.336381                   100         2 total
 ```
+### Site Administrator glance
+
+For Site Administrators, "user" and "system" are 24 hour recorded totals using the same mechanism that counts run-queue size and task duration. As there are 86,400 seconds in a day per logical core, in theory the maximal value would approach 86,400 seconds * \<n processors>, but as several hundred processes run on a server it would be impossible for any one task group to ever reach this total (like absolute zero).
 
 ## Process
 
+A PID is a process ID. A process ID is any *thread*. A single-threaded application creates 1 process ID. A multithreaded application creates up to *n* process IDs. The nuance is important because **process enforcement affects thread counts, not process counts**. In the below example, MySQL is charged with 37 processes. In a typical view with `ps`, this may only appear as 1 process on the surface.
+
+![Threaded vs non-threaded PID view of MySQL](./images/resource-enforcement-pids.png)
+
+
+
 ## IO
+
 IO restrictions are classified by read and write. 
 
 ```bash

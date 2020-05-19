@@ -6,7 +6,7 @@ Local delivery agent ("LDA") handles last mile delivery of mail locally to the s
 
 ## Delivery pipeline
 
-Message filtering is done prior to delivery via maildrop. Each message goes through two levels of filters: (1) global — processed first in `/etc/maildroprc` followed by (2) local per-user filters in `$HOME/.mailfilter`. Basic filtering recipes are provided below. Syntax and usage may be found in [mailfilter(7)](http://hostineer.com/linux-man/man7/maildropfilter.7.html).
+Message filtering is done prior to delivery via maildrop. Each message goes through two levels of filters: (1) global — processed first in `/etc/maildroprc` followed by (2) local per-user filters in `$HOME/.mailfilter`. Basic filtering recipes are provided below. Syntax and usage may be found in [mailfilter(7)](https://www.courier-mta.org/maildropfilter.html).
 
 Depending upon spam filtering technology, there may be a separate "xfilter" call for external message filtering. rspamd filters before enqueueing a message whereas SpamAssassin occurs *after* enqueueing the message.
 
@@ -150,7 +150,7 @@ if (/^X-Spam-Flag: YES/)
 
 ### Filtering to an external program
 
-maildrop’s [xfilter](http://hostineer.com/linux-man/man7/maildropfilter.7.html#lbBI) directive pipes the message to an external script for processing. A rudimentary example reverses the message text. Naturally, as this is a shell script it should be directly executable from the shell, so ensure the permissions are at least 700 (`chmod 700 reverse.sh`).
+maildrop’s [xfilter](https://www.courier-mta.org/maildropfilter.html#idm45723571076144) directive pipes the message to an external script for processing. A rudimentary example reverses the message text. Naturally, as this is a shell script it should be directly executable from the shell, so ensure the permissions are at least 700 (`chmod 700 reverse.sh`).
 
 ```maildrop
 # .mailfilter
