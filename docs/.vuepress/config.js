@@ -13,6 +13,7 @@ module.exports = {
         }
       }
     ],
+    'vuepress-plugin-reading-time',
     'alias',
     [
       'vuepress-plugin-clean-urls', {

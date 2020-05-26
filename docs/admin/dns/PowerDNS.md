@@ -2,11 +2,8 @@
 
 This is a drop-in provider for [ApisCP](https://apiscp.com) to enable DNS support using PowerDNS. This module may use PostgreSQL or MySQL as a backend driver.
 
-## Nameserver installation
-
 ::: warning
-CentOS 8 is restricted to PowerDNS 4.3 from EPEL due to library dependencies when MySQL is used
-as a backend. Use PostgreSQL to avoid this restriction.
+CentOS 8 is restricted to PowerDNS 4.3 from EPEL due to library dependencies when MySQL is used as a backend. Use PostgreSQL to avoid this restriction.
 
 ```
 cpcmd scope:set cp.bootstrapper powerdns_driver pgsql
@@ -16,8 +13,9 @@ upcp -sb software/powerdns
 or at install time, `-s dns_default_provider='powerdns' -s powerdns_driver='pgsql'`
 :::
 
-### Local PowerDNS
-*PostgreSQL can be used by specifying powerdns_driver=pgsql, cpcmd scope:set will accomplish this:*
+## Nameserver installation
+
+Installation can be chosen at install time or after setup. Installation is only necessary if you intend on running a PowerDNS instance on the server. This section covers *installation*; skip down to **ApisCP DNS provider setup** for information on configuring a server to use PowerDNS as a DNS provider.
 
 ```bash
 cpcmd scope:set cp.bootstrapper powerdns_enabled true
@@ -28,7 +26,25 @@ upcp -sb software/powerdns
 cpcmd scope:set dns.default-provider powerdns
 ```
 
-PowerDNS is now setup to accept requests on port 8081. Requests require an authorization key that can be found in `/etc/pdns/pdns.conf`
+::: tip DNS-only licenses
+ApisCP provides a DNS-only license class that allows ApisCP to run on a server without the capability to host sites. These licenses are free and may be requested via [my.apiscp.com](https://my.apiscp.com).
+:::
+
+### Listening for requests
+
+Firewall access is automatically opened inbound for 53/TCP and 53/UDP when PowerDNS is enabled. On CentOS 8+ machines, to avoid a potential service conflict with systemd-resolved, PowerDNS will bind only to the primary IP address. This can be changed by setting `powerdns_dns_bind_address` to a comma-separated string of IPv4 and IPv6 addresses. Prior to PowerDNS 4.3, this value may only accept a list of IPv4 addresses.
+
+```bash
+# Listen on 192.168.0.1 and all IPv6 interfaces on pdns v4.3
+cpcmd scope:set cp.bootstrapper powerdns_dns_bind_address '192.168.0.1, ::'
+upcp -sb software/powerdns
+```
+
+### Local PowerDNS
+
+In Local mode, PowerDNS only accepts API calls that originate locally from the server. This allows you to place PowerDNS' API behind a reverse proxy, such as Apache. Local-only is enabled by default.
+
+PowerDNS is setup to accept requests on port 8081 (`powerdns_api_port` setting). Requests require an authorization key that can be found in `/etc/pdns/pdns.conf`
 
 ```
 # Install jq if not already installed
@@ -37,20 +53,6 @@ yum install -y jq
 grep '^api-key=' /etc/pdns/pdns.conf | cut -d= -f2
 curl -v -H 'X-API-Key: APIKEYABOVE' http://127.0.0.1:8081/api/v1/servers/localhost | jq .
 ```
-
-ApisCP provides a DNS-only license class that allows ApisCP to run on a server without the capability to host sites. These licenses are free and may be requested via [my.apiscp.com](https://my.apiscp.com).
-
-### Remote PowerDNS (alternate install)
-Alternatively, ApisCP can be configured to connect to a remote PowerDNS server.  This is useful if running a DNS cluster and want every ApisCP server to connect to it.
-
-```bash
-cpcmd scope:set cp.bootstrapper powerdns_enabled true
-cpcmd scope:set cp.bootstrapper powerdns_apionly true
-upcp -sb software/powerdns
-cpcmd scope:set dns.default-provider powerdns
-```
-
-Proceed with the setup in section "ApisCP DNS provider setup" below.  The API key will be sourced from your remote server.
 
 ### Idempotently changing configuration
 
@@ -139,7 +141,6 @@ The server may be accessed once the source IP has been whitelisted,
 ```bash
 curl -q -H 'X-API-Key: SOMEKEY' http://myserver.apiscp.com/api/v1/servers/localhost
 ```
-
 
 ## ApisCP DNS provider setup
 
