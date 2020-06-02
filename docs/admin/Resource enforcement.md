@@ -149,7 +149,35 @@ A PID is a process ID. A process ID is any *thread*. A single-threaded applicati
 
 ![Threaded vs non-threaded PID view of MySQL](./images/resource-enforcement-pids.png)
 
+Let's set process limit to 100 and induce a [fork bomb](https://en.wikipedia.org/wiki/Fork_bomb), which rapidly spawns up to 100 processes before summarily exiting:
 
+```bash
+EditDomain -c cgroup,proclimit=100 -D site1
+su site1
+# Uncomment following line to run a fork bomb
+# :(){ ; :|:& };:
+
+# Output:
+# bash: fork: retry: No child processes
+# bash: fork: retry: No child processes
+# bash: fork: retry: No child processes
+```
+
+And confirm the PID counter maxed out by investigating the contents of pids.max in the pids controller,
+
+```bash
+cat /sys/fs/cgroup/pids/site11/pids.max
+```
+
+Likewise if 100 threads were created using a tool such as [GNU Parallel](https://www.gnu.org/software/parallel/) a similar result would be seen once the thread count hits 100.
+
+::: tip One of many layers
+A secondary defense, in the event no such cgroup protection is applied, exists in `FST/siteinfo/etc/security/limits.d/10-apnscp-user.conf` that sets a generous limit of 2,048 processes. This can be adjusted by setting `limit_nproc` in Bootstrapper and running `system/limits` role.
+:::
+
+::: warning
+Program behavior is often unspecified when it can no longer create additional threads or processes. proclimit should be used judiciously to prevent abuse, not act as a prod for users to upgrade to a more profitable package type.
+:::
 
 ## IO
 

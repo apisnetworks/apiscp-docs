@@ -495,7 +495,7 @@ composer require psr/log
 
 ApisCP comes with a separate [theme SDK](https://github.com/apisnetworks/apnscp-bootstrap-sdk) available on Github. Global themes can be inserted into `public/css/themes/`. Default theme is adjusted via **[style]** => **theme**. Users can build and install their own themes if **[style]** => **allow_custom** is enabled.
 
-# Hooks
+# Module hooks
 
 Several hooks are provided to latch into ApisCP both for account and user creation. All hook names are prefixed with an underscore ("_"). All hooks run under Site Administrator privilege ("*PRIVILEGE_SITE*"). Any module that implements one must implement all hooks as dictated by the `\Opcenter\Contracts\Hookable` interface.
 
@@ -585,6 +585,10 @@ cpasswd =
 ## Event-driven callbacks
 
 ApisCP features a lightweight global serial callback facility called Cardinal. This is used internally and not [context-safe](#contextables).
+
+# API hooks
+
+API hooks are a simple form of responding to API interaction in the control panel. This is covered in detail in [Hooks.md](admin/Hooks.md). 
 
 # Service Definitions
 
