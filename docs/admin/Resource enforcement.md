@@ -88,12 +88,68 @@ Memory is a misunderstood and complex topic. [linuxatemyram.com](https://www.lin
 ```bash
 # Set ceiling of 512 MB for all processes
 EditDomain -c cgroup,memory=512 domain.com
+# Switch to domain.com account
+su domain.com
+# Generate up to 512 MB, some memory is reserved by the shell
+yes | tr \\n x | head -c $((512*1024*1024)) | grep n
+# Once memory has been reached, process terminates with "Killed"
 ```
 
-A site may consume up to 512 MB of memory before the OOM killer is invoked.
+A site may consume up to 512 MB of memory before the OOM killer is invoked. When an OOM condition is reached, further memory allocation fails, event logged in the memory controller, and offending application ends abruptly. 
+
+`dmesg` notes an OOM killer invocation on the process,
+
+```{1,2,3}
+[2486967.059804] grep invoked oom-killer: gfp_mask=0xd0, order=0, oom_score_adj=600
+[2486967.059926] Task in /site133 killed as a result of limit of /site133
+[2486967.059929] memory: usage 524288kB, limit 524288kB, failcnt 153
+[2486967.059930] memory+swap: usage 525060kB, limit 9007199254740988kB, failcnt 0
+[2486967.059932] kmem: usage 0kB, limit 9007199254740988kB, failcnt 0
+[2486967.059933] Memory cgroup stats for /site133: cache:0KB rss:524288KB rss_huge:0KB mapped_file:0KB swap:772KB inactive_anon:31404KB active_anon:492884KB inactive_file:0KB active_file:0KB unevictable:0KB
+[2486967.059957] [ pid ]   uid  tgid total_vm      rss nr_ptes swapents oom_score_adj name
+[2486967.060381] [22040]     0 22040    51698     1729      57       10             0 su
+[2486967.060384] [22041]  9730 22041    29616      971      14      322           600 bash
+[2486967.060446] [25889]  9730 25889    27014       86      11        0           600 yes
+[2486967.060449] [25890]  9730 25890    27020      154      11        0           600 tr
+[2486967.060452] [25891]  9730 25891    27016      166      11        0           600 head
+[2486967.060455] [25892]  9730 25892   224814   130523     268        0           600 grep
+[2486967.060459] Memory cgroup out of memory: Kill process 25892 (grep) score 710 or sacrifice child
+[2486967.067494] Killed process 25892 (grep), UID 9730, total-vm:899256kB, anon-rss:521228kB, file-rss:864kB, shmem-rss:0kB
+```
 
 ::: tip
 "OOM" is an initialism for "out of memory". Killer is... a killer. OOM killer is invoked by the kernel to judiciously terminate processes when it's out of memory either on the system or control group.
+:::	
+
+Using [Metrics](Metrics.md), OOM events can be easily tracked. `cpcmd -d domain.com telemetry:get c-cgroup-oom` reports the latest OOM value for a site. A free-form query is also available that provides similar information for all sites.
+
+```sql
+SELECT 
+	domain, 
+	value, 
+	MAX(ts) 
+FROM 
+	metrics 
+JOIN 
+	siteinfo USING (site_id) 
+JOIN 
+	metric_attributes USING (attr_id) 
+WHERE 
+	name = 'c-memory-oom' 
+	AND 
+	value > 0 
+	AND 
+	ts > NOW() - INTERVAL '1 DAY' 
+GROUP BY (domain, value);
+
+```
+
+As an alternative, range can be used to examine the sum over a window.
+
+`cpcmd telemetry:range c-memory-oom -86400 null 12`
+
+::: details
+`c-memory-oom` attribute is summed over the last day (86400 seconds) for site ID 12. `false` may be specified after site ID to list per record.
 :::
 
 ## CPU
