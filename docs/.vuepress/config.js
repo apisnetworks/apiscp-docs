@@ -227,6 +227,7 @@ module.exports = {
           children: [
             "admin/Customizing",
             "admin/Billing integration",
+            "VENDORS",
             "admin/Hooks",
             "PROGRAMMING",
             "admin/Hydration"
