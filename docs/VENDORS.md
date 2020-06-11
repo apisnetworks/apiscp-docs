@@ -6,7 +6,7 @@ API requests must be made using the ApisCP X.509 provided after establishing a v
 
 Requests are made using REST. All vendor requests are prefixed in the vendor/ namespace.
 
-::: danger API in development
+::: tip API in development
 This API is still under development. This may change! Please direct all feedback to matt@apisnetworks.com
 :::
 

@@ -2,13 +2,13 @@
 title: Image hydration
 ---
 
-One of the most important aspects of apnscp is that its [installation mechanism](https://gitlab.com/apisnetworks/apnscp/tree/master/resources/playbooks) doubles as a platform integrity check, meaning that you can run the install over apnscp as many times as you want and only incorrect/missing configuration is altered. Over 12,000+ lines of Ansible yaml go into printing out an apnscp platform, and still it's far from complete.
+One of the most important aspects of ApisCP is that its [installation mechanism](https://gitlab.com/apisnetworks/apnscp/tree/master/resources/playbooks) doubles as a platform integrity check, meaning that you can run the install over ApisCP as many times as you want and only incorrect/missing configuration is altered. Over 12,000+ lines of Ansible yaml go into printing out an ApisCP platform, and still it's far from complete.
 
 But what we have now is an opportunity to perform a *complete install*, remove personally identifiable information generated at install time, then run the install again to fill in the gaps. This process is called **hydration**. A dehydrated (desiccated) image provides native protection against brute-force, but lacks the ability to login and manage sites until hydrated.
 
 ## Installation
 
-Start with a vanilla install using the [customization tool](https://apnscp.com/#customize). Because we're building for a generalized install, remove the `whitelist_ip` directive that is autopopulated. The command below builds an image using CloudFlare for nameservers (`use_robust_dns`), MariaDB 10.3 (default), no built-in DNS support, rspamd as the preferred [spam filter](https://hq.apiscp.com/filtering-spam-with-rspamd/), PHP 7.3, and Postgres 11.
+Start with a vanilla install using the [customization tool](https://apiscp.com/#customize). Because we're building for a generalized install, remove the `whitelist_ip` directive that is autopopulated. The command below builds an image using CloudFlare for nameservers (`use_robust_dns`), MariaDB 10.3 (default), no built-in DNS support, rspamd as the preferred [spam filter](https://hq.apiscp.com/filtering-spam-with-rspamd/), PHP 7.3, and Postgres 11.
 
 ```bash
 curl https://raw.githubusercontent.com/apisnetworks/apnscp-bootstrapper/master/bootstrap.sh | bash -s - -s use_robust_dns='true' -s dns_default_provider='null' -s spamfilter='rspamd' -s system_php_version='7.3' -s pgsql_version='11'
@@ -22,7 +22,7 @@ Once the initial reboot happens, login to the server and view installation. Inst
 tail -f /root/apnscp-bootstrapper.log
 ```
 
-apnscp will resume installation if interrupted by failure and update the panel code prior to reattempting. Failures are rare, but if you encounter one send an email to help@apnscp.com with the following information for assistance.
+ApisCP will resume installation if interrupted by failure and update the panel code prior to reattempting. Failures are rare, but if you encounter one send an email to help@apiscp.com with the following information for assistance.
 
 ```bash
 grep -m1 -B10 failed= /root/apnscp-bootstrapper.log
@@ -32,7 +32,7 @@ grep -m1 -B10 failed= /root/apnscp-bootstrapper.log
 
 ## Breaking the machine
 
-Following installation, we need to scrub some information that will be later regenerated. This will momentarily break the panel, but too highlights the magic of Ansible. For brevity any path that doesn't begin explicitly with a "/" is assumed to be relative to the apnscp install root, /usr/local/apnscp. *clean.sh* is a helper script to facilitate this task.
+Following installation, we need to scrub some information that will be later regenerated. This will momentarily break the panel, but too highlights the magic of Ansible. For brevity any path that doesn't begin explicitly with a "/" is assumed to be relative to the ApisCP install root, /usr/local/apnscp. *clean.sh* is a helper script to facilitate this task.
 
 ```bash
 env CLEAN=1 sh /usr/local/apnscp/build/clean.sh
@@ -45,7 +45,7 @@ clean.sh removes or truncates a variety of components for use with regeneration.
 #### Key/license data
 
 - ❌ storage/certificates/* - remove all traces within the Let's Encrypt storage directory
-- ❌ config/license.pem - apnscp license unique to the server. A trial license will be acquired on deployment
+- ❌ config/license.pem - ApisCP license unique to the server. A trial license will be acquired on deployment
 - ❌ /root/.composer - Composer certificate
 
 #### temporary files
@@ -53,7 +53,7 @@ clean.sh removes or truncates a variety of components for use with regeneration.
 - ❌ storage/tmp/, /tmp/* - hopefully /tmp goes without saying
 - ❌ /.socket/btmp, /.socket/wtmp - previous login data. We'll just truncate the records using `truncate` rather than remove to avoid conflict with tmpfiles
 - ❌ storage/logs/*, /var/log/* - previous logs
-- ❌ storage/constants.php - automatically generated on apnscp boot
+- ❌ storage/constants.php - automatically generated on ApisCP boot
 
 #### credentials
 
@@ -76,7 +76,7 @@ clean.sh removes or truncates a variety of components for use with regeneration.
 #### config/ files
 
 - ❌ db.yaml, contains specific database credentials. This will be regenerated on install
-- ❌ httpd-custom.conf, apnscp configuration
+- ❌ httpd-custom.conf, ApisCP configuration
 
 #### server-specific IPs
 
@@ -137,7 +137,7 @@ EOF
 
 ## Fin!
 
-That's it! On first boot apnscp will scrub any changes to the platform, as well as process any code updates, before running the installer once again. It's a good idea during this time to set a new password for root,
+That's it! On first boot ApisCP will scrub any changes to the platform, as well as process any code updates, before running the installer once again. It's a good idea during this time to set a new password for root,
 
 ```bash
 passwd root
@@ -153,6 +153,19 @@ cpcmd scope:set system.sshd-pubkey-only true
 Make sure you have a key generated for root otherwise you won't be able to login!
 
 A prebuilt image on a fresh machine reduced installation time to a modest **8 minutes**, not bad! There's an [outstanding bug](https://github.com/dw/mitogen/issues/636) with [Mitogen](https://networkgenomics.com/ansible/), that once fixed, will blaze through installation time within 2 minutes.
+
+## Using cloud-init
+[cloud-init](https://cloud-init.io/) is a utility for customizing cloud instances triggered on first boot. An ApisCP script can be added to `/etc/cloud/cloud.cfg.d/` to arm ApisCP with a trial license and update installation. This ensures that once an image is brought online, it's immediately protected.
+
+```yaml
+#cloud-config
+# ApisCP provisioning script
+
+runcmd:
+  - /bin/sh -c '[[ ! -f "/usr/local/apnscp/config/license.pem" ]] && curl -f -A "apnscp bootstrapper" -o "/usr/local/apnscp/config/license.pem" "https://bootstrap.apiscp.com"'
+  - [systemctl, start, bootstrapper-resume]
+package_upgrade: true
+```
 
 # See also
 
