@@ -37,6 +37,111 @@ systemctl restart apiscp
 
 It may take up to 30 minutes for the negative cache TTL to expire due to a specification baked into SOA records (c.f. [RFC 2308](https://tools.ietf.org/html/rfc2308)).
 
+### Issuance staging
+Issuance may be staged, that is to say authorization generated using `letsencrypt:challenges()`, then solved at a later time using `letsencrypt:solve()`. Once solved, the a certificate may be ordered for the hostname using `letsencrypt:request()` using the pre-solved challenges as a shibboleth. 
+
+```bash
+cpcmd -d site1 letsencrypt:challenges '[*.mydomain.com,mydomain.com]'
+# '*.mydomain.com':
+#  -
+#    domain: mydomain.com
+#    status: pending
+#    type: dns-01
+#    url: 'https://acme-staging-v02.api.letsencrypt.org/acme/chall-v3/65182225/pZ_rOA'
+#    token: y8SB_bt3yw-WgW9qpbsycaf5JohZJ2O4Mg5WttMXEPc
+#    payload: y8SB_bt3yw-WgW9qpbsycaf5JohZJ2O4Mg5WttMXEPc.eBTzuQcWvH6qMui1h0LTUCEYFIbxlCTafdxpVRJU-KY
+# mydomain.com:
+#  -
+#    domain: mydomain.com
+#    status: pending
+#    type: http-01
+#    url: 'https://acme-staging-v02.api.letsencrypt.org/acme/chall-v3/65182226/P6I9wg'
+#    token: JSauNS-u2QmqMZfnyljdbD9PTWF39-W7mMvBPuOf294
+#    payload: JSauNS-u2QmqMZfnyljdbD9PTWF39-W7mMvBPuOf294.eBTzuQcWvH6qMui1h0LTUCEYFIbxlCTafdxpVRJU-KY
+#  -
+#    domain: mydomain.com
+#    status: pending
+#    type: dns-01
+#    url: 'https://acme-staging-v02.api.letsencrypt.org/acme/chall-v3/65182226/DicfxQ'
+#    token: JSauNS-u2QmqMZfnyljdbD9PTWF39-W7mMvBPuOf294
+#    payload: JSauNS-u2QmqMZfnyljdbD9PTWF39-W7mMvBPuOf294.eBTzuQcWvH6qMui1h0LTUCEYFIbxlCTafdxpVRJU-KY
+#  -
+#    domain: mydomain.com
+#    status: pending
+#    type: tls-alpn-01
+#    url: 'https://acme-staging-v02.api.letsencrypt.org/acme/chall-v3/65182226/rQVQPQ'
+#    token: JSauNS-u2QmqMZfnyljdbD9PTWF39-W7mMvBPuOf294
+#    payload: JSauNS-u2QmqMZfnyljdbD9PTWF39-W7mMvBPuOf294.eBTzuQcWvH6qMui1h0LTUCEYFIbxlCTafdxpVRJU-KY
+```
+
+Values returned are **raw values** sent verbatim by Let's Encrypt.
+
+* **For DNS** verification, *payload* must be the sha256 digest base64-encoded as a TXT record named "_acme-challenge"
+* **For HTTP** verification, *payload* must be stored verbatim in a URL reachable via `/.well-known/acme-challenge/TOKEN`
+
+We'll walk through setting up both of these challenges in ApisCP.
+
+#### Staging HTTP
+HTTP staging checks a URI for the Let's Encrypt payload. In the above example, we'll need to create an accessible location named `/.well-known/acme-challenge/JSauNS-u2QmqMZfnyljdbD9PTWF39-W7mMvBPuOf294` on the domain, mydomain.com, with the *payload* contents `JSauNS-u2QmqMZfnyljdbD9PTWF39-W7mMvBPuOf294.eBTzuQcWvH6qMui1h0LTUCEYFIbxlCTafdxpVRJU-KY`.
+
+```bash
+mkdir -p /var/www/html/.well-known/acme-challenge
+echo 'JSauNS-u2QmqMZfnyljdbD9PTWF39-W7mMvBPuOf294.eBTzuQcWvH6qMui1h0LTUCEYFIbxlCTafdxpVRJU-KY' > '/var/www/html/.well-known/acme-challenge/JSauNS-u2QmqMZfnyljdbD9PTWF39-W7mMvBPuOf294'
+# Verify it's reachable
+curl -H http://mydomain.com/.well-known/acme-challenge/JSauNS-u2QmqMZfnyljdbD9PTWF39-W7mMvBPuOf294
+```
+
+::: warning
+`.well-known/` is often aliased to a general purpose system directory location. If the above curl request doesn't work, there's a good change it's located somewhere else, e.g. /tmp/.well-known.
+:::
+
+#### Staging DNS
+Wildcard SSL records must use DNS  to complete the challenge. To complete a DNS challenge, create a DNS TXT record named "\_acme\_challenge" on the hostname for which you're requesting DNS. \*.foo.com would require a record named "\_acme\_challenge.foo.com" as would a DNS challenge on foo.com.
+
+Payload data must be the base64-encoded sha256 hash of *payload*. In the above example, this can be computed using basic shell scripts:
+
+```bash
+echo 'y8SB_bt3yw-WgW9qpbsycaf5JohZJ2O4Mg5WttMXEPc.eBTzuQcWvH6qMui1h0LTUCEYFIbxlCTafdxpVRJU-KY' | sha256sum -t | cut -d' ' -f1 | base64 -w0 ; echo 
+# Produces 'ODE4NjE1ODllNjczMGVlZmExZDE4NDg1N2VjNGEwZGY1YmJjM2Q2NmE3NTk0NWFkMzU4OTEwOWRhZTcwYTM4Mwo='
+```
+
+Now take your payload and add a DNS record named\ _acme\_challenge.
+
+```bash
+# Specify "30" to use a 30 second TTL so the record isn't cached for long
+cpcmd -d mydomain.com dns:add-record mydomain.com '' TXT 'ODE4NjE1ODllNjczMGVlZmExZDE4NDg1N2VjNGEwZGY1YmJjM2Q2NmE3NTk0NWFkMzU4OTEwOWRhZTcwYTM4Mwo=' 30
+```
+
+::: tip
+DNS may take some time to propagate. This is due to propagation built into the protocol (TTL value). The [ApisCP KB](https://kb.apnscp.com/dns/dns-work/) covers propagation in greater detail.
+:::
+
+#### Finalizing staging
+Once challenges are setup, call `letsencrypt:solve(['*.mydomain.com':'dns','mydomain.com':'http'])`.
+
+```bash
+env DEBUG=1 cpcmd -d mydomain.com "['*.mydomain.com':'dns','mydomain.com':'http']"
+# DEBUG   : SSL challenge attempt: dns (*.mydomain.com)
+# DEBUG   : SUCCESS! SSL challenge response: *.mydomain.com (dns) - VALID
+# DEBUG   : SSL challenge attempt: http (mydomain.com)
+# DEBUG   : SUCCESS! SSL challenge response: mydomain.com (http) - VALID
+```
+Then once all challenges are solved for the named set, `letsencrypt:request()` should be called with IP address checks disabled (second parameter),
+
+```bash
+cpcmd -d mydomain.com letsencrypt:request "['*.mydomain.com','mydomain.com']" false
+DEBUG   : *.mydomain.com already resolved by dns
+DEBUG   : mydomain.com already resolved by http
+INFO    : reminder: only 5 duplicate certificates and 50 unique certificates may be issued per week per account
+INFO    : reloading web server in 2 minutes, stay tuned!
+----------------------------------------
+MESSAGE SUMMARY
+Reporter level: OK
+INFO: reminder: only 5 duplicate certificates and 50 unique certificates may be issued per week per account
+INFO: reloading web server in 2 minutes, stay tuned!
+----------------------------------------
+```
+
 ## Storage/issuance process
 
 Certificates are stored under `/usr/local/apnscp/storage/certificates/data/certs/ACME-SERVER` where *ACME-SERVER* is the configured Let's Encrypt signing service (acme-v02.api.letsencrypt.org/directory typically in production). These certificates are read at panel boot as part of housekeeping to determine which certificates should be reissued. Reissuance is bracketed as 10 days before expiration and up to day of expiration. It may be altered via [letsencrypt] => lookahead_days and [letsencrypt] => lookbehind_days respectively.
