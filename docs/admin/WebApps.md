@@ -57,10 +57,20 @@ cpcmd admin:update-webapps '[site:mydomain.com]'
 
 While the actual upgrade path may look more like the following,
 
-| ✅ mydomain.com | Wordpress | 4.0    | 4.0.25 |
+| ⭐ ✅ mydomain.com | Wordpress | 4.0    | 4.0.25 |
 | -------------- | --------- | ------ | ------ |
-| ✅ mydomain.com | Wordpress | 4.0.25 | 4.1.25 |
-| ✅ mydomain.com | Wordpress | 4.1.25 | 4.2.22 |
+| ⭐ ✅ mydomain.com | Wordpress | 4.0.25 | 4.1.25 |
+| ⭐ ✅ mydomain.com | Wordpress | 4.1.25 | 4.2.22 |
+
+### Update Assurance
+Jobs marked by ⭐ are vetted by Update Assurance, a secondary validation system which creates a snapshot and logs key metrics: HTTP status and content length, prior to applying an update. After an update is processed, HTTP status and content length are re-evaluated for abberations. A non-2XX status code or content length that exceeds *[webapps]* => *[assurance_drift](Tuneables.md)* will force an automated rollback.
+
+Update Assurance requires active participation by the site, which may be enabled by enabling snapshots at install time or at any time under **Web** > **Web Apps** > *Select Site* > **Actions** > **Enable Snapshots**. Snapshots may be enabled programatically by specifying `'[git:1]'` at install time.
+
+```bash
+# Enable UA + SSL at install time
+cpcmd -d domain.com wordpress:install domain.com '' '[ssl:1,git:1]'
+```
 
 ### Update algorithm
 
@@ -155,3 +165,14 @@ Currently the following apps generate additional information in debug mode:
 - Joomla!
 - Laravel
 - WordPress
+
+## Screenshots
+ApisCP ships with a chromium driver for screenshot acquisition of all hosted websites. Screenshots are automatically enabled when `has_low_memory` is disabled in Bootstrapper or `has_screenshots` is enabled. `cp.screenshots` is a [Scope](Scopes.md) wrapper for this setting.
+
+```bash
+cpcmd scope:set cp.screenshots true
+# Wait until Bootstrapper finishes reconfiguring server ...
+cpcmd web:capture-inventory
+```
+
+chromium runs when screenshot updates are required. Setting a large TTL in *[screenshots]* => *ttl* allows these screenshots to remain cached for long periods of time until `web:capture-inventory()` is run.

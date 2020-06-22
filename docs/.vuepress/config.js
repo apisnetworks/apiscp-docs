@@ -158,7 +158,7 @@ module.exports = {
                     "admin/dns/Digitalocean.md",
                     "admin/dns/Linode.md",
                     "admin/dns/PowerDNS.md",
-                    "admin/dns/Vultr.md", 
+                    "admin/dns/Vultr.md",
                   ]
                 }
               ]
@@ -180,7 +180,7 @@ module.exports = {
                 "admin/MySQL",
                 "admin/phpMyAdmin",
                 "admin/PostgreSQL"
-	      ]
+              ]
             },
             {
               title: "Web Apps",
@@ -190,6 +190,8 @@ module.exports = {
                   title: "Apps",
                   children: [
                     "admin/webapps/WordPress",
+                    "admin/webapps/Node",
+                    "admin/webapps/Ruby",
                   ]
                 }
               ]

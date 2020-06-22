@@ -106,7 +106,7 @@ cd /usr/local/apnscp/bin
 env DEBUG=1 ./apnscpd -f restart
 ```
 
-When debugging is active, the following tasks are disabled: cron, housekeeping, jobs.
+When debugging is active, the following tasks are disabled: cron, housekeeping, jobs. Setting *[cron]* => *no_debug* to false allows backend tasks to resume as normal; however, this state is unstable for production environments.
 
 ## PHP-FPM status
 
