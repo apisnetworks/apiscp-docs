@@ -93,6 +93,33 @@ upcp -sb php/install-pecl-module
 This task runs as root. Be sure you trust module sources.
 :::
 
+By convention ApisCP will use the basename up to the first character in the set `:-.` as the module name. In the above example, `php-memcached` module configuration would be saved as "php.ini" in FST/siteinfo/etc/phpXX.d/. You can override this behavior using **dense extension format**.
+
+#### Dense extension format
+Not all extensions are named as you'd want them to be. ApisCP supports a dense format for extensions that explicitly defines the extension URL, name, and whether it's a Zend extension. An example of this is Xdebug that when installed from the latest GitHub release would be treated as "2.ini".
+
+```bash
+ansible-playbook bootstrap.yml  --tags=php/install-pecl-module,apnscp/php-filesystem-template --extra-vars=pecl_extensions='{"name":"xdebug","zend":true,"extension":"https://github.com/xdebug/xdebug/archive/2.9.6.tar.gz"}'
+```
+
+Dense mode accepts the following attributes:
+
+| Parameter | Description                                    |
+| --------- | ---------------------------------------------- |
+| name      | Extension name                                 |
+| zend      | Whether Zend extension                         |
+| extension | Standard extension URI (PECL, URL, local file) |
+
+Likewise to set as default for all PHP builds,
+
+```bash
+cpcmd scope:set cp.bootstrapper pecl_extensions '["mailparse","https://github.com/php-memcached-dev/php-memcached.git","https://pecl.php.net/get/inotify-2.0.0.tgz",'\''{"name":"xdebug","zend":true,"extension":"https://github.com/xdebug/xdebug/archive/2.9.6.tar.gz"}'\'']'
+```
+
+::: warning Quote parsing
+Escaping quotes can become elaborate very quickly. To escape a nested single quote, first close the quote, then escape the intended quote, then resume single quotes. Adding `'` inside `'...'` would thus be `''\'''`
+:::
+
 ## Enabling sites
 
 Switching an account over is a breeze! Flip the `apache,jail` setting to enable jailing:
@@ -266,7 +293,7 @@ ApisCP uses a composition filesystem called [BoxFS](Filesystem.md) that allows f
 - `FILESYSTEMTEMPLATE/siteinfo/etc/php.ini` is the base configuration that may be edited by Site Administrators and copied up to their respective account layer. 
 - `FILESYSTEMTEMPLATE/siteinfo/etc/phpXX.d` is a version-specific configuration directory also editable that follows propagation rules. 
 - `siteXX/fst/etc/php-fpm.d/sites/` may not be edited directly and instead relies on inclusion of `fpm-config-custom.blade.php` template. Any `php_admin_value`/`php_admin_flag` directive trumps all other matching directive settings. 
-- Site Administrators can apply additional directives in `siteXX/etc/php-fpm.d/` that apply to all pools of the site.
+- Site Administrators can apply additional directives in `siteXX/etc/php-fpm.d/` that apply to all pools of the site. *Must end in .conf and follow PHP-FPM pool directives*.
 - `.user.ini` in each document root allows for additional configuration. This configuration is cached for 300 seconds per `user_ini.cache_ttl`.
 
 ### System-wide configuration
