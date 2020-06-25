@@ -151,6 +151,8 @@ nano 2/server-1.conf
 #        FileSet = "Client-Layer"
 # }
 systemctl restart bacula-dir
+# Whitelist the client IP, if using ApisCP
+cpcmd rampart:whitelist 61.2.12.11
 ```
 
 That's it! A new backup task is now available.
