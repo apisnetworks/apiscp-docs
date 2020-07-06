@@ -9,6 +9,9 @@ ApisCP ships with native support for a variety of Web Apps. Module names are par
 - Magento (magento)
 - Laravel (laravel)
 - [WordPress](webapps/WordPress.md) (wordpress)
+- Ad hoc (webapp)
+
+Additional web apps are available as third-party contributions. An "ad hoc" web app provides easily integration with the Web App facility.
 
 ## Installing
 
@@ -176,3 +179,8 @@ cpcmd web:capture-inventory
 ```
 
 chromium runs when screenshot updates are required. Setting a large TTL in *[screenshots]* => *ttl* allows these screenshots to remain cached for long periods of time until `web:capture-inventory()` is run.
+
+## Ad hoc apps
+
+Ad hoc types are defined by a manifest called `.webapp.yml` within the document root for the site. Manifests may be created by selecting the "Ad hoc" app type in **Web** > **Web Apps** or by copying the skeleton from `resources/storehouse/webapp-adhoc.yml `to the designated document root.
+

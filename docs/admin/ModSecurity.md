@@ -85,3 +85,16 @@ print(main('/eicar'))
 Confirmation will be similar, reporting the virus found.
 
 ![Lua EICAR test](./images/eicar-lua-test.png)
+
+## Troubleshooting
+### 413 Request Entity Too Large on POST
+When sending a large payload (> 256 KB) as a POST, mod_security will reject the content with a `413 Request Entity Too Large` response. This occurs from a combination of the request size and form encoding type ("enctype"). When submitting files, the form enctype should be set as "*multipart/form-data*". A form default encoding type is "*application/x-www-form-urlencoded*" and unsuitable for sending large files ([RFC 1867](https://tools.ietf.org/html/rfc1867) § 3.2). Moreover, specifying "*multipart/form-data*" allows a file to suggest its MIME disposition and character encoding ([RFC 2388](https://tools.ietf.org/html/rfc2388) § 5.6).
+
+mod_security sets a POST limit of 256 KB. This may be raised using Bootstrapper. Size is in bytes. The following example sets the limit to 4 MB using builtin arithmetic in bash.
+
+```bash
+cpcmd scope:set cp.bootstrapper modsec_limit_nofiles $((4*1024*1024))
+upcp -sb apache/modsecurity
+```
+
+A preferred workaround is to correct the form by specifying `enctype="multipart/form-data"` for the offending code as this is the correct way to submit large files and binary data.
