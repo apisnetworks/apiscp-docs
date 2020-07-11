@@ -98,28 +98,61 @@ $i = 0;
 echo ++$i;
 ```
 
-### get_site
+### Input/output types
+cpcmd uses a custom parser for input and displays output in Yaml or as a string depending upon return type complexity. Both features may be controlled using `-i` and `-o` flags respectively. Each accepts a transform format.
+
+
+#### Input formats
+| Type      | Example                      |
+| --------- | ---------------------------- |
+| cli       | `[foo:bar]`                  |
+| json      | `{"foo":"bar"}`              |
+| serialize | `a:1:{s:3:"foo";s:3:"bar";}` |
+
+::: tip
+`serialize` is useful when working with objects. Variable types will not be lost on ingestion. `json` is the fastest format. `cli` is a simple representation for complex data types.
+:::
+
+#### Output formats
+
+| Type      | Example                      |
+| --------- | ---------------------------- |
+| cli       | `[foo:bar]`                  |
+| json      | `{"foo":"bar"}`              |
+| serialize | `a:1:{s:3:"foo";s:3:"bar";}` |
+| yaml | `foo: bar` |
+| var_dump | `array(1) { ["foo"]=> string(3) "bar" }` |
+| print | `Array ( [foo] => bar )` |
+
+::: tip
+When working with serialized output in a shell pipeline, wrap output in `xargs -d` otherwise quotes will be lost while evaluating arguments in bash.
+
+`cpcmd -o serialize common:whoami | xargs -d$'\n' env DEBUG=1 cpcmd -i serialize test:backend-collector`
+:::
+
+## get_config
+
+Get service metadata from domain.
+
+### Example
+
+```bash
+get_config domain.com siteinfo email
+```
+
+## get_site
 
 Get site name from domain. Same as "site" + `get_site_id` 
 
-### get_site_id
+## get_site_id
 
 Get internal site ID from domain. Returns 1 on failure otherwise 0.
 
-#### Example
+### Example
 
 ```bash
 get_site_id example.com
 [[ $? -ne 0 ]] && echo "example.com doesn't exist"
-```
-### fstresolve
-
-Determine libraries linked against a binary. Used to resolve dependency problems when propagating a system package into the filesystem template.
-
-#### Example
-
-```bash
-fstresolve /home/virtual/FILESYSTEMTEMPLATE/siteinfo/usr/bin/ar
 ```
 
 ## Scripts
