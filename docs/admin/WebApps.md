@@ -182,5 +182,41 @@ chromium runs when screenshot updates are required. Setting a large TTL in *[scr
 
 ## Ad hoc apps
 
-Ad hoc types are defined by a manifest called `.webapp.yml` within the document root for the site. Manifests may be created by selecting the "Ad hoc" app type in **Web** > **Web Apps** or by copying the skeleton from `resources/storehouse/webapp-adhoc.yml `to the designated document root.
+Ad hoc types are defined by a manifest called `.webapp.yml` within the document root for the site. Manifests may be created using the API command `webapp:manifest-create($hostname, $path)` or **Manifest** action in **Web** > **Web Apps**, which copies the file`resources/storehouse/webapp-adhoc.yml `to its designated app root.
 
+Manifests may define additional [Fortification](Fortification.md) roles as well as augment paths. After editing a Manifest, it must be resigned using `webapp:manifest-sign($hostname, $path)` or **Manifest** > **Sign Manifest** in **Web** > **Web Apps**.
+
+```yaml
+# optional base webapp to extend from
+# e.g. "wordpress" would give it all WordPress module features
+base:
+# database configuration, used for snapshots
+database:
+  # "mysql" or "pgsql"
+  type: mysql
+  # database user
+  user:
+  # user password - can leave blank
+  password:
+  # database name
+  db:
+  # database host
+  host: localhost
+  # optional prefix attached to tables
+  prefix:
+fortification:
+  # Fortification profiles, called via webapp:fortify($hostname, $path, $type)
+  max:
+    - file1
+    - dir/subdir/
+  min:
+    - file1
+    - file2
+    - dir/
+# Populated by Web > Web Apps > Sign Manifest or webapp:sign()
+signature:
+# Set by manifest on sign
+manifest_version:
+```
+
+If `base` is set, `webapp:*` methods, which is a general utility module, will use the specified API module, e.g. `webapp:db-config($domain)` would call `wordpress:db-config($domain)` even though the Web App may not be a WordPress application. Setting `base` is most helpful when stacking Fortification profiles.
