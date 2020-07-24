@@ -75,7 +75,7 @@ cpcmd -d benchmark.test wordpress:install benchmark.test
 cpcmd scope:set apache.evasive enabled false
 cpcmd scope:set apache.block10 false
 sleep 120
-ab -n 1000 -c 1 http://benchmark.test/
+ab -k -n 1000 -c 1 http://benchmark.test/
 ```
 
 ::: details
@@ -120,3 +120,26 @@ ab -n 10 -c 1 http://benchmark.test/
 echo "KEYS *" | redis-cli -s /home/virtual/benchmark.test/tmp/redis.sock
 ```
 
+### Concurrency
+Benchmarks are designed to model real-world scenarios with artificial, deterministic usage patterns. It's an oxymoron to believe any such correlation exists between benchmarks and typical usage scenarios, but what benchmarks provide is the theoretical peak throughput. *It's all downhill from there!*
+
+When evaluating the peak throughput do not run more than NPROC+1 instances. Linux has an intelligent scheduling algorithm to interleave parcels of work (threads). If for example a site is handling 5 concurrent requests over 250 ms, the processing is rarely contiguous due to network latency/output buffering. Benchmarking locally removes this barrier. 
+
+Let's assume a WordPress site on a two-core machine. Following this logic, benchmark figures should begin to stabilize after 3 concurrent requests. All requests are generated using `ab` as outlined above. The PHP-FPM pool was reconfigured from **ondemand** to **static** and the total worker count (`pm.max_children`) changed from **3** to **20** to 
+
+| Concurrency | Throughput (req/sec) |    % Δ | Time per req (ms) |     % Δ |
+| :---------: | -------------------: | -----: | ----------------: | ------: |
+|      1      |                83.18 |      — |            12.022 |       — |
+|      2      |               163.01 | 95.97% |             6.135 | -48.97% |
+|      3      |               169.12 |  3.75% |             5.913 |  -3.63% |
+|      4      |               174.86 |  3.39% |             5.719 |  -3.28% |
+|      5      |               174.61 | -0.14% |             5.727 |   0.14% |
+|      6      |               175.53 |  0.53% |             5.697 |  -0.52% |
+|      7      |               174.73 | -0.46% |             5.723 |   0.46% |
+|      8      |               176.24 |  0.86% |             5.674 |  -0.86% |
+|      9      |               175.65 | -0.33% |             5.693 |   0.33% |
+|     10      |               177.18 |  0.87% |             5.644 |  -0.86% |
+|     15      |               175.89 | -0.73% |             5.685 |   0.73% |
+|     20      |               177.87 |  1.23% |             5.622 |  -1.11% |
+
+ApisCP uses NPROC + 2 workers per site. Typically this is sufficient for optimal throughput except in high latency environments. PHP requests operate synchronously, which means the workers is only freed to handle a new request at the conclusion of the previous request. Theoretically, in the above benchmark, PHP could serve ~170 concurrent users per second with 4 PHP-FPM workers assuming a uniform distribution or 14.6 million pageviews per day. Often these figures are much lower in real-world, hampered by network latency both on the request and response.

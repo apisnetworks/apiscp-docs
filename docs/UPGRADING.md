@@ -70,6 +70,12 @@ systemctl restart apiscp
 
 `-b` accepts a list of roles to run as well. For example, a common task after making changes to apnscp-vars.yml is to process the affected roles. `upcp -sb mail/rspamd mail/configure-postfix`  runs only the rspamd + configure-postfix subroles within mail.
 
+Additional arguments may be provided through the `BSARGS` environment variable,
+
+```bash
+env BSARGS="--extra-vars=force=yes" upcp -sb apnscp/install-extensions
+```
+
 ### FLARE Updates
 
 FLARE is a separate update system for ApisCP that performs hourly checks for critical releases. FLARE is automatically enabled whenever nightly updates are enabled (`cpcmd scope:get cp.nightly-updates`). This feature is a crucial side-channel to allow emergency updates should the need arise (new OS update introduces volatile changes, zero day mitigation, etc). FLARE checks are handled via `apnscp-flare-check` timer and its eponymous oneshot service.
