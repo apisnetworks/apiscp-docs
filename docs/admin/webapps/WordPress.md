@@ -63,3 +63,8 @@ cpcmd -d domain.com wordpress:fortify domain.com '' max
 ::: tip
 Arguments differ due to module intent. Modules of the "webapp" family prefer *\$hostname*, *\$path* as opposed to a raw filesystem path as domains/subdomains can be relinked relatively easily. Doing so allows the API calls to remain stable even if the document root is not.
 :::
+
+## Fortification enhancements
+**New in 3.2.0:**
+
+WordPress' FTP driver is used to grant write-access to system files. In certain scenarios, a plugin or theme may be unaware of how to use WordPress' VFS library to interact with a site. Setting [Fortification](../Fortification.md) modes to **Disable Fortification**, **Web App Write Mode**, or **Learning Mode** will set `FS_METHOD` in `wp-config.php` to `'direct'`. Enabling any other Fortification mode or resetting permissions will reset `FS_METHOD` to `false`, which selects the appropriate VFS driver (FTP) based on write-access to `wp-includes/file.php`. Without altering permissions outside of the control panel, this test will always fail thus requiring FTP to manage files.
