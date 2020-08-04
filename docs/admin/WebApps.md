@@ -220,3 +220,8 @@ manifest_version:
 ```
 
 If `base` is set, `webapp:*` methods, which is a general utility module, will use the specified API module, e.g. `webapp:db-config($domain)` would call `wordpress:db-config($domain)` even though the Web App may not be a WordPress application. Setting `base` is most helpful when stacking Fortification profiles.
+
+
+
+## Third-party applications
+Third-party applications may be deployed under `config/custom/

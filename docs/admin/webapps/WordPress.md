@@ -67,4 +67,40 @@ Arguments differ due to module intent. Modules of the "webapp" family prefer *\$
 ## Fortification enhancements
 **New in 3.2.0:**
 
-WordPress' FTP driver is used to grant write-access to system files. In certain scenarios, a plugin or theme may be unaware of how to use WordPress' VFS library to interact with a site. Setting [Fortification](../Fortification.md) modes to **Disable Fortification**, **Web App Write Mode**, or **Learning Mode** will set `FS_METHOD` in `wp-config.php` to `'direct'`. Enabling any other Fortification mode or resetting permissions will reset `FS_METHOD` to `false`, which selects the appropriate VFS driver (FTP) based on write-access to `wp-includes/file.php`. Without altering permissions outside of the control panel, this test will always fail thus requiring FTP to manage files.
+WordPress' FTP driver is used to grant write-access to system files. In certain scenarios, a plugin or theme may be unaware of how to use WordPress' VFS library to interact with a site. Setting [Fortification](../Fortification.md) modes to **Disable Fortification**, **Web App Write Mode**, or **Learning Mode** will set `FS_METHOD` in *wp-config.php* to `'direct'`. Enabling any other Fortification mode or resetting permissions will reset `FS_METHOD` to `false`, which selects the appropriate VFS driver (FTP) based on write-access to *wp-includes/file.php*. Without altering permissions outside of the control panel, this test will always fail thus requiring FTP to manage files.
+
+## Programmatic wp-config.php
+**New in 3.2.0:**
+
+An AST walker in `updateConfiguration()` allows one to reliably update `define()` statements within *wp-config.php*. `define()` statements make up the core of WP [configuration](https://wordpress.org/support/article/editing-wp-config-php/). 3.2 bundles a powerful AST walker that can read any valid WordPress configuration, look for define() statements, and update its corresponding configuration.
+
+For example, what if we're importing a WP install from another platform that doesn't use Fortification? The following [hook](../Hooks.md) would set `FTP_USER`, `FS_METHOD`, and `FTP_HOST` for all existing installations whenever `wordpress:valid()` is called:
+
+```php
+<?php
+        \a23r::registerCallback('wordpress', 'valid', function ($ret, $args) {
+        if (!$ret) {
+            return;
+        }
+
+        $approot = $args[0];
+
+        if ($approot[0] !== '/') {
+            // passed as $hostname, $path
+            $approot = $this->getAppRoot($args[0], $args[1] ?? '');
+        }
+
+        $pairs = [
+            'FS_METHOD'           => false,
+            'FTP_USER'            => $this->username . '@' . $this->domain,
+            'FTP_HOST'            => 'localhost'
+        ];
+
+        return $this->updateConfiguration($approot, $pairs);
+    });
+```
+`wordpress:valid()` is triggered during plugin/theme enumeration as part of periodic updates. Running a manual update would update all valid WordPress installs with the new configuration:
+
+```bash
+cpcmd admin:update-webapps '[type:wordpress,assets:true]'
+```
