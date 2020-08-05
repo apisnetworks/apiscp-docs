@@ -224,4 +224,4 @@ If `base` is set, `webapp:*` methods, which is a general utility module, will us
 
 
 ## Third-party applications
-Third-party applications may be deployed under `config/custom/
+Third-party applications may be deployed under `config/custom/webapps/<name>`. A demo app is available via [apiscp-webapp-demo](https://github.com/apisnetworks/apiscp-webapp-demo) on GitHub.

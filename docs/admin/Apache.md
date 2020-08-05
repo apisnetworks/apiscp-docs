@@ -288,7 +288,7 @@ Configuration for site12 will not show as the [ServerAlias](https://httpd.apache
 ```bash
 cd /etc/httpd/conf/virtual
 mv site12 priority-site12
-ln -s site12 priority-site12
+ln -s priority-site12 site12
 htrebuild
 ```
 
@@ -301,3 +301,4 @@ htrebuild
 For supporting documentation, see also 
 - [PHP-FPM](PHP-FPM.md) - PHP
 - [Passenger](Passenger.md) - Node, Ruby, Python, and Go
+
