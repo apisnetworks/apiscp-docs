@@ -156,6 +156,8 @@ module.exports = {
                     "admin/dns/AWS.md",
                     "admin/dns/Cloudflare.md",
                     "admin/dns/Digitalocean.md",
+                    "admin/dns/Hetzner.md",
+                    "admin/dns/Katapult.md",
                     "admin/dns/Linode.md",
                     "admin/dns/PowerDNS.md",
                     "admin/dns/Vultr.md",
