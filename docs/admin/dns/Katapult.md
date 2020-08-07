@@ -8,7 +8,15 @@ This is a drop-in provider for [ApisCP](https://apiscp.com) to enable DNS suppor
 EditDomain -c dns,provider=katapult -c dns,key=Ku83HzcXaz domain.com
 ```
 
-Where the key is created within Katapult. See [Katapult API Reference](https://developers.katapult.io/api/docs/latest/authentication/) for more information.
+Where the "key" is created within Katapult. See [Katapult API Reference](https://developers.katapult.io/api/docs/latest/authentication/) for more information.
+
+### Organizations
+Keys may be attached to multiple organizations. ApisCP will use the first valid organization when determining where to create the zone. This can be overridden by 
+specifying 'token' and 'org' fields:
+
+```bash
+EditDomain -c dns,provider=katapult -c dns,provider='[token:Ku83HzcXaz,org:org_AmJ024]' domain.com
+```
 
 ### Setting as default
 

@@ -101,26 +101,30 @@ Wildcard SSL records must use DNS  to complete the challenge. To complete a DNS 
 Payload data must be the base64-encoded sha256 hash of *payload*. In the above example, this can be computed using basic shell scripts:
 
 ```bash
-echo 'y8SB_bt3yw-WgW9qpbsycaf5JohZJ2O4Mg5WttMXEPc.eBTzuQcWvH6qMui1h0LTUCEYFIbxlCTafdxpVRJU-KY' | sha256sum -t | cut -d' ' -f1 | base64 -w0 ; echo 
-# Produces 'ODE4NjE1ODllNjczMGVlZmExZDE4NDg1N2VjNGEwZGY1YmJjM2Q2NmE3NTk0NWFkMzU4OTEwOWRhZTcwYTM4Mwo='
+echo -n 'y8SB_bt3yw-WgW9qpbsycaf5JohZJ2O4Mg5WttMXEPc.eBTzuQcWvH6qMui1h0LTUCEYFIbxlCTafdxpVRJU-KY' | openssl dgst -binary -sha256 | openssl base64 | tr -d '=' | tr '+/' '-_' 
+# Produces 'wA1Vss7jqjQ-FYQ3Jvs99ZWg9sg8Stafh6KjEjxY9J4'
 ```
 
 Now take your payload and add a DNS record named\ _acme\_challenge.
 
 ```bash
 # Specify "30" to use a 30 second TTL so the record isn't cached for long
-cpcmd -d mydomain.com dns:add-record mydomain.com '' TXT 'ODE4NjE1ODllNjczMGVlZmExZDE4NDg1N2VjNGEwZGY1YmJjM2Q2NmE3NTk0NWFkMzU4OTEwOWRhZTcwYTM4Mwo=' 30
+cpcmd -d mydomain.com dns:add-record mydomain.com '' TXT 'wA1Vss7jqjQ-FYQ3Jvs99ZWg9sg8Stafh6KjEjxY9J4' 30
 ```
 
 ::: tip
 DNS may take some time to propagate. This is due to propagation built into the protocol (TTL value). The [ApisCP KB](https://kb.apnscp.com/dns/dns-work/) covers propagation in greater detail.
 :::
 
+::: warning Mind the -n flag
+`echo -n` omits a newline, which if not specified would calculate the hash of "string\n" instead of "string" producing two distinct hash values!
+:::
+
 #### Finalizing staging
 Once challenges are setup, call `letsencrypt:solve(['*.mydomain.com':'dns','mydomain.com':'http'])`.
 
 ```bash
-env DEBUG=1 cpcmd -d mydomain.com "['*.mydomain.com':'dns','mydomain.com':'http']"
+env DEBUG=1 cpcmd -d mydomain.com letsencrypt:solve "['*.mydomain.com':'dns','mydomain.com':'http']"
 # DEBUG   : SSL challenge attempt: dns (*.mydomain.com)
 # DEBUG   : SUCCESS! SSL challenge response: *.mydomain.com (dns) - VALID
 # DEBUG   : SSL challenge attempt: http (mydomain.com)
