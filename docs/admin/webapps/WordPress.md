@@ -72,7 +72,7 @@ WordPress' FTP driver is used to grant write-access to system files. In certain 
 ## Programmatic wp-config.php
 **New in 3.2.0:**
 
-An AST walker in `updateConfiguration()` allows one to reliably update `define()` statements within *wp-config.php*. `define()` statements make up the core of WP [configuration](https://wordpress.org/support/article/editing-wp-config-php/). 3.2 bundles a powerful AST walker that can read any valid WordPress configuration, look for define() statements, and update its corresponding configuration.
+`define()` statements make up the core of WP [configuration](https://wordpress.org/support/article/editing-wp-config-php/). 3.2 bundles a powerful AST parser that can read any valid WordPress configuration, look for define() statements, and update its corresponding configuration.
 
 For example, what if we're importing a WP install from another platform that doesn't use Fortification? The following [hook](../Hooks.md) would set `FTP_USER`, `FS_METHOD`, and `FTP_HOST` for all existing installations whenever `wordpress:valid()` is called:
 

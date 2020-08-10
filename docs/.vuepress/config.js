@@ -191,6 +191,7 @@ module.exports = {
                 {
                   title: "Apps",
                   children: [
+                    "admin/webapps/Nextcloud",
                     "admin/webapps/WordPress",
                     "admin/webapps/Node",
                     "admin/webapps/Ruby",
