@@ -118,3 +118,23 @@ After updating the filesystem template via `systemctl reload fsmount`, inodes ma
 ```bash
 echo 2 > /proc/sys/vm/drop_caches
 ```
+
+### Excessive inode counts on recycled sites
+
+If a site is deleted, then added again through an [account wipe](https://kb.apnscp.com/control-panel/resetting-your-account/), it's possible for inode figures to be higher than what is reported through `du`.
+
+To sum up the inode usage charged to an account, run
+
+```bash
+du --inode -s /home/virtual/siteXX/shadow
+```
+
+where *siteXX* is the [site identifier](CLI.md#get-site) of an account.
+
+If the inode tally as reported in *fused* from `cpcmd -d siteXX site:get-account-quota` disagrees, then the kernel is holding some files in memory. Clear the cache by issuing,
+
+```bash
+echo 3 > /proc/sys/vm/drop_caches
+```
+
+In normal operation, this resolves itself automatically as caches are eventually expired by Linux's [VFS](https://www.usenix.org/legacy/publications/library/proceedings/usenix01/full_papers/kroeger/kroeger_html/node8.html).
