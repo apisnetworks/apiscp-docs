@@ -188,6 +188,7 @@ module.exports = {
               title: "Web Apps",
               children: [
                 ["admin/WebApps", "Overview"],
+                ["admin/webapps/Custom", "Third-party apps"],
                 {
                   title: "Apps",
                   children: [

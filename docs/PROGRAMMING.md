@@ -397,7 +397,7 @@ ApisCP controllers provide a few attachment points for hooks.
 
 ## Laravel integration
 
-ApisCP uses [Laravel Blade](https://laravel.com/docs/5.5/blade) bundled with Laravel 5.5 for templates or basic "include()" if the template is named *\<APP NAME>*/*\<APP NAME>*.tpl
+ApisCP uses [Laravel Blade](https://laravel.com/docs/6.x/blade) bundled with Laravel 6 for templates or basic "include()" if the template is named *\<APP NAME>*/*\<APP NAME>*.tpl
 
 ### Blade
 
