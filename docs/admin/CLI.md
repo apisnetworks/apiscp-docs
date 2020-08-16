@@ -156,7 +156,7 @@ get_site_id example.com
 ```
 
 ## Scripts
-All ApisCP scripts are available under `{{ $themeConfig.APNSCP_ROOT }}/bin/php/scripts`. All scripts make use of the apnscp CLI framework and require invocation with `apnscp_php` to operate.
+All ApisCP scripts are available under `{{ $themeConfig.APNSCP_ROOT }}/bin/scripts`. All scripts make use of the apnscp CLI framework and require invocation with `apnscp_php` to operate.
 
 ### change_dns.php
 
