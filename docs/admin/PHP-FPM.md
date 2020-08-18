@@ -48,7 +48,7 @@ All PHP-FPM pools are managed through systemd using socket activation. When a re
 
 ## Building
 
-### Configuring
+### Configuration
 
 The default PHP interpreter may be changed using the `apache.php-version` [Scope](Scopes.md). Additional configuration flags may be specified by setting `phpXX_build_flags` in Bootstrapper where XX is \<MAJOR>\<MINOR> (`cp.bootstrapper`is a Scope to facilitate interaction). Alternatively `php_build_flags` may be set, which applies to all PHP builds.
 

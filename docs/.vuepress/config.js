@@ -188,13 +188,16 @@ module.exports = {
               title: "Web Apps",
               children: [
                 ["admin/WebApps", "Overview"],
+                "admin/webapps/Passenger",
                 ["admin/webapps/Custom", "Third-party apps"],
                 {
                   title: "Apps",
                   children: [
                     "admin/webapps/Nextcloud",
                     "admin/webapps/WordPress",
+                    "admin/webapps/Go",
                     "admin/webapps/Node",
+                    "admin/webapps/Python",
                     "admin/webapps/Ruby",
                   ]
                 }

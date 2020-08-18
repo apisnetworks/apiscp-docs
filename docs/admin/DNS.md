@@ -7,7 +7,7 @@ ApisCP ships with a variety of [DNS providers](https://github.com/search?q=topic
 ## Providers
 
 - null: dummy driver that always returns success
-- builtin: use BIND or write a [surrogate](https://docs.apiscp.com/development/programming-guide/#extending-modules-with-surrogates) module to override DNS behavior
+- builtin: use BIND or write a [surrogate](../PROGRAMMING.md#extending-modules-with-surrogates) module to override DNS behavior
 - [powerdns](https://github.com/lithiumhosting/apnscp-powerdns): PowerDNS DNS
 - [aws](https://github.com/apisnetworks/apnscp-dns-aws): Route53 (AWS) DNS
 - [cloudflare](https://github.com/apisnetworks/apnscp-dns-cloudflare): Cloudflare DNS

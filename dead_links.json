@@ -1,16 +1,24 @@
 {
   "external": [
     [
-      "https://www.troyhunt.com/extended-validation-certificates-are-really-really-dead/ -> 0",
-      "docs/admin/SSL.md"
+      "http://127.0.0.1:8080/ -> 0",
+      "docs/admin/Apache.md"
     ],
     [
-      "https://docs.apiscp.com/admin/managing-accounts/#adding-accounts -> 404",
-      "docs/admin/Plans.md"
+      "http://127.0.0.1:8080/. -> 0",
+      "docs/admin/Apache.md"
     ],
     [
-      "https://docs.apiscp.com/admin/helper-binaries/#get_site_id -> 404",
-      "docs/admin/Customizing.md"
+      "http://127.0.0.1:8081/api/v1/servers/localhost -> 401",
+      "docs/admin/dns/PowerDNS.md"
+    ],
+    [
+      "http://127.0.0.1: -> 403",
+      "docs/admin/Tuneables.md"
+    ],
+    [
+      "http://127.0.0.1:8081 -> 404",
+      "docs/admin/dns/PowerDNS.md"
     ],
     [
       "https://docs.apiscp.com/development/programming-guide/#hooks -> 404",
@@ -21,28 +29,40 @@
       "docs/admin/DNS.md"
     ],
     [
-      "https://docs.apiscp.com/admin/tuneables/ -> 404",
-      "docs/admin/Plans.md"
+      "https://acme-staging-v02.api.letsencrypt.org/acme/chall-v3/65182226/P6I9wg' -> 404",
+      "docs/admin/SSL.md"
     ],
     [
-      "https://docs.blesta.com/display/user/ApisCP -> 404",
-      "docs/admin/Billing integration.md"
+      "https://acme-staging-v02.api.letsencrypt.org/acme/chall-v3/65182226/DicfxQ' -> 404",
+      "docs/admin/SSL.md"
     ],
     [
-      "http://hostineer.com/linux-man/man7/maildropfilter.7.html#lbBI -> 404",
-      "docs/admin/LDA.md"
-    ],
-    [
-      "http://hostineer.com/linux-man/man7/maildropfilter.7.html -> 404",
-      "docs/admin/LDA.md"
+      "https://acme-staging-v02.api.letsencrypt.org/acme/chall-v3/65182225/pZ_rOA' -> 404",
+      "docs/admin/SSL.md"
     ],
     [
       "https: -> 0",
       "docs/admin/SSL.md"
     ],
     [
-      "http: -> 0",
+      "https://foobara/node/changing-node-versions/ -> 0",
+      "docs/admin/webapps/Node.md"
+    ],
+    [
+      "https://myserver.apiscp.com/dns. -> 0",
+      "docs/admin/dns/PowerDNS.md"
+    ],
+    [
+      "http://myserver.apiscp.com/api/v1/servers/localhost -> 0",
+      "docs/admin/dns/PowerDNS.md"
+    ],
+    [
+      "https://acme-staging-v02.api.letsencrypt.org/acme/chall-v3/65182226/rQVQPQ' -> 404",
       "docs/admin/SSL.md"
+    ],
+    [
+      "https://asciinema.org/a/260493.svg -> 502",
+      "docs/admin/Migrations - cPanel.md"
     ],
     [
       "https://asciinema.org/a/260493.svg -> 502",
@@ -51,9 +71,56 @@
     [
       "https://asciinema.org/a/260493 -> 502",
       "docs/admin/Migrations.md"
+    ],
+    [
+      "https://asciinema.org/a/260493 -> 502",
+      "docs/admin/Migrations - cPanel.md"
+    ],
+    [
+      "http://mydomain.com/.well-known/acme-challenge/JSauNS-u2QmqMZfnyljdbD9PTWF39-W7mMvBPuOf294 -> 404",
+      "docs/admin/SSL.md"
+    ],
+    [
+      "https://foobara/ruby/changing-ruby-versions/ -> 0",
+      "docs/admin/webapps/Ruby.md"
+    ],
+    [
+      "http: -> 0",
+      "docs/admin/SSL.md"
+    ],
+    [
+      "https://myserver.apiscp.com/dns, -> 0",
+      "docs/admin/dns/PowerDNS.md"
+    ],
+    [
+      "http://dev.mysql.com/doc/refman/5.6/en/operating-system-error-codes.html -> 404",
+      "docs/admin/MySQL.md"
+    ],
+    [
+      "https://developers.katapult.io/api/docs/latest/authentication/ -> 403",
+      "docs/admin/dns/Katapult.md"
+    ],
+    [
+      "https://myserver.apiscp.com/dns/api/v1 -> 0",
+      "docs/admin/dns/PowerDNS.md"
+    ],
+    [
+      "https://katapult.io -> 403",
+      "docs/admin/dns/Katapult.md"
+    ],
+    [
+      "https://bootstrap.apiscp.com -> 403",
+      "docs/admin/Hydration.md"
+    ],
+    [
+      "https://myserver.apiscp.com/dns/api/v1/servers/localhost -> 0",
+      "docs/admin/dns/PowerDNS.md"
     ]
   ],
   "internal": [
-
+    [
+      "src/admin/Plans/index.md",
+      "docs/admin/Migrations - server.md"
+    ]
   ]
 }

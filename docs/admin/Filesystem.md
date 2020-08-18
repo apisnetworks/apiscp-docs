@@ -31,8 +31,8 @@ Services that have corresponding filesystem structures are installed under /home
 | Directory | Purpose                                                      |
 | :-------- | :----------------------------------------------------------- |
 | cur       | Current account configuration                                |
-| new       | Pending account configuration during an account edit. See [Programming Guide](https://docs.apiscp.com/development/programming-guide/#hooks). |
-| old       | Previous account configuration during an account edit. See [Programming Guide](https://docs.apiscp.com/development/programming-guide/#hooks). |
+| new       | Pending account configuration during an account edit. See [Programming Guide](../PROGRAMMING.md#hooks). |
+| old       | Previous account configuration during an account edit. See [Programming Guide](../PROGRAMMING.md#hooks). |
 | services  | Filesystem services enabled on account which have a corresponding FILESYSTEMTEMPLATE presence. |
 | users     | Per-user configuration.                                      |
 

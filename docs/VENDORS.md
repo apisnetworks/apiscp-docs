@@ -102,6 +102,7 @@ curl -i \
 ```
 
 **SAMPLE RESPONSE**
+
 ```bash
 [{"code":"iifGi10LQpKo6cAk2oNKSMMvgz5t2ZC4qcOHN5W8iyssD85TZzYHKhIxUcCB","available":1,"issued":1591601554,"created_at":1591601554,"common_name":"server123"}]
 ```
@@ -171,6 +172,7 @@ curl -i \
 ```
 
 **SAMPLE RESPONSE**
+
 ```bash
 [{"type":"startup","total":1,"expired":"0","revoked":"0"}]
 ```

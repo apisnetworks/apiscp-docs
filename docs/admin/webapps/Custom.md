@@ -1,4 +1,4 @@
-## Third-party applications
+# Third-party applications
 
 Third-party applications may be deployed under `config/custom/webapps/<name>`. A demo app is available via [apiscp-webapp-demo](https://github.com/apisnetworks/apiscp-webapp-demo) on GitHub.
 
