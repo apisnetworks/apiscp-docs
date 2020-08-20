@@ -92,6 +92,7 @@ Let's take this one step further, configuring a WP Redis object cache. Use `redi
 
 ```bash
 # Create a new Redis instance for benchmark.test named "wp-test" listening on /tmp/redis.sock
+cpcmd -d benchmark.test crontab:toggle-status 1
 cpcmd -d benchmark.test redis:create wp-test '[unixsocket:/tmp/redis.sock]'
 # Switch to benchmark.test account to configure plugin
 su benchmark.test
@@ -112,6 +113,14 @@ wp-cli redis enable
 wp-cli redis status
 ```
 
+::: warning Bug in 2.0.12
+wp-cli redis status will throw an error in 2.0.12. Add the following to `wp-content/plugins/redis-cache/includes/ui/diagnostics.php` after `global $wp_object_cache;`:
+
+```php
+$roc = \Rhubarb\RedisCache\Plugin::instance();
+```
+:::
+
 Exit out of the subshell, run as an unrestricted user, then verify data is cached:
 
 ```bash
@@ -120,7 +129,73 @@ ab -n 10 -c 1 http://benchmark.test/
 echo "KEYS *" | redis-cli -s /home/virtual/benchmark.test/tmp/redis.sock
 ```
 
+#### Output cache
+*5 ms* may be fast, but what if we want to make WordPress faster? A simple solution is to reuse previously rendered output. We can easily accomplish this using [Apache](Apache.md#setting-upstream-cache)'s builtin cache. Moreover, we can serve optimized content that has passed through [Google Pagespeed](https://developers.google.com/speed/pagespeed/module).
+
+Any caching plugin will work adequately for this task. We'll use W3TC as it provides additional WP-CLI commands. In continuation from the above Redis example, let's enable caching in Apache, then switch back to *benchmark.test* to install/configure W3TC:.
+
+```bash
+# Enable memory-backed caching
+cpcmd scope:set apache.cache memory
+# Require sites to opt-in with "UnsetEnv no-cache"
+cpcmd scope:set apache.cachetype explicit
+```
+Now switch to benchmark.test account,
+
+```bash
+su benchmark.test
+cd /var/www/html
+wp-cli plugin install --activate w3-total-cache
+wp-cli w3-total-cache fix_environment
+wp-cli w3-total-cache option set pgcache.enabled true --type=boolean
+```
+
+Exit back out and reapply Fortification so `wp-content/cache` permissions are corrected as needed. Note if [Fortification](Fortification.md) was set to min, this operation is unnecessary.
+
+```bash
+cpcmd -d benchmark.test wordpress:fortify benchmark.test
+```
+
+Then run `ab` against the site. Note it's expected to encounter some transient response size anomalies while Pagespeed optimizes the content. From a simple testing dual-core server, page throughput jumped from **116 req/second to 3782 req/second**.
+
+```bash
+ab  -k -n 1000 -c 4 http://benchmark.test/
+```
+
+#### Trimming .htaccess
+
+One last thing we can do is put the `.htaccess` on a diet. Remove all of the superfluous `AddType` directives. These are negotiated automatically by [TypesConfig](https://httpd.apache.org/docs/2.4/mod/mod_mime.html#typesconfig) in the server configuration. Remember, for each page request Apache must enumerate all rules in .htaccess. Shaving 250 lines can greatly improve throughput!
+
+After removing the unnecessary directives, .htaccess shrunk by 32.8% (8960 bytes to 6014 bytes). Page throughput likewise improved to **4224.36 req/second**, a gain of 11.6% just by removing superfluous directives. 
+
+<center><b>.htaccess size matters</b></center>
+
+#### Removing .htaccess
+
+Apache's biggest strength is too its biggest weakness: flexibility. Because users may override settings in `.htaccess` at their discretion, Apache must backtrack and check all previous directories before reaching a verdict. With SSD and NVMe SSD, the overhead of these stat() checks is greatly ameliorated, but we can achieve higher throughput in the name of benchmarks.
+
+Taking the .htaccess one step further, let's remove it from the equation entirely and convert it to startup directives saved in memory whenever Apache boots much like NGINX. Assume that `get_site_id benchmark.test` returns "130" in the following example.
+
+Copy your .htaccess from `/home/virtual/benchmark.test/var/www/html/` into `/etc/httpd/conf/site130/`. Next, we'll change the dispatcher location and disable overrides.
+
+```bash
+cp /home/virtual/benchmark.test/var/www/html/.htaccess /etc/httpd/conf/site130/wp-test
+```
+
+Edit wp-test surrounding the dispatcher rules in a \<Directory>... \</Directory> clause adding `AllowOverride none` and `UnsetEnv no-cache`  inside the clause as depicted in the screenshot. 
+
+::: tip CacheQuickHandler
+Optionally, add `CacheQuickHandler on` outside \<Directory>...\</Directory> to bypass additional axis processing. This will further improve processing times to the values arrived at in this article *at the expense of brute-force protection*. CacheQuickHandler usage blocks the effects of [mod_evasive](Evasive.md), but static content has nothing to interact with. Regardless, use at your own risk.
+:::
+
+![Rule promotion in Apache](./images/wp-rule-promotion.png)
+
+Run `htrebuild`, then benchmark. Performance skyrocketed from **4224 req/second to a blistering 15271 req/second**! 
+
+*We've switched from 4 to 8 core concurrency to ensure proper saturation. At `-c4` output is ~13583 req/second. At `-c8` output saturates at 15271 req/second.*
+
 ### Concurrency
+
 Benchmarks are designed to model real-world scenarios with artificial, deterministic usage patterns. It's an oxymoron to believe any such correlation exists between benchmarks and typical usage scenarios, but what benchmarks provide is the theoretical peak throughput. *It's all downhill from there!*
 
 When evaluating the peak throughput do not run more than NPROC+1 instances. Linux has an intelligent scheduling algorithm to interleave parcels of work (threads). If for example a site is handling 5 concurrent requests over 250 ms, the processing is rarely contiguous due to network latency/output buffering. Benchmarking locally removes this barrier. 
