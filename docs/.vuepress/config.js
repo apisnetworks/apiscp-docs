@@ -14,6 +14,11 @@ module.exports = {
       }
     ],
     'vuepress-plugin-reading-time',
+    [
+      '@vuepress/google-analytics', {
+         'ga': 'UA-132347022-1'
+       }
+    ],
     'alias',
     [
       'vuepress-plugin-clean-urls', {
