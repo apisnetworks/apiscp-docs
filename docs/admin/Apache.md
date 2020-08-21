@@ -296,6 +296,16 @@ htrebuild
 `site12` is renamed to `priority-site12` thus ensuring it comes `site10`. A symbolic link is created to `site12` to allow future panel edits to update the configuration now in `priority-site12`.  `htrebuild` will skip any symbolic links in `/etc/httpd/conf/virtual-built` as well. Deletion will delete both the regular file and symbolic link if encountered.
 :::
 
+### AH03490: scoreboard is full, not at MaxRequestWorkers.Increase ServerLimit.
+
+Apache uses a mutex to serialize requests when polling with `select()` (there are intractable scalability problems with `select()` vs `epoll()`/`kqueue()` beyond the scope of this document). `posixsem` is used by default, which has the highest throughput, ~15% more than the next best option: `pthread`. Likewise `pthread` is approximately 12% faster than `sysvsem`. Depending upon architecture, `posixsem` may cause spurious lockups evidenced in `/var/log/httpd/error_log`. If this is the case, then change the mutex model to `pthread` or `sysvsem` by editing `/etc/httpd/conf/httpd-custom.conf` and setting:
+
+```
+Mutex pthread default
+```
+
+Run `htrebuild` after to reload the web server  configuration.
+
 ## See also
 
 For supporting documentation, see also 
