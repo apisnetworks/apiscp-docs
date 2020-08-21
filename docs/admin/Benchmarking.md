@@ -62,7 +62,7 @@ By default, a 2 minute delay is imposed before applying configuration changes to
 cpcmd scope:set apache.evasive enabled false
 cpcmd scope:set apache.block10 false
 # Now benchmark a site
-ab -n 1000 -c 1 http://mydomain.com/
+ab -n 1000 -c $(nproc) http://mydomain.com/
 ```
 
 ### Fast WordPress benchmark
@@ -75,18 +75,20 @@ cpcmd -d benchmark.test wordpress:install benchmark.test
 cpcmd scope:set apache.evasive enabled false
 cpcmd scope:set apache.block10 false
 sleep 120
-ab -k -n 1000 -c 1 http://benchmark.test/
+ab -k -n 1000 -c $(nproc) http://benchmark.test/
 ```
 
 ::: details
 Run the following commands to create a new domain named "benchmark.test". DNS and email will be disabled for the domain. Install WordPress, disable Evasive and HTTP/1.0 protection on the account. Sleep for 2 minutes for *[httpd]* => *reload_delay* to expire (`at -l` shows pending jobs), then run 1000 requests in serial against the domain.
+
+`nproc` runs up to n parallel workers equal to the number of CPU cores available on the machine. See [concurrency](#concurrency) section below for rationale.
 :::
 
 ::: tip
 Overriding your [hosts file](https://kb.apnscp.com/dns/previewing-your-domain/) would allow you to access the WordPress administrative portal as if it were a real, resolvable domain. Use the IP from `cpcmd -d benchmark.test site:ip-address`.
 :::
 
-#### Extending
+### Extending WordPress
 
 Let's take this one step further, configuring a WP Redis object cache. Use `redis:create` to create a new Redis instance for the account, then `wp-cli` to install a Redis cache plugin. 
 
@@ -125,12 +127,12 @@ Exit out of the subshell, run as an unrestricted user, then verify data is cache
 
 ```bash
 exit
-ab -n 10 -c 1 http://benchmark.test/
+ab -n 10 -c 4 http://benchmark.test/
 echo "KEYS *" | redis-cli -s /home/virtual/benchmark.test/tmp/redis.sock
 ```
 
 #### Output cache
-*5 ms* may be fast, but what if we want to make WordPress faster? A simple solution is to reuse previously rendered output. We can easily accomplish this using [Apache](Apache.md#setting-upstream-cache)'s builtin cache. Moreover, we can serve optimized content that has passed through [Google Pagespeed](https://developers.google.com/speed/pagespeed/module).
+*5 ms* may be fast, but what if we want to make WordPress faster? A simple solution is to reuse previously rendered output. We can easily accomplish this using [Apache](Apache.md#setting-upstream-cache)'s builtin cache. Moreover, we can serve optimized content that has passed through [Google PageSpeed](https://developers.google.com/speed/pagespeed/module).
 
 Any caching plugin will work adequately for this task. We'll use W3TC as it provides additional WP-CLI commands. In continuation from the above Redis example, let's enable caching in Apache, then switch back to *benchmark.test* to install/configure W3TC:.
 
@@ -156,7 +158,7 @@ Exit back out and reapply Fortification so `wp-content/cache` permissions are co
 cpcmd -d benchmark.test wordpress:fortify benchmark.test
 ```
 
-Then run `ab` against the site. Note it's expected to encounter some transient response size anomalies while Pagespeed optimizes the content. From a simple testing dual-core server, page throughput jumped from **116 req/second to 3782 req/second**.
+Then run `ab` against the site. Note it's expected to encounter some transient response size anomalies while PageSpeed optimizes the content. From a simple testing dual-core server, page throughput jumped from **116 req/second to 3782 req/second**.
 
 ```bash
 ab  -k -n 1000 -c 4 http://benchmark.test/
@@ -168,7 +170,7 @@ One last thing we can do is put the `.htaccess` on a diet. Remove all of the sup
 
 After removing the unnecessary directives, .htaccess shrunk by 32.8% (8960 bytes to 6014 bytes). Page throughput likewise improved to **4224.36 req/second**, a gain of 11.6% just by removing superfluous directives. 
 
-<center><b>.htaccess size matters</b></center>
+<center><b>.htaccess size matters</b></center>  
 
 #### Removing .htaccess
 
@@ -179,10 +181,10 @@ Taking the .htaccess one step further, let's remove it from the equation entirel
 Copy your .htaccess from `/home/virtual/benchmark.test/var/www/html/` into `/etc/httpd/conf/site130/`. Next, we'll change the dispatcher location and disable overrides.
 
 ```bash
-cp /home/virtual/benchmark.test/var/www/html/.htaccess /etc/httpd/conf/site130/wp-test
+mv /home/virtual/benchmark.test/var/www/html/.htaccess /etc/httpd/conf/site130/wp-test
 ```
 
-Edit wp-test surrounding the dispatcher rules in a \<Directory>... \</Directory> clause adding `AllowOverride none` and `UnsetEnv no-cache`  inside the clause as depicted in the screenshot. 
+Edit wp-test surrounding the dispatcher rules in a \<Directory>... \</Directory> clause adding `AllowOverride none` and `UnsetEnv no-cache`  inside the clause as depicted in the screenshot.
 
 ::: tip CacheQuickHandler
 Optionally, add `CacheQuickHandler on` outside \<Directory>...\</Directory> to bypass additional axis processing. This will further improve processing times to the values arrived at in this article *at the expense of brute-force protection*. CacheQuickHandler usage blocks the effects of [mod_evasive](Evasive.md), but static content has nothing to interact with. Regardless, use at your own risk.
@@ -194,13 +196,49 @@ Run `htrebuild`, then benchmark. Performance skyrocketed from **4224 req/second 
 
 *We've switched from 4 to 8 core concurrency to ensure proper saturation. At `-c4` output is ~13583 req/second. At `-c8` output saturates at 15271 req/second.*
 
+#### Optimizing render
+
+ApisCP ships with PageSpeed to transparently rewrite and cache HTML. 70 microseconds is quite fast. The difference between 70 and 7 microseconds (14k and 140k pages per second) isn't appreciable to cross the just noticeable difference threshold,, but what is is rendering performance that can be orders of magnitude higher. Apache has excellent integration with PageSpeed which can be combined with its cache to save rendered, optimized copies.
+
+Edit `/etc/httpd/conf/site130/wp-test` as noted in the above example and add `ModPagespeedRewriteLevel CoreFilters` after `UnsetEnv no-cache`. Next, run `htrebuild` to rebuild the configuration.
+
+Next, install the [OceanWP](https://wordpress.org/themes/oceanwp/) theme for a cursory evaluation.
+
+```bash
+su benchmark.test
+cd /var/www/html
+wp-cli theme install --activate oceanwp
+# Flush PageSpeed cache
+curl -X PURGE http://benchmark.test
+# Flush disk cache
+wp-cli w3-total-cache flush all
+sleep 5
+```
+It may take a few moments for PageSpeed to rebuild the rendered content. For comparison, the following two blocks are before and after PageSpeed's optimizer has rewritten output using **Safe optimizations** in **Web** > **Site Optimizer** (`CoreFilters` setting).
+
+![OceanWP unoptimized](./images/pagespeed-unoptimized.png)
+
+![OceanWP optimized](./images/pagespeed-optimized.png)
+
+Next, we can use Lighthouse to evaluate performance before and after.
+
+![Lighthouse OceanWP unoptimized](./images/pagespeed-lighthouse-unoptimized.png)
+
+![Lighthouse OceanWP optimized](./images/pagespeed-lighthouse-optimized.png)
+
+The difference is staggering: compared to decreasing page transmission time by 65 microseconds, we've decreased rendering time by 10,000 microseconds - **a 153x improvement** - using a single action in the control panel, enabling PageSpeed.
+
+In 2017, Akamai found a [100 ms delay](https://www.akamai.com/uk/en/about/news/press/2017-press/akamai-releases-spring-2017-state-of-online-retail-performance-report.jsp) in website load time can decrease conversion rates by 7%. Improving page transmission by 65 microseconds has less of a net effect than improving render times. Moreover, the JND threshold in humans in approximately [50 milliseconds](https://www.sciencedirect.com/science/article/pii/S0042698901001602) (769x more than page transmission gains). Page throughput is important, but it's not everything.
+
+<center><b>Always focus optimizations where the yield can be greatest.</b></center>  
+
 ### Concurrency
 
 Benchmarks are designed to model real-world scenarios with artificial, deterministic usage patterns. It's an oxymoron to believe any such correlation exists between benchmarks and typical usage scenarios, but what benchmarks provide is the theoretical peak throughput. *It's all downhill from there!*
 
-When evaluating the peak throughput do not run more than NPROC+1 instances. Linux has an intelligent scheduling algorithm to interleave parcels of work (threads). If for example a site is handling 5 concurrent requests over 250 ms, the processing is rarely contiguous due to network latency/output buffering. Benchmarking locally removes this barrier. 
+When evaluating the peak throughput do not run more than NPROC+2 instances. Linux has an intelligent scheduling algorithm to interleave parcels of work (threads). If for example a site is handling 5 concurrent requests over 250 ms, the processing is rarely contiguous due to network latency/output buffering. Benchmarking locally removes this barrier. 
 
-Let's assume a WordPress site on a two-core machine. Following this logic, benchmark figures should begin to stabilize after 3 concurrent requests. All requests are generated using `ab` as outlined above. The PHP-FPM pool was reconfigured from **ondemand** to **static** and the total worker count (`pm.max_children`) changed from **3** to **20** to 
+Let's assume a WordPress site on a two-core machine. Following this logic, benchmark figures should begin to stabilize after 3 concurrent requests. All requests are generated using `ab` as outlined above. The PHP-FPM pool was reconfigured from **ondemand** to **static** and the total worker count (`pm.max_children`) changed from **3** to **20**. The table below summarizes benchmarks with various concurrency (`-c`) levels.
 
 | Concurrency | Throughput (req/sec) |    % Δ | Time per req (ms) |     % Δ |
 | :---------: | -------------------: | -----: | ----------------: | ------: |

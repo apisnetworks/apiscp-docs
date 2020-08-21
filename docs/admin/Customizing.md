@@ -40,7 +40,7 @@ Alternatively consider the apache.evasive [Scope](Scopes.md), which provides err
 **⚠️ DO NOT TOUCH**: /etc/httpd/modsecurity.d/activated_rules/clamav.conf  
 **Customization file**: /etc/httpd/modsecurity.d/ or httpd-custom.conf
 
-### Pagespeed
+### PageSpeed
 **⚠️ DO NOT TOUCH**: /etc/httpd/conf.d/pagespeed.conf MANAGED BLOCK (#BEGIN/#END)  
 **Customization file**: /etc/httpd/conf.d/pagespeed.conf or httpd-custom.conf
 
