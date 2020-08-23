@@ -112,3 +112,23 @@ cpcmd config:set cp.config letsencrypt verify_ip false
 ```
 
 This may result in domains that have expired to halt automatic SSL renewal.
+
+## Problems
+
+### Changing IPs
+A machine may change either from a private to public network or its public IP change during its lifetime. In such situations, it's necessary to update the IP addresses ApisCP listens on and the IP addresses for each site. [Bootstrapper](Bootstrapper.md) can update all internal IP mappings by passing `force=yes`, which has specific meaning for some tasks.
+
+```bash
+env BSARGS="--extra-vars=force=yes" upcp -sb
+```
+
+It is necessary to update the public IP addresses for each site as well. Namebased IP addresses are assigned round-robin at creation. For example if a server has `1.2.2.2` and `1.4.5.6` then site1 is allocated `1.2.2.2`, site2 `1.4.5.6`, site3 `1.2.2.2`, and so on.
+
+Confirm the IP address bool has been updated in `/etc/virtualhosting/namebased_ip_addrs` and `/etc/virtualhosting/namebased_ip6_addrs`, then clear `ipinfo,nbaddrs` and `ipinfo,nb6addrs` respectively for reassignment. Namebased sites may be selected using a [collection](cpcmd-examples.md#collections).
+
+```bash
+cpcmd -o json admin:collect null '[ipinfo.namebased:1]' | jq -r 'keys[]' | while read SITE ; do
+	echo "Updating $(get_config $SITE siteinfo domain) - $SITE"
+	EditDomain -c ipinfo,nbaddrs=[] -c ipinfo,namebased=1 -c ipinfo,nb6addrs=[] $i
+done
+```
