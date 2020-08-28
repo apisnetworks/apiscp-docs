@@ -209,6 +209,7 @@ module.exports = {
                 }
               ]
             },
+            "admin/Docker",
             {
               title: "Mail",
               children: [
