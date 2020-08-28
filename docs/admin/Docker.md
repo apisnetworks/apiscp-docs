@@ -98,3 +98,33 @@ crontab -e
 @reboot docker run -d  -p 8082:8080 --name zeppelin apache/zeppelin:0.9.0 
 ```
 
+## Container management
+
+[Portainer](https://portainer.io) is a tool made for managing a collection of Docker containers. Given the sensitive nature of sending credentials across the wire, this subdomain (*portainer.apiscp.com*) will require HTTPS and set an HTTP strict transport security header to ensure future connections use SSL.
+
+![Portainer Dashboard](./images/portainer.png)
+
+First create the persistent volume store, then run it.
+
+```bash
+docker volume create portainer_data
+docker run -d -p 8000:8000 -p 9000:9000 --name=portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer
+```
+
+Lastly, connect it using Apache to the backend container.
+
+```
+RewriteEngine On
+DirectoryIndex disabled
+
+Header always set Strict-Transport-Security "max-age=63072000;"
+RewriteCond %{HTTPS} !=on
+RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R,L]
+
+RequestHeader set X-Forwarded-Proto "https"
+RewriteCond %{HTTP:Upgrade} =websocket [NC]
+RewriteRule ^(.*)$ ws://localhost:9000/$1 [L,QSA,P]
+RewriteRule ^(.*)$ http://localhost:9000/$1 [L,QSA,P]
+```
+
+That's all there is!
