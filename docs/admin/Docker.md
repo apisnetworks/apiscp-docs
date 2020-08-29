@@ -128,3 +128,30 @@ RewriteRule ^(.*)$ http://localhost:9000/$1 [L,QSA,P]
 ```
 
 That's all there is!
+
+## Security
+
+This current implementation of Docker **is not suitable in a multi-administrator environment**. Users within other domains may see and manage Docker containers. There are plans to implement RBAC and bring Docker as a permanent fixture to ApisCP, but for now **only one authorized user may use Docker on a server**.
+
+If the same group treatment is applied to another domain, for instance, that user also has visibility of the Docker containers:
+
+```bash
+chroot /home/virtual/apisnetworks.com/ groupadd --system -g "$(getent group docker | cut -d: -f3)" docker
+chroot /home/virtual/apisnetworks.com/ usermod -G docker -a "$(get_config apisnetworks.com siteinfo admin_user)"
+su apisnetworks.com
+docker container ls
+# CONTAINER ID        IMAGE                   COMMAND                  CREATED             STATUS              PORTS                                            NAMES
+# 13d1ed48ff42        portainer/portainer     "/portainer"             8 hours ago         Up 8 hours          0.0.0.0:8000->8000/tcp, 0.0.0.0:9000->9000/tcp   portainer
+# f1a5e11a3cc9        apache/zeppelin:0.9.0   "/usr/bin/tini -- ..."   9 hours ago         Up 9 hours          0.0.0.0:8082->8080/tcp                           zeppelin
+```
+
+Secondly, in the above examples, Docker privileges are bestowed to the Site Administrator of an account via `usermod`. In normal configuration, PHP-FPM runs as a separate, unprivileged user (`apache`). This feature may be changed by editing the service parameter `apache`,`webuser` to match the Site Administrator. In such configurations, an exploit in PHP would permit an attacker access to all `docker` commands.
+
+**Never grant a PHP-FPM user Docker privileges. Never designate a Docker user as apache,webuser.**
+
+```bash
+# NEVER EVER DO THIS!
+EditDomain -c apache,webuser="$(get_config apisnetworks.com siteinfo admin_user)" apisnetworks.com
+chroot /home/virtual/apisnetworks.com/ usermod -G docker -a "$(get_config apisnetworks.com siteinfo admin_user)"
+# ^^^ BZZZT. WRONG. ^^^
+```
