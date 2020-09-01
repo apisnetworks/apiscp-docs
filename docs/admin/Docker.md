@@ -70,6 +70,8 @@ Create a subdomain or addon domain. Inside the [document root](https://kb.apnscp
 For example, if the port argument is `--port 8082:8080` then externally, 8082 is being forwarded internally to the Docker container expecting traffic on 8080. Knowing this, prepare the .htaccess file:
 
 ```
+DirectoryIndex disabled
+
 RewriteEngine On
 RewriteCond %{HTTP:Upgrade} =websocket [NC]
 RewriteRule ^(.*)$ ws://localhost:8082/$1 [L,QSA,P]
@@ -80,6 +82,10 @@ RewriteRule ^(.*)$ http://localhost:8082/$1 [L,QSA,P]
 Enable Websocket support by loading the [wstunnel](https://httpd.apache.org/docs/2.4/mod/mod_proxy_wstunnel.html) module. Not every application utilizes Websockets, so check with your vendor documentation. Zeppelin requires Websocket for use.
 
 Add `LoadModule proxy_wstunnel_module modules/mod_proxy_wstunnel.so` to `/etc/httpd/conf/httpd-custom.conf`, then run `htrebuild` to activate configuration changes.
+:::
+
+::: tip Disabling index negotiation
+Apache will try multiple files to determine which file to serve when no file is explicitly provided in the request URI. Disabling an index ensures this request - without a filename - is passed directly to your Docker instance for resolution.
 :::
 
 Run Zeppelin, and you're done!
@@ -114,14 +120,15 @@ docker run -d -p 8000:8000 -p 9000:9000 --name=portainer --restart=always -v /va
 Lastly, connect it using Apache to the backend container.
 
 ```
-RewriteEngine On
 DirectoryIndex disabled
 
+RequestHeader set X-Forwarded-Proto "https"
 Header always set Strict-Transport-Security "max-age=63072000;"
+
+RewriteEngine On
 RewriteCond %{HTTPS} !=on
 RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R,L]
 
-RequestHeader set X-Forwarded-Proto "https"
 RewriteCond %{HTTP:Upgrade} =websocket [NC]
 RewriteRule ^(.*)$ ws://localhost:9000/$1 [L,QSA,P]
 RewriteRule ^(.*)$ http://localhost:9000/$1 [L,QSA,P]
