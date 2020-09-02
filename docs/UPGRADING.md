@@ -100,3 +100,24 @@ If system updates are disabled, then they may be applied from the command-line v
 ### Manual FST updates
 
 Filesystem template ("FST") updates are managed by Yum Synchronizer, which is invoked as a yum postaction on update/install. Yum Synchronizer usage is covered in depth in [Filesystem.md](admin/Filesystem.md).
+
+## Problems
+### `upcp` reports "fatal: refusing to merge unrelated histories"
+`upcp` will fail with the above error when the current commit does not match its local history log. Two solutions exist to resolve this.
+
+First, unshallow the repository by fetching the entire commit history.
+
+```bash
+cd /usr/local/apnscp
+git fetch --unshallow
+# Try updating again
+upcp
+```
+
+Second, if fetching all history does not allow ApisCP to continue on its update track, perform a reset on the HEAD pointer.
+
+```bash
+cd /usr/local/apnscp
+upcp --reset
+git checkout master
+```
