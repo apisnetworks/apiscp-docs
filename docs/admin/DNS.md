@@ -9,11 +9,13 @@ ApisCP ships with a variety of [DNS providers](https://github.com/search?q=topic
 - null: dummy driver that always returns success
 - builtin: use BIND or write a [surrogate](../PROGRAMMING.md#extending-modules-with-surrogates) module to override DNS behavior
 - [powerdns](https://github.com/lithiumhosting/apnscp-powerdns): PowerDNS DNS
-- [aws](https://github.com/apisnetworks/apnscp-dns-aws): Route53 (AWS) DNS
-- [cloudflare](https://github.com/apisnetworks/apnscp-dns-cloudflare): Cloudflare DNS
-- [digitalocean](https://github.com/apisnetworks/apnscp-dns-digitalocean): DigitalOcean DNS
-- [linode](https://github.com/apisnetworks/apnscp-dns-linode): Linode DNS
-- [vultr](https://github.com/apisnetworks/apnscp-dns-vultr): Vultr DNS
+- [aws](https://github.com/apisnetworks/apiscp-dns-aws): Route53 (AWS) DNS
+- [cloudflare](https://github.com/apisnetworks/apiscp-dns-cloudflare): Cloudflare DNS
+- [digitalocean](https://github.com/apisnetworks/apiscp-dns-digitalocean): DigitalOcean DNS
+- [hetzner](https://github.com/apisnetworks/apiscp-dns-hetzner): DigitalOcean DNS
+- [katapult](https://github.com/apisnetworks/apiscp-dns-katapult): DigitalOcean DNS
+- [linode](https://github.com/apisnetworks/apiscp-dns-linode): Linode DNS
+- [vultr](https://github.com/apisnetworks/apiscp-dns-vultr): Vultr DNS
 
 Additional providers may be created by using any of the existing DNS providers as a template. Custom providers should be located in `lib/Opcenter/Dns/Providers` and `lib/Opcenter/Mail/Providers`.  Available providers may be enumerated as the admin,
 
