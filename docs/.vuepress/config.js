@@ -260,6 +260,7 @@ module.exports = {
             {
               title: "Release notes",
               children: [
+                "RELEASE-3.2",
                 "RELEASE-3.1",
                 "RELEASE-3.0",
               ]
