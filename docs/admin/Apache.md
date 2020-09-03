@@ -252,6 +252,14 @@ In Event MPM, a single child process can handle multiple requests concurrently. 
 
 ![Summarizing parameter relationship](./images/http-server-client-relationship.svg)
 
+The above scenario would be represented in the following configuration.
+
+```
+MaxRequestWorkers 12
+ServerLimit 2
+ThreadsPerChild 6
+```
+
 Threads may be tuned to decrease the number of processes spawned without changing the maximum number of concurrent connections (**MaxRequestWorkers**).
 
 ```text
