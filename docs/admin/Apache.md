@@ -314,6 +314,12 @@ cpcmd scope:set apache.mutex pthread
 
 Apache will automatically reload after 2 minutes.
 
+### BDB0004 fop_read_meta: /etc/httpd/conf/http10: unexpected file type of format
+
+Map files are stored as sdbm, an open implementation of [ndbm](https://en.wikipedia.org/wiki/DBM_(computing)). When no HTTP/1.0 bypasses are configured and a client accesses the web server using HTTP/1.0 protcol - almost always a bot - Apache logs this informative message in the error log.
+
+To bypass this message, add at least 1 hostname to the map file. This can be accomplished from the [command-line helper](CLI.md#cpcmd) as `cpcmd -d domain.com web:allow-protocol domain.com http10`. Otherwise the message is purely diagnostic and has no effect on service.
+
 ## See also
 
 For supporting documentation, see also 
