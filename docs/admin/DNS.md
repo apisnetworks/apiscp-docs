@@ -12,8 +12,8 @@ ApisCP ships with a variety of [DNS providers](https://github.com/search?q=topic
 - [aws](https://github.com/apisnetworks/apiscp-dns-aws): Route53 (AWS) DNS
 - [cloudflare](https://github.com/apisnetworks/apiscp-dns-cloudflare): Cloudflare DNS
 - [digitalocean](https://github.com/apisnetworks/apiscp-dns-digitalocean): DigitalOcean DNS
-- [hetzner](https://github.com/apisnetworks/apiscp-dns-hetzner): DigitalOcean DNS
-- [katapult](https://github.com/apisnetworks/apiscp-dns-katapult): DigitalOcean DNS
+- [hetzner](https://github.com/apisnetworks/apiscp-dns-hetzner): Hetzner DNS
+- [katapult](https://github.com/apisnetworks/apiscp-dns-katapult): Katapult DNS
 - [linode](https://github.com/apisnetworks/apiscp-dns-linode): Linode DNS
 - [vultr](https://github.com/apisnetworks/apiscp-dns-vultr): Vultr DNS
 
