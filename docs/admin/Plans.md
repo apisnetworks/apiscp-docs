@@ -181,6 +181,23 @@ Domains may be deleted using `DeleteDomain`. DeleteDomain accepts a list of argu
 **--since=TIMESPEC**: only delete domains suspended TIMESPEC ago ("last week", "now", 1579934058).  
 **--force**: delete a domain in a partial edit state.  
 **--dry-run**: show what will be deleted without deleting.  
+**--match=IDENTIFIER**: delete domains that match IDENTIFIER in the suspension reason (regular expression, delimiter implicitly added).
+
+
+### Advanced matching
+**New in 3.2.5**
+Templates may contain hidden markup prefixed by `;` or `#` that is not visible to the end user. These may contain special identifiers used by `--match=IDENTIFIER`. For example assuming the following suspension message in siteXX/info/disabled:
+
+```ini
+Your account has been suspended.
+
+# REASON-XYZ-123
+; Some other internal notes
+```
+
+`cpcmd -d domain.com auth:inactive-reason` will report "*Your account has been suspended*" masking any additional markup prefixed with "#" or ";".
+
+Likewise to target this site suspended over 30 days ago, `DeleteDomain --dry-run --match=REASON-XYZ-123 --since="last month"`
 
 ### API access
 
@@ -200,9 +217,19 @@ A suspended domain revokes access to all services, except panel, as well as page
 
 When a billing invoice is specified any site that possesses this identifier either as billing,invoice or billing,parent_invoice will be suspended.
 
+### Reasons
+**New in 3.2.5**
+`--reason=reason` may be used to specify a suspension reason.
+
+`--template=NAME`, if specified, uses the template *NAME* to refer to a template under `resources/templates/opcenter/suspension`. The reason value is passed to the template as `$reason`. This may be [customized](Customization.md).
+
+If a suspension reason is provided, the customer, upon login to panel UI will be shown this reason. Reason may be adjusted by setting *[auth]* => *show_suspension_reason* to false (see [Tuneables.md](Tuneables.md)).
+
+Likewise if a suspension reason is given, `DeleteDomain` accepts `--match=word` to match a regular expression in the suspension reason. See [DeleteDomain](#DeleteDomain) for more information.
+
 ### API access
 
-`admin:deactivate-site(string $site): bool` allows suspension of sites. See [API.md](API.md) for implementing API access. $site may be any site identifier or billing invoice.
+`admin:deactivate-site(string $site, array $flags = []): bool` allows suspension of sites. See [API.md](API.md) for implementing API access. $site may be any site identifier or billing invoice.
 
 ## ActivateDomain
 
