@@ -18,11 +18,16 @@ After making changes run `htrebuild` to rebuild and test configuration. Apache w
 | No          | conf/apnscp-httpd-rewrite.conf | Inheritable base rules applied to webmail redirections, addon domains, and subdomains. |
 | Maybe       | siteXX/                        | Per-module configurations. If a module name exists now, do not touch. If a file name does not exist now, it may exist in the future. |
 | Yes         | siteXX/custom                  | A reserved location for per-site overrides. This will never be overwritten. |
+| Yes         | siteXX/custom.raw              | A reserved location for per-site overrides. This will never be overwritten. Does not substitute fst/ with shadow/. |
 | Maybe       | siteXX.ssl/                    | Similar to siteXX/. Only applies when site is served over SSL. |
 | Yes         | siteXX.ssl/custom              | Similar to siteXX/custom. Only applies when site is served over SSL. |
 | No          | conf/virtual-*                 | Monolithic files compiled down by `htrebuild` command. Used by Apache to improve recovery time. |
 | No          | conf/virtual-*.bad             | If a failed rebuild occurs, the offending file is saved to this location. |
 | No          | conf.d/mod_security.conf       | mod_security configuration distributed as part of ApisCP distribution. |
+
+::: tip Shadow-layer substitutions
+ApisCP will replace all occurrences of `fst/` with the direct [data layer](Filesystem.md) `shadow/` when including drop-in configuration under siteXX during `htrebuild`. Suffix a file with `.raw` to prevent this substitution if for example matching a path verbatim as with `<Directory /home/virtual/siteXX/fst/var/www/html>`.
+:::
 
 ## Scopes
 
