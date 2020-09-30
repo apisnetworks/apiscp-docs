@@ -60,11 +60,11 @@ PowerDNS may be configured via files in `/etc/pdns/local.d`. In addition to this
 
 ```bash
 cpcmd scope:set cp.bootstrapper 'powerdns_custom_config' '["allow-axfr-ips":1.2.3.4,"also-notify":1.2.3.4]'
-cd /usr/local/apnscp/resources/playbooks
-ansible-playbook addin.yml --extra-vars=addin=apnscp-powerdns
+# Then re-run Bootstrapper
+upcp -sb software/powerdns
 ```
 
-`allow-axfr-ips` and `also-notify` directives will be set whenever the addin plays are run.
+`allow-axfr-ips` and `also-notify` directives will be set whenever the role is run.
 
 ### Enabling ALIAS support
 ALIAS is a synthetic record that allows CNAME records to be set on the zone apex. ALIAS records require `powerdns_enable_recursion` to be enabled as well as an optional `powerdns_recursive_ns` to be set otherwise it will default to the system in `/etc/resolv.conf`.
@@ -72,9 +72,8 @@ ALIAS is a synthetic record that allows CNAME records to be set on the zone apex
 ```bash
 cpcmd scope:set cp.bootstrapper powerdns_enable_recursion true
 cpcmd scope:set cp.bootstrapper powerdns_recursive_ns '[1.1.1.1,1.0.0.1]'
-# Then re-run the addin...
-cd /usr/local/apnscp/resources/playbooks
-ansible-playbook addin.yml --extra-vars=addin=apnscp-powerdns
+# Then re-run Bootstrapper
+upcp -sb software/powerdns
 ```
 
 ## Remote API access
@@ -129,8 +128,8 @@ Additionally, PowerDNS' whitelist must be updated as well. This can be quickly a
 
 ```
 cpcmd scope:set cp.bootstrapper powerdns_localonly false
-cd /usr/local/apnscp/resources/playbooks
-ansible-playbook addin.yml --extra-vars=addin=apnscp-powerdns
+# Then re-run Bootstrapper
+upcp -sb software/powerdns
 ```
 
 **Downsides**: requires whitelisting IP addresses for access to API server. Must run on port different than Apache.
