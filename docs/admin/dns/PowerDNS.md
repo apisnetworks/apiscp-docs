@@ -76,7 +76,46 @@ cpcmd scope:set cp.bootstrapper powerdns_recursive_ns '[1.1.1.1,1.0.0.1]'
 upcp -sb software/powerdns
 ```
 
+### AXFR-based clustering
+
+PowerDNS expects a custom database cluster by default ([zone kind](https://doc.powerdns.com/authoritative/modes-of-operation.html): NATIVE). Using AXFR-based replication will allow provisioning of zones to slaves by supermaster, but AXFR/NOTIFY lacks support for automated zone removal. PowerDNS must be installed first and a suitable backend selected in as under "[Nameserver installation](#nameserver-installation)". In the following example, master is an unpublished nameserver.
+
+On the master, *assuming 1.2.3.4 and 1.2.3.5 are slave nameservers with the hostnames ns1.domain.com and ns2.domain.com respectively*, add the following configuration:
+
+```bash
+cpcmd scope:set cp.bootstrapper powerdns_zone_type master
+cpcmd scope:set cp.bootstrapper powerdns_custom_config '["allow-axfr-ips":"1.2.3.4,1.2.3.5","also-notify":"1.2.3.4,1.2.3.5","master":"yes"]'
+cpcmd scope:set cp.bootstrapper powerdns_nameservers '[ns1.domain.com,ns2.domain.com]'
+env BSARGS="--extra-vars=force=yes" upcp -sb software/powerdns
+```
+
+On the slave, *assuming the master is 1.2.3.3 with the hostname master.domain.com*, add the following configuration:
+
+```bash
+cpcmd scope:set cp.bootstrapper powerdns_zone_type slave
+cpcmd scope:set cp.bootstrapper powerdns_custom_config '["allow-notify-from":"1.2.3.3","slave":"yes"]'
+cpcmd scope:set cp.bootstrapper powerdns_nameservers '[ns1.domain.com,ns2.domain.com]'
+cpcmd scope:set cp.bootstrapper powerdns_supermaster '[ip:1.2.3.4,nameserver:master.domain.com,account:master]'
+env BSARGS="--extra-vars=force=yes" upcp -sb software/powerdns
+```
+
+Lastly, on the hosting nodes, *assuming all DNS zone traffic is sent to the unpublished master master.domain.com (IP address 1.2.3.3) with the API key from `/etc/pdns/pdns.conf` of `abc1234`*, configure each to use the same API key and endpoint discussed below.
+
+```bash
+cpcmd scope:set cp.bootstrapper powerdns_api_uri 'https://master.mydomain.com/dns'
+cpcmd scope:set cp.bootstrapper powerdns_nameservers '[ns1.domain.com,ns2.domain.com]'
+cpcmd scope:set cp.bootstrapper powerdns_api_key 'abc1234'
+cpcmd scope:set cp.bootstrapper powerdns_zone_type 'master'
+env BSARGS="--extra-vars=force=yes" upcp -sb software/powerdns
+```
+
+::: tip force=yes
+Bootstrapper will avoid overwriting certain configurations unless explicitly asked. `force=yes` is a global variable that forces an overwrite on files.
+:::
+
+
 ## Remote API access
+
 In the above example, only local requests may submit DNS modifications to the server. None of the below examples affect querying; DNS queries occur over 53/UDP typically (or 53/TCP if packet size exceeds UDP limits). Depending upon infrastructure, there are a few options to securely accept record submission, *all of which require an API key for submission*.
 
 ### SSL + Apache
@@ -141,7 +180,7 @@ The server may be accessed once the source IP has been whitelisted,
 curl -q -H 'X-API-Key: SOMEKEY' http://myserver.apiscp.com/api/v1/servers/localhost
 ```
 
-## ApisCP DNS provider setup
+## DNS provider
 
 Every server that runs ApisCP may delegate DNS authority to PowerDNS. This is ideal in distributed infrastructures in which coordination allows for seamless [server-to-server migrations](https://docs.apiscp.com/admin/Migrations%20-%20server).
 
