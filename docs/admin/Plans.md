@@ -7,17 +7,20 @@ Plans are service presets that may be assigned to an account. ApisCP contains a 
 
 A variety of helpers exist to add, delete, modify, suspend, activate, import, and export a domain. These helpers have corresponding API commands in the [admin](https://api.apiscp.com/class-Admin_Module.html) module paired with each topic. *$flags* denote any feature, besides *-c service,param=value*, passed to the helper. Example of such flags are:
 
-| Flag               | Scope        | Usage                                                        |
-| ------------------ | ------------ | ------------------------------------------------------------ |
-| --reset            | edit         | Resets site to plan defaults                                 |
-| --dry-run          | edit, delete | Shows actions without performing                             |
-| --backup           | edit         | Backup metadata prior to editing                             |
-| --force            | delete       | Delete a domain in a partially edited state                  |
-| --since=*timespec* | delete       | Delete domains suspended since *timespec* ("now", "last month", unix timestamp) |
-| --reconfig         | edit         | Reconfigure all services implementing ServiceReconfiguration |
-| --all              | edit         | Target all domains                                           |
-| --help             | all          | Show help                                                    |
-| --output=type      | all          | Set the output format. Values are "json" or unset            |
+| Flag               | Scope             | Usage                                                        |
+| ------------------ | ----------------- | ------------------------------------------------------------ |
+| -c                 | edit, add, import | Override default service values                              |
+| --reset            | edit              | Resets site to plan defaults                                 |
+| --dry-run          | edit, delete      | Shows actions without performing                             |
+| --backup           | edit              | Backup metadata prior to editing                             |
+| --reason           | suspend           | Specify suspension reason                                    |
+| --force            | delete            | Delete a domain in a partially edited state                  |
+| --since=*timespec* | delete            | Delete domains suspended since *timespec* ("now", "last month", unix timestamp) |
+| --filter           | delete            | Delete domains matching (regex) suspension reason            |
+| --reconfig         | edit              | Reconfigure all services implementing ServiceReconfiguration |
+| --all              | edit              | Target all domains                                           |
+| --help             | all               | Show help                                                    |
+| --output=type      | all               | Set the output format. Values are "json" or unset            |
 
 These flags may be passed to the API whenever *$flags* is an accepted parameter. Flags simply present are passed as '[name:true]' whereas flags that accept values are passed as '[name:value]'.
 

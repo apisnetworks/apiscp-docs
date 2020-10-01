@@ -36,21 +36,42 @@ All accounts are placed in synthetic roots. /etc/passwd is constructed of releva
 
 Likewise, /etc/shadow contents reflect passwords of users in the account and not other users elsewhere.
 
+## Geolocation
+
+**New in 3.2.6**  
+Maxmind GeoIP2 and GeoLite2 City services may be used to provide geolocation services to authentication access notices (credential changes, unrecognized devices). GeoIP2 is an [API service](https://www.maxmind.com/en/geoip2-precision-services) that may be configured using `auth.geoip-key` [Scope](admin/Scopes.md). GeoIP2 is a paid service from Maxmind. 
+
+```bash
+cpcmd scope:set auth.geoip-key '[user:1234,key:key-name]'
+```
+
+GeoLite2 is a free database hosted on-premise that allows similar geolocation data. After [registering](https://dev.maxmind.com/geoip/geoip2/geolite2/) for access to the database, locate `GeoLite2-City.mmdb` in `/usr/local/apnscp/resources/storehouse`. Registration is required to consent to various privacy/marketing regulations.
+
+ApisCP will prefer GeoIP2 if both are provided.
+
 ## PHP Restrictions
 
-PHP is run as an ISAPI for efficiency reasons. Several necessary safeguards are in place to combat unwanted malicious activity.
+### Normal operation
 
-1. All accounts are bound by open_basedir restrictions. This restricts which directories native PHP functions can descend. By default, access is restricted to the synthetic root and a few globally disposable system directories.
+PHP runs as a jailed PHP-FPM process that runs setuid after binding itself to the corresponding cgroup controllers but before launching `php-fpm` process. PHP-FPM can either run as a separate system user (`apache`) or same-user as is a common setup in cPanel/Plesk-based systems. PHP-FPM runs in a jail that is localized to the [synthetic filesystem](admin/Filesystem.md) root and moreover, mounted with its own /tmp directory, restricts write-access to /etc, /boot, and /usr as well as mounts a private device namespace. 
 
-2. Dangerous binaries are restricted execute from the web server through ACLs. These include binaries such as rm, mv, cp, cat, whoami, perl, python, php, and others that have no reasonable usage from a PHP script. pyenv/rbenv/goenv within `FILESYSTEMTEMPLATE/ssh/usr/local/share` are also revoked access. Users that need to run these binaries are encouraged to look up the comparable PHP function (mv => rename, rm => unlink, cat => file_get_contents) or run PHP as a CGI, which inherits the uid/gid of the script. This runs nightly via `/etc/cron.daily/99lockdown_procs` and so long as Yum Synchronizer maintains a hardlink of the file, which it will, then the ACLs apply both to the binary in the system-wide location as well as filesystem synthetic root.
+### Low-memory mode
 
-3. Because all processes except for PHP operate within a synthetic root, discretionary access controls differ in what "world" means. world, in this context, is apache. group is any member of the account. Setting a folder 707 ensures that both the web server has write access as well as the owner.
+PHP is run as an ISAPI for efficiency reasons when `has_low_memory` is enabled in [Bootstrapper](admin/Bootstrapper.md). Several necessary safeguards are in place to combat unwanted malicious activity.
 
-   ApisCP implements a facility called "[Fortification](https://kb.apiscp.com/control-panel/understanding-fortification/)" to simplify this process. An application that is fortified is bestowed world read/write/execute permissions, which solely entails the web server. Any file created by the web server is tagged with that system ID, which makes developing an audit trail (file_audit API command) very easy. Moreover, unless PHP application files are explicitly given world read, write permission, PHP can *never* write to these files.
+All accounts are bound by open_basedir restrictions. This restricts which directories native PHP functions can descend. By default, access is restricted to the synthetic root and a few globally disposable system directories.
+
+### Common measures
+
+1. Dangerous binaries are restricted execute from the web server through ACLs. These include binaries such as rm, mv, cp, cat, whoami, perl, python, php, and others that have no reasonable usage from a PHP script. pyenv/rbenv/goenv within `FILESYSTEMTEMPLATE/ssh/usr/local/share` are also revoked access. Users that need to run these binaries are encouraged to look up the comparable PHP function (mv => rename, rm => unlink, cat => file_get_contents) or run PHP as a CGI, which inherits the uid/gid of the script. This runs nightly via `/etc/cron.daily/99lockdown_procs` and so long as Yum Synchronizer maintains a hardlink of the file, which it will, then the ACLs apply both to the binary in the system-wide location as well as filesystem synthetic root.
+
+2. Because all processes except for PHP operate within a synthetic root, discretionary access controls differ in what "world" means. world, in this context, is apache. group is any member of the account. In ISAPI mode, setting a folder 707 ensures that both the web server has write access as well as the owner. In PHP-FPM mode, a folder must have group access or have ACLs bestowed to allow write-access by Apache.
+
+   ApisCP implements a facility called "[Fortification](admin/Fortification.md)" to simplify this process. An application that is fortified is bestowed world read/write/execute permissions, which solely entails the web server. Any file created by the web server is tagged with that system ID, which makes developing an audit trail (file_audit API command) very easy. Moreover, unless PHP application files are explicitly given world read, write permission, PHP can *never* write to these files.
 
    It is very import to be judicious of your use of permissions. Fortification profiles exist for Wordpress, Joomla, Drupal, Magento, and Laravel. Fortification profiles can be developed dynamically by selecting **Web** > **Web Apps** > *Select Site* > **Fortification** > **Web App Learning Mode** within ApisCP.
-
-There are future plans to include jailed PHP-FPM workers that run within the synthetic roots, but still run under a generic system ID. Presently, this ISAPI method outlined above is the only supported means.
+   
+   Applications that do not have built-in Fortification profiles can be easily adapted using [Web App Manifests](admin/WebApps.md#ad-hoc-apps).
 
 ## Passenger
 
