@@ -80,29 +80,32 @@ upcp -sb software/powerdns
 
 PowerDNS expects a custom database cluster by default ([zone kind](https://doc.powerdns.com/authoritative/modes-of-operation.html): NATIVE). Using AXFR-based replication will allow provisioning of zones to slaves by supermaster, but AXFR/NOTIFY lacks support for automated zone removal. PowerDNS must be installed first and a suitable backend selected in as under "[Nameserver installation](#nameserver-installation)". In the following example, master is an unpublished nameserver.
 
-On the master, *assuming 1.2.3.4 and 1.2.3.5 are slave nameservers with the hostnames ns1.domain.com and ns2.domain.com respectively*, add the following configuration:
+On the **master**, *assuming 1.2.3.4 and 1.2.3.5 are slave nameservers with the hostnames ns1.domain.com and ns2.domain.com respectively*, add the following configuration:
 
 ```bash
 cpcmd scope:set cp.bootstrapper powerdns_zone_type master
 cpcmd scope:set cp.bootstrapper powerdns_custom_config '["allow-axfr-ips":"1.2.3.4,1.2.3.5","also-notify":"1.2.3.4,1.2.3.5","master":"yes"]'
+cpcmd scope:set cp.bootstrapper powerdns_webserver_enable true
 cpcmd scope:set cp.bootstrapper powerdns_nameservers '[ns1.domain.com,ns2.domain.com]'
 env BSARGS="--extra-vars=force=yes" upcp -sb software/powerdns
 ```
 
-On the slave, *assuming the master is 1.2.3.3 with the hostname master.domain.com*, add the following configuration:
+On the **slave(s)**, *assuming the master is 1.2.3.3 with the hostname master.domain.com*, add the following configuration:
 
 ```bash
 cpcmd scope:set cp.bootstrapper powerdns_zone_type slave
-cpcmd scope:set cp.bootstrapper powerdns_custom_config '["allow-notify-from":"1.2.3.3","slave":"yes"]'
+cpcmd scope:set cp.bootstrapper powerdns_custom_config '["allow-notify-from":"1.2.3.3","slave":"yes","superslave":"yes"]'
+cpcmd scope:set cp.bootstrapper powerdns_webserver_enable false
 cpcmd scope:set cp.bootstrapper powerdns_nameservers '[ns1.domain.com,ns2.domain.com]'
-cpcmd scope:set cp.bootstrapper powerdns_supermaster '[ip:1.2.3.4,nameserver:master.domain.com,account:master]'
+cpcmd scope:set cp.bootstrapper powerdns_supermaster '[ip:1.2.3.3,nameserver:ns1.domain.com,account:master]'
+cpcmd scope:set cp.bootstrapper powerdns_api_uri 'https://master.domain.com/dns/api/v1'
 env BSARGS="--extra-vars=force=yes" upcp -sb software/powerdns
 ```
 
-Lastly, on the hosting nodes, *assuming all DNS zone traffic is sent to the unpublished master master.domain.com (IP address 1.2.3.3) with the API key from `/etc/pdns/pdns.conf` of `abc1234`*, configure each to use the same API key and endpoint discussed below.
+Lastly, on the **hosting nodes**, *assuming all DNS zone traffic is sent to the unpublished master master.domain.com (IP address 1.2.3.3) with the API key from `/etc/pdns/pdns.conf` of `abc1234`*, configure each to use the same API key and endpoint discussed below.
 
 ```bash
-cpcmd scope:set cp.bootstrapper powerdns_api_uri 'https://master.mydomain.com/dns'
+cpcmd scope:set cp.bootstrapper powerdns_api_uri 'https://master.domain.com/dns/api/v1'
 cpcmd scope:set cp.bootstrapper powerdns_nameservers '[ns1.domain.com,ns2.domain.com]'
 cpcmd scope:set cp.bootstrapper powerdns_api_key 'abc1234'
 cpcmd scope:set cp.bootstrapper powerdns_zone_type 'master'
@@ -112,6 +115,22 @@ env BSARGS="--extra-vars=force=yes" upcp -sb software/powerdns
 ::: tip force=yes
 Bootstrapper will avoid overwriting certain configurations unless explicitly asked. `force=yes` is a global variable that forces an overwrite on files.
 :::
+
+#### Periodic maintenance
+
+Sometimes you may want to force a zone update - if changing public nameservers - or prune expired domains since AXFR-based clusters do not afford automated zone removals. These snippets come from [hopefully.online](https://hopefully.online/powerdns-master-slave-cluster):
+
+- **all zone renotify**
+
+    ```bash
+    pdns_control list-zones --type master | sed '$d' | xargs -L1 pdns_control notify
+    ```
+
+- **zone cleanup**
+
+    ```bash
+    pdns_control list-zones --type slave | sed '$d' | xargs -I {} sh -c "host -t SOA {} master.domain.com | tail -n1 | grep -q 'has SOA record' | pdnsutil delete-zone {}"
+    ```
 
 
 ## Remote API access
@@ -130,8 +149,8 @@ In this situation, the endpoint is https://myserver.apiscp.com/dns. Changes are 
 </Location>
 ```
 
-**Downsides**: minor SSL overhead. Dependent upon Apache.
-**Upsides**: easy to setup. Protected by threat deterrence. PowerDNS accessible remotely via an easily controlled URI.
+**Downsides**: minor SSL overhead. Dependent upon Apache.  
+**Upsides**: easy to setup. Protected by threat deterrence. PowerDNS accessible remotely via an easily controlled URI.  
 
 In the above example, API requests can be made via https://myserver.apiscp.com/dns, e.g.
 
@@ -171,8 +190,8 @@ cpcmd scope:set cp.bootstrapper powerdns_localonly false
 upcp -sb software/powerdns
 ```
 
-**Downsides**: requires whitelisting IP addresses for access to API server. Must run on port different than Apache.
-**Upsides**: operates independently from Apache.
+**Downsides**: requires whitelisting IP addresses for access to API server. Must run on port different than Apache.  
+**Upsides**: operates independently from Apache.  
 
 The server may be accessed once the source IP has been whitelisted,
 

@@ -477,6 +477,26 @@ systemctl restart php-fpm-site1-apis.com
 
 Configuration may be overrode by account owners ("Site Administrators") by placing  accompanying configuration in /etc/phpXX.d.
 
+#### Automatic builds/updates
+**New in 3.2.6**
+
+`php_multiphp` is a Bootstrapper setting that allows automated builds at install and updates during monthly platform checks. Versions should be defined as a list of MAJOR.MINOR versions; MAJOR.MINOR.PATCH works but would never update past initial install.
+
+```bash
+cpcmd scope:set cp.bootstrapper php_multiphp '[5.6,7.2]'
+upcp -sb php/multiphp
+# Similar to above, but add 7.1
+cpcmd scope:set apache.php-multi '[5.6,7.1]'
+# Reports 5.6, 7.1, and 7.2
+cpcmd scope:get apache.php-multi
+# Remove PHP 7.2
+cpcmd scope:set apache.php-multi '[7.2:false]'
+# Report active multiPHP versions 5.6, 7.1
+cpcmd scope:get apache.php-multi
+```
+
+The latest version of 5.6 and 7.2 would build as multiPHP releases. 
+
 #### Installing modules
 
 Modules may be installed as one would normally expect with regular PHP-FPM. The only difference is the presence of `multiphp_build=true` and `php_version` must be explicitly set to at least MAJOR.MINOR.
