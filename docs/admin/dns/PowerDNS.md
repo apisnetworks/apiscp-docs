@@ -80,9 +80,12 @@ upcp -sb software/powerdns
 
 PowerDNS expects a custom database cluster by default ([zone kind](https://doc.powerdns.com/authoritative/modes-of-operation.html): NATIVE). Using AXFR-based replication will allow provisioning of zones to slaves by supermaster, but AXFR/NOTIFY lacks support for automated zone removal. PowerDNS must be installed first and a suitable backend selected in as under "[Nameserver installation](#nameserver-installation)". In the following example, master is an unpublished nameserver.
 
+![AXFR cluster layout](./powerdns-axfr-cluster.svg)
+
 On the **master**, *assuming 1.2.3.4 and 1.2.3.5 are slave nameservers with the hostnames ns1.domain.com and ns2.domain.com respectively*, add the following configuration:
 
 ```bash
+cpcmd scope:set cp.bootstrapper powerdns_enabled true
 cpcmd scope:set cp.bootstrapper powerdns_zone_type master
 cpcmd scope:set cp.bootstrapper powerdns_custom_config '["allow-axfr-ips":"1.2.3.4,1.2.3.5","also-notify":"1.2.3.4,1.2.3.5","master":"yes"]'
 cpcmd scope:set cp.bootstrapper powerdns_webserver_enable true
@@ -93,6 +96,7 @@ env BSARGS="--extra-vars=force=yes" upcp -sb software/powerdns
 On the **slave(s)**, *assuming the master is 1.2.3.3 with the hostname master.domain.com*, add the following configuration:
 
 ```bash
+cpcmd scope:set cp.bootstrapper powerdns_enabled true
 cpcmd scope:set cp.bootstrapper powerdns_zone_type slave
 cpcmd scope:set cp.bootstrapper powerdns_custom_config '["allow-notify-from":"1.2.3.3","slave":"yes","superslave":"yes"]'
 cpcmd scope:set cp.bootstrapper powerdns_webserver_enable false
@@ -115,6 +119,8 @@ env BSARGS="--extra-vars=force=yes" upcp -sb software/powerdns
 ::: tip force=yes
 Bootstrapper will avoid overwriting certain configurations unless explicitly asked. `force=yes` is a global variable that forces an overwrite on files.
 :::
+
+Be sure to skip down to the [Remote API access](#remote-api-access) section to configure the hidden master endpoint.
 
 #### Periodic maintenance
 
@@ -173,6 +179,8 @@ Working off the example above *<Location /dns> ... </Location>*
 	DOSEnabled off
 </Location>
 ```
+#### 429 errors
+429 Rate limit exceeded occurs whenever the page count exceeds the threshold. Raising `DOSPageCount`/`DOSPageInterval` will raise the threshold to trigger a 429 response. See also [Evasive.md](../Evasive.md).
 
 ### Standalone server
 
