@@ -68,3 +68,16 @@ upcp -sb
 ```
 
 See [PowerDNS](dns/PowerDNS.md) module documentation for further details.
+
+## Troubleshooting
+
+### dns:add_record_conditionally() fails due to duplicate entries
+`dns:add-record-conditionally()` queries the configured module nameservers for a matching DNS record set using `dig`. If [PowerDNS](./dns/PowerDNS.md), these nameservers are read from `config/auth.yaml` and set by the `powerdns_nameservers` [Bootstrapper setting](Bootstrapper.md). For other DNS providers, this value is read from the respective API.
+
+```bash
+cpcmd -d domain.com dns:get-hosting-nameservers domain.com
+# Reports ns1.domain.com, ns2.domain.com
+dig +norec +aaonly +time=3 +tcp +short @ns1.domain.com TXT foo.domain.com
+# Equivalent to the following commmand:
+cpcmd -d domain.com dns:record-exists domain.com foo TXT
+```
