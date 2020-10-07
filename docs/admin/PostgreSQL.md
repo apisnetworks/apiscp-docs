@@ -21,6 +21,18 @@ When a prefix is changed, all authentication details must be updated to referenc
 
 ## Troubleshooting
 
+### Depopulating databases
+
+**New in 3.2.6**
+
+Both MySQL and PostgreSQL have a double throw safety switch built into [service metadata](Glossary.md#metadata). To remove databases and access rights, both *enabled* and *dbaseprefix* must be disabled/nulled respectively.
+
+```bash
+EditDomain -c pgsql,enabled=0 -c pgsql,dbaseprefix=None -D domain.com
+```
+
+In the above, PostgreSQL is disabled and all databases/grants removed from an account. To temporarily disable database creation without removing these grants, specify `pgsql,enabled=0` without nulling *dbaseprefix*.
+
 ### Upgrading PostgreSQL
 
 It is not advised to upgrade PostgreSQL major versions, e.g. 11 -> 12. Instead, migrate the sites to another server using automated [server-to-server](Migrations - server.md) migrations. Upgrade-in-place requires exporting the database via `pg_dumpall` then importing following upgrade.

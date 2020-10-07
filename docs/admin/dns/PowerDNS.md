@@ -172,7 +172,7 @@ Working off the example above *<Location /dns> ... </Location>*
 ```
 <Location /dns>
 	# Raise threshold to 30 same-page requests in 2 seconds
-	DOSPageCount 30
+	DOSPageCount 60
 	DOSPageInterval 2
 
 	# Or disable entirely

@@ -23,6 +23,18 @@ When a prefix is changed, all authentication details must be updated to referenc
 
 ## Troubleshooting
 
+### Depopulating databases
+
+**New in 3.2.6**
+
+Both MySQL and PostgreSQL have a double throw safety switch built into [service metadata](Glossary.md#metadata). To remove databases and access rights, both *enabled* and *dbaseprefix* must be disabled/nulled respectively.
+
+```bash
+EditDomain -c mysql,enabled=0 -c mysql,dbaseprefix=None -D domain.com
+```
+
+In the above, MySQL is disabled and all databases/grants removed from an account. To temporarily disable database creation without removing these grants, specify `mysql,enabled=0` without nulling *dbaseprefix*.
+
 ### Cyclic InnoDB crash
 
 #### Background
