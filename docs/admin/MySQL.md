@@ -18,7 +18,7 @@ When a prefix is changed, all authentication details must be updated to referenc
 
 ## Enabling remote connections
 
-`data_center_mode` is a [Bootstrapper](Bootstrapper.md) setting that opens remote access to MySQL. Once opened, MySQL is protected by [Rampart](Rampart.md). `data_center_mode` opens up remote MySQL access in addition to a slew of other features. If you'd like to just open MySQL, use the **mysql.remote-access** [Scope](Scopes.md).
+`data_center_mode` is a [Bootstrapper](Bootstrapper.md) setting that opens remote access to MySQL. Once opened, MySQL is protected by [Rampart](../FIREWALL.md). `data_center_mode` opens up remote MySQL access in addition to a slew of other features. If you'd like to just open MySQL, use the **mysql.remote-access** [Scope](Scopes.md).
 
 
 ## Troubleshooting
