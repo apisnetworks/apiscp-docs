@@ -135,7 +135,7 @@ Sometimes you may want to force a zone update - if changing public nameservers -
 - **zone cleanup**
 
     ```bash
-    pdns_control list-zones --type slave | sed '$d' | xargs -I {} sh -c "host -t SOA {} master.domain.com | tail -n1 | grep -q 'has SOA record' | pdnsutil delete-zone {}"
+    pdns_control list-zones --type slave | sed '$d' | xargs -I {} sh -c "host -t SOA {} master.domain.com | tail -n1 | grep -q 'has no SOA record' | pdnsutil delete-zone {}"
     ```
 
 
