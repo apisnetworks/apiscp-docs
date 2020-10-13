@@ -71,8 +71,8 @@ Each backend has different authentication parameters. These are baked into `argo
 ```bash
 cpcmd scope:set argos.auth '' USERKEY
 # is equivalent to...
-cpcmd argos_config high '[user_key:USERKEY]'
-cpcmd argos_config default '[user_key:USERKEY]'
+cpcmd argos:config-relay high '[user_key:USERKEY]'
+cpcmd argos:config-relay default '[user_key:USERKEY]'
 ```
 
 Pushover requires one additional configuration parameter, API token:
@@ -80,21 +80,21 @@ Pushover requires one additional configuration parameter, API token:
 ```bash
 cpcmd scope:set argos.config '' '[api_token:APITOKEN]'
 # Alternatively...
-cpcmd argos_config default '[api_token:APITOKEN]'
-cpcmd argos_config high '[api_token:APITOKEN]'
+cpcmd argos:config-relay default '[api_token:APITOKEN]'
+cpcmd argos:config-relay high '[api_token:APITOKEN]'
 ```
 
 Now test sending a relay through each backend:
 
 ```bash
-cpcmd argos_test
-cpcmd argos_test high
+cpcmd argos:test
+cpcmd argos:test high
 ```
 
 You can use Argos to relay messages at your leisure to configured channels. Of course apnscp needs to be operable for it to work, so this won't work when MySQL is down!
 
 ```bash
-cpcmd argos_send "Some Message" high "Test Title"
+cpcmd argos:send "Some Message" high "Test Title"
 ```
 
 Alternatively you can use ntfy directly, which works if MySQL is down,
@@ -124,10 +124,10 @@ monit status apache
 
 ## Switching backends
 
-Pushover comes highly recommended because of its features, but you can exchange pushover with any supported monitoring interface. To exchange with the apnscp API, use `argos_config()`,
+Pushover comes highly recommended because of its features, but you can exchange pushover with any supported monitoring interface. To exchange with the apnscp API, use `argos:config()`,
 
 ```bash
-cpcmd argos_config default '[backend:slack]'
+cpcmd argos:config-relay default '[backend:slack]'
 # Or alternatively
 cpcmd scope:set argos.backend high default
 ```
@@ -143,11 +143,11 @@ cpcmd scope:set argos.backend high default
 Multiple channels may be stacked into a channel to expand notification. It requires creating a new channel, then enrolling the channel as a backend into either *default* or *high* unless you want to relay through a separate channel.
 
 ```bash
-cpcmd argos_create_backend slack-relay slack
-cpcmd argos_config slack-relay '[token:slacktoken,recipient:#somechannel]'
+cpcmd argos:create-backend slack-relay slack
+cpcmd argos:config-relay slack-relay '[token:slacktoken,recipient:#somechannel]'
 # Stack slack-relay onto default
-cpcmd argos_set_default '[default,slack-relay]'
-cpcmd argos_test slack-relay
+cpcmd argos:set-default-relay '[default,slack-relay]'
+cpcmd argos:test slack-relay
 # Alternatively...
 ntfy -c /root/.argos.conf -b slack-relay send 'Test!'
 ```
