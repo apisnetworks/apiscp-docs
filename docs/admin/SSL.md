@@ -92,7 +92,7 @@ curl -H http://mydomain.com/.well-known/acme-challenge/JSauNS-u2QmqMZfnyljdbD9PT
 ```
 
 ::: warning
-`.well-known/` is often aliased to a general purpose system directory location. If the above curl request doesn't work, there's a good change it's located somewhere else, e.g. /tmp/.well-known.
+`.well-known/` is often aliased to a general purpose system directory location. If the above curl request doesn't work, there's a good chance it's located somewhere else, e.g. /tmp/.well-known.
 :::
 
 #### Staging DNS
