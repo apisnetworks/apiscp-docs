@@ -228,9 +228,11 @@ module.exports = {
               ]
             },
             "admin/FTP",
+
             "admin/Monitoring",
             "admin/Resource enforcement",
             "admin/Metrics",
+            "admin/Kernel",
 
             "admin/Backups",
             "admin/Maps",
