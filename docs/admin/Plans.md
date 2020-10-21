@@ -62,7 +62,7 @@ AddDomain -c siteinfo,domain=securedomain.com -c siteinfo,admin_user=secureuser 
 
 **--plan|-p=name**: apply named plan to account  
 **--force**: hook failure does not constitute addition failure  
-**--bootstrap**: attempt to issue SSL certificate upon creation. Setting *[letsencrypt]* => *auto_bootstrap* [tuneable](Tuneables.md) implies this option. When enabled `-c ssl,enabled=0` disables this feature.
+**--bootstrap | --bootstrap=[true|false]**: attempt to issue SSL certificate upon creation. Setting *[letsencrypt]* => *auto_bootstrap* [tuneable](Tuneables.md) implies this option. When enabled, `--bootstrap=false` or  `-c ssl,enabled=0` disables this feature.
 
 ### API usage
 
