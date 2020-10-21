@@ -39,4 +39,17 @@ mysql
 SET GLOBAL table_definition_cache=16384;
 ```
 
-If the error resolves, this is due to the [table definition](https://dev.mysql.com/doc/refman/5.6/en/server-system-variables.html#sysvar_table_definition_cache) limit of 4096 being reached. Changes may be made permanent by adding `table_definition_cache=16384` under the [mysqld] section in /etc/my.cnf.d/server.cnf or any file lexicographically higher than "apnscp.conf".
+If the error resolves, this is due to the [table definition](https://dev.mysql.com/doc/refman/5.6/en/server-system-variables.html#sysvar_table_definition_cache) limit of 4096 being reached. Changes may be made permanent by adding `table_definition_cache=16384` under the **[mysqld]** section in `/etc/my.cnf.d/server.cnf` or any file lexicographically higher than "apnscp.conf".
+
+## fail2ban extended startup
+
+Hosting more sites creates more opportunity for indiscriminate attacks. [Rampart](../FIREWALL.md) continuously blocks threats, logging to fail2ban to replay its activity if the server were to reboot. "recidive" is a long-term ban list for repeat offenders that accumulates significant entries over its 10 day duration, sometimes up to 10,000 while other short-term ban lists may have a few dozen entries at a time. Whenever fail2ban starts (or restarts), this ban list is recreated from entries in `/var/log/fail2ban.log` that can create additional resource contention between CPU/disk that amplifies a thundering herd problem among other services, including per-site PHP-FPM pools that can number in the several hundreds.
+
+fail2ban can be configured to tail `/var/log/fail2ban.log` on startup, that is to say instead of replaying the entire log just monitor for new entries. Instead of parsing 100k+ lines only new lines are parsed that can reduce the cumulative burden on startup. 
+
+Existing bans in the database will still be applied on startup, but these bans are replayed with less rigor that may create omissions in the "recidive" ban list.
+
+```bash
+cpcmd scope:set cp.bootstrapper f2b_recidive_tail true
+upcp -sb fail2ban/configure-jails
+```

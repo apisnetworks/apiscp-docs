@@ -135,9 +135,14 @@ Sometimes you may want to force a zone update - if changing public nameservers -
 - **zone cleanup**
 
     ```bash
-    pdns_control list-zones --type slave | sed '$d' | xargs -I {} sh -c "host -t SOA {} master.domain.com | tail -n1 | grep -q 'has no SOA record' | pdnsutil delete-zone {}"
+    pdns_control list-zones --type slave | sed '$d' | xargs -I {} sh -c "host -T -t SOA {} master.domain.com | tail -n1 | grep -q 'has no SOA record' | pdnsutil delete-zone {}"
     ```
 
+::: tip TCP mode
+DNS uses UDP by default, which is a lossy protocol that does not guarantee
+delivery. Enable TCP mode with `-T` to guarantee the transmission was
+received by master.domain.com.
+:::
 
 ## Remote API access
 
