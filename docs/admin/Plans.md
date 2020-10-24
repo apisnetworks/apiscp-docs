@@ -63,6 +63,7 @@ AddDomain -c siteinfo,domain=securedomain.com -c siteinfo,admin_user=secureuser 
 **--plan|-p=name**: apply named plan to account  
 **--force**: hook failure does not constitute addition failure  
 **--bootstrap | --bootstrap=[true|false]**: attempt to issue SSL certificate upon creation. Setting *[letsencrypt]* => *auto_bootstrap* [tuneable](Tuneables.md) implies this option. When enabled, `--bootstrap=false` or  `-c ssl,enabled=0` disables this feature.
+**--notify**: send a welcome email to the email address specified in *siteinfo*,*email*. This template may be overridden in `resources/views/email/opcenter/account-created.blade.php` (see [Customizing.md](Customizing.md)).
 
 ### API usage
 
