@@ -145,3 +145,34 @@ This situation arises when the primary domain is *not authorized* to handle mail
 ```php
 mail('user@example.com', 'Subject Line', 'Email body', ['From' => 'help@apiscp.com']);
 ```
+
+## Troubleshooting
+
+###  "TLS is required, but was not offered by host"
+When sending mail to a domain, it may be rejected with the following delivery status notification indicating a problem with TLS used to encrypt the communication. It has been observed with @sbcglobal.net (Prodigy Internet) services to be a spurious error caused by a delayed DNSBL check *after* connection.
+
+For example, consider the following debug attempt that opens a SMTP connection to 144.160.159.22 issuing a STARTTLS command to opportunistically encrypt the connection:
+
+```bash
+sudo -u postfix openssl s_client -connect 144.160.159.22:25 -starttls smtp -debug
+```
+
+```
+220 flpd599.prodigy.net ESMTP Sendmail Inbound 8.15.2/8.15.2; Thu, 29 Oct 2020 09:53:18 -0700..
+
+(0x17))
+
+EHLO mail.example.com..
+
+119 (0x77)) 250-flpd599.prodigy.net Hello X.Y.Z [X.Y.Z.108], pleased to meet you..250 ENHANCEDSTATUS
+CODES..
+(0xA))
+
+STARTTLS..
+
+122 (0x7A))
+
+553 5.3.0 flpd599 DNSBL:RBL 521<X.Y.Z.108 > _is_blocked. For assistance forward this error to abuse_rbl@abuse-att.net..
+```
+
+In the above example it's clear a DNSBL verdict is reached after initializing a TLS session thus resulting in the spurious error.
