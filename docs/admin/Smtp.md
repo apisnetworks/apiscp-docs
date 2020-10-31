@@ -146,6 +146,37 @@ This situation arises when the primary domain is *not authorized* to handle mail
 mail('user@example.com', 'Subject Line', 'Email body', ['From' => 'help@apiscp.com']);
 ```
 
+## Splitting delivery IPs
+
+Postfix supports a [sender transport map](http://www.postfix.org/postconf.5.html#sender_dependent_default_transport_maps) that allows a different [transport](http://www.postfix.org/transport.5.html) to be configured by sender (domain or full email).
+
+Assigning a delivery IP for a domain (or sender) requires [customizating](Customizing.md#postfix) master.cf.
+
+Create a new service in `/etc/postfix/master.d` named `ip-relay.cf` with a new *smtp* service:
+
+```
+mydomain.com-out unix  -       -       n       -       -       smtp
+        -o smtp_helo_name=mydomain.com
+        -o smtp_bind_address=64.22.68.2
+```
+
+::: details
+A new transport called `mydomain.com-out` is created that invokes the `smtp` process in Postfix to handle mail. Both `smtp_helo_name` and `smtp_bind_address` are overrode for this service. Any mail that passes through this transport will connect from 64.22.68.2 and identify itself during HELO as `mydomain.com`.
+:::
+
+Add a new sender transport in `/etc/postfix/sender_transports`. For all mail from @mydomain.com to send through this transport specify:
+
+```
+@mydomain mydomain.com-out:
+```
+
+Lastly run `postmap /etc/postfix/sender_transport` to recompile the map and `upcp -sb mail/configure-postfix` to update master.cf.
+
+::: tip Site-specific overrides
+Any override named `siteXX-NAME.cf` will be removed when the corresponding siteXX is removed from the server.
+:::
+
+
 ## Troubleshooting
 
 ###  "TLS is required, but was not offered by host"
