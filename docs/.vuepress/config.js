@@ -204,6 +204,7 @@ module.exports = {
                     "admin/webapps/WordPress",
                     "admin/webapps/Go",
                     "admin/webapps/Node",
+                    "admin/webapps/Perl",
                     "admin/webapps/Python",
                     "admin/webapps/Ruby",
                   ]

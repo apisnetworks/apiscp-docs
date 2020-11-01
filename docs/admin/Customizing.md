@@ -200,6 +200,11 @@ Any file in fail2ban may be overridden with a corresponding `.local` file. It ta
 *See also*
 - [MANUAL 0.8](https://www.fail2ban.org/wiki/index.php/MANUAL_0_8#Configuration) (fail2ban.org) - covers configuration/override in detail
 
+## MySQL
+
+**⚠️ DO NOT TOUCH:** /etc/my.cnf.d/apnscp.conf  
+**Customization file:** /etc/my.cnf.d/*  
+
 ## Postfix
 
 **⚠️ DO NOT TOUCH:** /etc/postfix/master.conf  
@@ -242,11 +247,6 @@ mydomain.com-out unix  -       -       n       -       -       smtp
 ```
 
 Then to merge changes for both examples, run `upcp -sb mail/configure-postfix`.
-
-## MySQL
-
-**⚠️ DO NOT TOUCH:** /etc/my.cnf.d/apnscp.conf  
-**Customization file:** /etc/my.cnf.d/*  
 
 ## PostgreSQL
 
