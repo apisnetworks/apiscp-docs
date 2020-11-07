@@ -9,7 +9,7 @@
 - Containers are not supported (Virtuozzo, OpenVZ)
 
 ## Bootstrapping
-[Bootstrapper](https://github.com/apisnetworks/apnscp-playbooks) is an idempotent tool to continuously update and correct your server. If things drift, Bootstrapper is designed to provide the **minimal set** of enforcing changes to make your server work. You will always have free rein of your server as long as it doesn't impede upon the responsibility of ApisCP. [Scopes](admin/Scopes) provide guarded management points that are jointly managed by Bootstrapper.
+[Bootstrapper](https://github.com/apisnetworks/apnscp-playbooks) is an idempotent tool to continuously update and correct your server. If things drift, Bootstrapper is designed to provide the **minimal set** of enforcing changes to make your server work. You will always have free rein of your server as long as it doesn't impede upon the responsibility of ApisCP. [Scopes](admin/Scopes.md) provide guarded management points that are jointly managed by Bootstrapper.
 
 Bootstrapping is performed during installation and during integrity checks, run monthly. To begin, run the stub script. This can be downloaded from the [GitHub](https://github.com/apisnetworks/apnscp-bootstrapper) repository. Customizations are provided through ApisCP's [Customization Tool](https://apiscp.com/#customizer).
 
