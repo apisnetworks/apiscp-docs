@@ -132,3 +132,27 @@ cpcmd -o json admin:collect null '[ipinfo.namebased:1]' | jq -r 'keys[]' | while
 	EditDomain -c ipinfo,nbaddrs=[] -c ipinfo,namebased=1 -c ipinfo,nb6addrs=[] $i
 done
 ```
+
+### Multihomed networks
+
+Consider a situation in which a network has 2 public IPs, **64.22.68.12** and **64.22.68.14**. Outbound Internet traffic goes over **64.22.68.14**. Inbound server traffic for websites goes over **64.22.68.12**. Detection will yield **64.22.68.14** while **64.22.68.12** is intended. It is necessary to edit *[dns],proxyaddr*  and *[dns],proxyaddr6* with the proper IP address after installation.
+
+```bash
+cpcmd scope:get cp.config dns proxyaddr
+# Reports incorrect value, 64.22.68.14
+cpcmd scope:set cp.config dns proxyaddr 64.22.68.12
+# DNS will now publish 64.22.68.12 for all domains
+```
+
+Likewise conflicts may also affect hairpin checks, which is a best-effort attempt to determine if the public IP forwards HTTP requests. Hairpin checks are essential during [SSL certificate](./SSL.md) prechecks to reduce error counts with Let's Encrypt. 
+
+A hairpin check from server1.mydomain.com with the public IP 64.22.68.12 as reported by DNS would be as follows,
+
+```curl
+curl -I --resolve server1.mydomain.com:80:64.22.68.12 http://server1.mydomain.com/monit.html
+```
+
+A timeout or non-200 response - assuming `/var/www/html/monit.html` exists on the ApisCP server - would be indicative of a router that does not support hairpinning.
+
+In such situations, set *[dns],hairpin* either 1 (public IP supports hairpinning) or 0 (public IP does not support hairpinning). ApisCP will always perform a best-effort guess if *[dns],proxyaddr* or *[dns],proxyaddr6* is configured; however these guesses may fail when DNS conflicts exist requiring manual override.
+
