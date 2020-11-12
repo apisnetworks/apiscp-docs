@@ -205,6 +205,19 @@ Any file in fail2ban may be overridden with a corresponding `.local` file. It ta
 **⚠️ DO NOT TOUCH:** /etc/my.cnf.d/apnscp.conf  
 **Customization file:** /etc/my.cnf.d/*  
 
+## phpMyAdmin
+
+**⚠️ DO NOT TOUCH:** /var/www/html/phpMyAdmin/config.inc.php  
+**Customization file:** /var/www/html/phpMyAdmin/config.local.inc.php    
+
+Create this customization file if it does not already exist.
+
+```php
+<?php
+    // set custom configuration here
+?>
+```
+
 ## Postfix
 
 **⚠️ DO NOT TOUCH:** /etc/postfix/master.conf  
