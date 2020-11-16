@@ -18,7 +18,7 @@ Whitelists may be IP address (64.22.68.1) or CIDR range (64.22.68.1/24). `rampar
 
 ![Firewall overview](./images/firewall-diagram.svg)
 
-## Whitelisting access
+## Whitelisting
 
 ApisCP restricts access to all ports except for well-known services (HTTP, FTP, mail, SSH) and optional services (CP, user daemons). A second whitelist, which allows access to blocked ports as well as overrides Rampart can be set using `cpcmd rampart:whitelist`:
 
@@ -70,11 +70,12 @@ curl -o- http://www.ipdeny.com/ipblocks/data/countries/cn.zone | while read -r I
 
 All blacklist listings are permanent unless removed with `cpcmd rampart:blacklist($ip, 'remove')`.
 
-## Service filters
 
-fail2ban monitors service logs for failed/anomalous logins. These are referred back to `f2b-XXX` ipsets when thresholds are reached.  By default a 10 minute ban is applied if 3 or more logins occur in a 5 minute period. Specific jails may be overrode by setting per-jail values in Bootstrapper using the cp.bootstrapper [Scope](admin/Scopes.md). fail2ban configuration variables follow a familiar pattern, `f2b_` + *jail name* + `_` + *parameter*.
+## Components
 
-*All time values are in seconds*
+A **service filter** inspects a log for offending activity. A **service accumulator** is a counter internal to fail2ban that keeps track of offending activity per IP and filter over a duration. Once this threshold is reached, a ban is placed on the IP for all ports configured for that filter.
+
+Service accumulators by default permit 3 attempts (`f2b_maxretry`) in a 5 minute period (`f2b_findtime`). Additional failures result in a 10 minute ban (`f2b_bantime`). These values may be altered in Bootstrapper.
 
 ```bash
 # Change monitoring interval to 15 minutes for Dovecot
@@ -87,6 +88,33 @@ cpcmd scope:set f2b_malware_maxretry 5
 upcp -sb fail2ban/configure-jails
 ```
 
+Per-service accumulators may be set specifying `f2b_` + *filter name* + _ + *accumulator var*. For example, to change the bantime setting for "dovecot" filter to 300 seconds:
+
+```bash
+cpcmd scope:set cp.bootstrapper f2b_dovecot_bantime 300
+upcp -sb fail2ban/configure-jails
+```
+
+**Service filters** are available in /etc/fail2ban/filter.d. Each jail in the next section uses a single filter to monitor for bad activity.
+
+### Jails
+
+A variety of jails provide granular protection over public services. The following table summarizes these jails.
+
+| Filter       | Port protection     | Role                            |
+| ------------ | ------------------- | ------------------------------- |
+| dovecot      | 110, 995, 143, 995  | IMAP/POP3 failures              |
+| evasive      | 80, 443             | HTTP brute-force                |
+| malware      | 80, 443             | HTTP uploads containing malware |
+| mysqld       | 3306                | Remote MySQL failures           |
+| pgsql        | 5432                | Remote PostgreSQL failures      |
+| postfix      | 25, 587, 465        | Anomalous SMTP traffic          |
+| postfix-sasl | 25, 587, 465        | SMTP (SASL auth) failures       |
+| recidive     | ALL PORTS           | Recurrent failures              |
+| spambots     | 25, 587             | Known bad SMTP fingerprints     |
+| sshd         | 22 (or `sshd_port`) | SSH failures                    |
+| vsftpd       | 20, 21, 989, 990    | FTP failures                    |
+
 ### Recidivism
 
 "Recidivism" is a specific term derived from fail2ban's [recidive jail](https://wiki.meurisse.org/wiki/Fail2Ban#Recidive) for repeat offenders. If a user repeats a ban across any monitored service 5 times (`f2b_recidive_maxretry`) in 12 hours (`f2b_recidive_findtime`), then a 10-day ban (`f2b_recidive_bantime`) is applied. Values may be altered by changing the parenthesized value with a [Scope](admin/Scopes.md).
@@ -97,8 +125,7 @@ cpcmd scope:set cp.bootstrapper f2b_recidive_bantime $((86400*30))
 upcp -sb fail2ban/configure-jails
 ```
 
-
-### Unbanning IP addresses
+## Unbanning IP addresses
 
 All IP addresses automatically unban from Rampart after a fixed duration. To manually unban an address from Rampart use cpcmd:
 
