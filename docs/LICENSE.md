@@ -1,8 +1,8 @@
 # License management
 
-ApisCP may be installed with a trial license using the [customization helper](https://apiscp.com/#customizer) on apiscp.com. Trial licenses are armed for 30 days and allow you to modify a system or reinstall to your preference. A lifetime paid license **cannot be reset nor reclaimed at this time**; therefore, it is recommended to install with a trial license then perform an upgrade in the panel once you're satisfied with the system.
+ApisCP may be installed with a trial license using the [customization helper](https://apiscp.com/#customizer) on apiscp.com. Trial licenses are armed for 30 days and allow you to modify a system or reinstall to your preference.
 
-Trial and paid versions of ApisCP are functionally identical.
+Trial and paid versions of ApisCP are functionally identical. Paid licenses may be revoked and reissued at any time.
 
 ## Creating a license upgrade
 
