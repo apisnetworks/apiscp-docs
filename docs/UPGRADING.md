@@ -22,6 +22,8 @@ ApisCP is configured to deploy patch and minor updates on update. This is contro
     *Example: ❌ 3.1.1 => 3.1.2*
 - **edge**: always apply updates, official or experimental  
     *Example: ✔️ 3.1.1 => 3.1.2, ✔️ 3.1.10 => 3.2.0, ✔️ 4.3.99 => 5.0.0, ✔️ 3fcae012 => cefa3210*
+- **edge-major**: apply edge updates until next major release  
+    Example: ✔️ 3.1.1 => cefa3210, ✔️ cefa3210 => 3.1.2, ❌ 3.1.2 => 4ac0f25f
 
 Updates are checked automatically every night. This behavior can be changed via `cp.nightly-updates` Scope.
 
