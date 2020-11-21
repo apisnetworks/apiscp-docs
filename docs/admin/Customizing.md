@@ -59,6 +59,12 @@ ApisCP was originally called APNSCP. Internally, in many places, the panel is st
 
 All views may be copied into `config/custom/resources/views/<path>` from `resources/views/<path>`. Custom views take precedence, including all mail templates. Overriding `layout.blade.php` allows customization to the skeleton of all apps in ApisCP.
 
+::: warning Updating configuration first time
+ApisCP compiles configuration on each start to provide the best possible performance. When creating resource overrides in `config/custom/resources/view` or `config/custom/resources/templates` the first time restart ApisCP so it knows to look in these directories. Prior to making this change, these locations are compiled out on boot.
+
+`systemctl restart apiscp`
+:::
+
 #### Layout
 
 A master layout named "layout" is provided in `resources/views/`. As with all templates suffixed "blade.php", it utilizes [Blade](https://laravel.com/docs/5.6/blade). A theme-specific blade may override the master layout by creating an eponymous template in `config/custom/resources/views/`. For example, to override the "apnscp" theme, create a file named `config/custom/resources/views/apnscp.blade.php`. Inheritance is supported via `@extends("layout")` in addition to section injection.

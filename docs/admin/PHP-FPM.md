@@ -326,6 +326,10 @@ php_value[post_max_size] = 64m
 
 Then restart the pool, `systemctl restart php-fpm-siteXX` 
 
+::: tip php_admin immutability
+Any value marked as `php_admin_value` or `php_admin_flag` may not be reset or changed once set. Use fpm-config-custom.blade.php below to update.
+:::
+
 ### Service templates
 
 Customizations are applied inline to all PHP-FPM pools defined in sites/ if an override exists in `config/custom/resources/templates/apache/php/partials/fpm-config-custom.blade.php`:
@@ -349,6 +353,12 @@ Once set, rebuild PHP-FPM for all sites:
 ```bash
 EditDomain --reconfig --all
 ```
+
+::: warning Updating configuration first time
+ApisCP compiles configuration on each start to provide the best possible performance. When creating resource overrides in `config/custom/resources/view` or `config/custom/resources/templates` the first time restart ApisCP so it knows to look in these directories. Prior to making this change, these locations are compiled out on boot.
+
+`systemctl restart apiscp`
+:::
 
 ### User overrides
 
