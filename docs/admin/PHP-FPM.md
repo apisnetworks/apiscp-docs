@@ -627,3 +627,35 @@ Remi is an easier system to manage when juggling a variety of PHP versions, but 
 3. Remi is not officially supported by Apis Networks for support. PHP bundled with ApisCP is built with features to address nearly all hosting inquiries over the last 15 years.
 4. Remi builds do not provide configuration adjustments to Site Administrators.
 5. Each PHP release may have different library requirements. `yum-post.php depends` will do its best to resolve these for you. After setup, verify it works correctly in an account (`su domain.com`) by running `scl enable phpXX -- php -r 'phpinfo();' > /dev/null` to attempt to load all extensions. This will pull in PHP extensions and hopefully provide some hint at what - if anything - is missing.
+
+## Troubleshooting
+
+### Pool fails to start
+
+Pools use socket activation to start. When activity comes across `/run/php-fpm/siteXX-pool-name.socket`, the corresponding service, `php-fpm-siteXX-pool-name` is started using systemd. systemd has a hold-off period that marks a pool as failed if more than 3 restarts occur within a 15 second interval. Restrictions are in place to avoid unintended denial of service attacks. systemd does not provide a means to restart these pools once deactivated either, requiring manual intervention within the panel to restart.
+
+Validate the concern that caused the pool not to start.
+
+```bash
+journalctl -n20 -u php-fpm-siteXX-domain.com
+# Look for timestamps of failures, e.g.
+# Nov 22 20:11:59 test3.apisnetworks.com php-fpm[7199]: [22-Nov-2020 20:11:59] WARNING: Nothing matches the include pattern '/etc/php-fpm.d/*.conf' from /etc/php-fpm.d/sites/apisnetworks.test.conf at line 53.
+# Nov 22 20:11:59 test3.apisnetworks.com php-fpm[7199]: [22-Nov-2020 20:11:59] ERROR: Unable to write to the PID file.: Disk quota exceeded (122)
+# Nov 22 20:11:59 test3.apisnetworks.com php-fpm[7199]: [22-Nov-2020 20:11:59] ERROR: FPM initialization failed
+# Nov 22 20:11:59 test3.apisnetworks.com systemd[1]: php-fpm-site193-apisnetworks.test.service holdoff time over, scheduling restart.
+# Nov 22 20:11:59 test3.apisnetworks.com systemd[1]: Stopped PHP worker for site193 - apisnetworks.test.
+# Nov 22 20:11:59 test3.apisnetworks.com systemd[1]: start request repeated too quickly for php-fpm-site193-apisnetworks.test.service
+# Nov 22 20:11:59 test3.apisnetworks.com systemd[1]: Failed to start PHP worker for site193 - apisnetworks.test.
+# Nov 22 20:11:59 test3.apisnetworks.com systemd[1]: Unit php-fpm-site193-apisnetworks.test.service entered failed state.
+# Nov 22 20:11:59 test3.apisnetworks.com systemd[1]: php-fpm-site193-apisnetworks.test.service failed.
+```
+
+Correct the underlying cause to remedy the problem. In this case increase disk quota: `EditDomain -c diskquota,quota=10000 -D apisnetworks.test`.
+
+::: tip Scroll up
+PHP-FPM will attempt to restart 3 times logging each failure. Because of this behavior the root cause may not be immediately apparently in the last 13 lines (*4 diagnostic lines per failure + 1 final failure*).
+:::
+
+### Verifying pool socket status
+
+`systemctl list-dependencies sockets.target` displays all sockets as well as their corresponding status. 🟢 is an active socket, while 🔴 is inactive.

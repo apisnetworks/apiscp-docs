@@ -101,7 +101,7 @@ upcp -sb fail2ban/configure-jails
 
 A variety of jails provide granular protection over public services. The following table summarizes these jails.
 
-| Filter       | Port protection     | Role                            |
+| Jail         | Port protection     | Role                            |
 | ------------ | ------------------- | ------------------------------- |
 | dovecot      | 110, 995, 143, 995  | IMAP/POP3 failures              |
 | evasive      | 80, 443             | HTTP brute-force                |
