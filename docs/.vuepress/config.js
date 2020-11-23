@@ -238,6 +238,7 @@ module.exports = {
             "admin/Backups",
             "admin/Maps",
             "admin/Benchmarking",
+            "admin/Panel proxy",
             "DEBUGGING",
           ]
         },

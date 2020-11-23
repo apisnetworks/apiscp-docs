@@ -5,7 +5,7 @@
 - 2 GB RAM
 - 20 GB storage
 - 1 CPU
-- RHEL/CentOS 7.4+
+- RHEL/CentOS 7.4+/8+ or CentOS 8 Stream
 - Containers are not supported (Virtuozzo, OpenVZ)
 
 ## Bootstrapping
