@@ -266,6 +266,32 @@ On all instances that accept traffic from cp-proxy, set *[core]* => *http_truste
 cpcmd scope:set cp.config core http_trusted_forward 1.2.3.4
 ```
 
+#### Multi-homed Hosts
+
+When working in situations in which a server is multi-homed, ensure each IP is bound to the panel. With ApisCP this can be accomplished by specifying multiple VHost macros in `/usr/local/apnscp/config/httpd-custom.conf`:
+
+```
+ServerName myserver.com
+Use VHost 64.22.68.12
+Use VHost 64.22.68.13
+```
+
+#### Different root domains
+
+Proxy requires that all servers share the same root domain. For example, assuming proxy endpoint "cp.mydomain.com" and hosting servers,
+
+- svr1.mydomain.com
+- svr2.mydomain.com
+- svr3.mydomain.hosting
+
+Both "svr1" and "svr2" would be valid names added to [cp-collector](https://github.com/apisnetworks/cp-collector). "svr3" would be invalid because the TLD (*.hosting*) differs.
+
+To work around this, add each differing domain to /etc/hosts or create DNS records under mydomain.com. For example, in `/etc/hosts` this would suffice:
+
+```bash
+echo "$(dig +short svr3.mydomain.hosting) svr3.mydomain.hosting" >> /etc/hosts
+```
+
 ### Design
 
 #### Server layout
@@ -295,13 +321,3 @@ Each subsequent request sends the session cookie that includes the server name t
 #### Bypassing reverse proxy
 
 An application may include `no-proxy` header in its response. The Location will flow through in the response headers effectively allowing the session to break from the proxy.
-
-#### Multi-homed Hosts
-
-When working in situations in which a server is multi-homed, ensure each IP is bound to the panel. With apnscp this can be accomplished by specifying multiple VHost macros in `/usr/local/apnscp/config/httpd-custom.conf`:
-
-```
-ServerName myserver.com
-Use VHost 64.22.68.12
-Use VHost 64.22.68.13
-```
