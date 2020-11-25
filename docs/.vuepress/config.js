@@ -270,6 +270,7 @@ module.exports = {
                 "RELEASE-3.0",
               ]
             },
+            ['https://api.ara.apiscp.com', 'Build log'],
             "GLOSSARY"
           ]
         }

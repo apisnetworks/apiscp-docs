@@ -628,6 +628,20 @@ Remi is an easier system to manage when juggling a variety of PHP versions, but 
 4. Remi builds do not provide configuration adjustments to Site Administrators.
 5. Each PHP release may have different library requirements. `yum-post.php depends` will do its best to resolve these for you. After setup, verify it works correctly in an account (`su domain.com`) by running `scl enable phpXX -- php -r 'phpinfo();' > /dev/null` to attempt to load all extensions. This will pull in PHP extensions and hopefully provide some hint at what - if anything - is missing.
 
+## Composer
+
+### Updating
+
+Run `php/composer` with `composer_keep_updates=true` to force a manual update of Composer. Composer may be periodically updated every platform scrub by setting this value in `apnscp-vars-runtime.yml`. A Scope is provided to make this easier.
+
+```bash
+# Update one-time
+env BSARGS="--extra-vars=composer_keep_updated=true" upcp -sb php/composer
+# Keep updated during scrubs
+cpcmd scope:set php.composer-autoupdate true
+```
+
+
 ## Troubleshooting
 
 ### Pool fails to start

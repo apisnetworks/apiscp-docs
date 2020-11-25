@@ -8,6 +8,14 @@ Panel proxy can be combined with [Cachet](https://cachethq.io/) to report server
 
 All components of panel proxy are available on [GitHub](https://github.com/search?q=topic%3Apanel-proxy+org%3Aapisnetworks&type=Repositories).
 
+A typical topology exists of at least 2 nodes with the cp-api on a separate node from cp-proxy/cp-collector for security. 
+
+::: details Layout considerations
+cp-collector encrypts authentication data with a key outside the database. This key is required to decrypt authentication keys (API/SSH) to collect accounts. Separation of services adds an extra layer of security should the API server become compromised. This also allows the API service to run on a normal ApisCP instance as its own account.
+:::
+
+![Minimum recommended topology](./images/proxy-server-topology-basic.svg)
+
 ## Collection agent
 
 **Repository**: [apisnetworks/cp-collect](https://github.com/apisnetworks/cp-collect)
