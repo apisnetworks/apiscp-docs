@@ -113,6 +113,7 @@ cpcmd rampart:whitelist 1.2.2.3
 cpcmd scope:set cp.bootstrapper clamav_clamd_tcp_addr 1.2.2.1
 # Setting true implicitly sets clamav_clamd_local_socket to null
 cpcmd scope:set cp.bootstrapper clamav_client_only true
+cpcmd scope:set cp.bootstrapper clamav_enabled true
 upcp -sb clamav/setup
 ```
 
