@@ -86,7 +86,46 @@ Confirmation will be similar, reporting the virus found.
 
 ![Lua EICAR test](./images/eicar-lua-test.png)
 
+
+## Remote anti-virus
+
+When multiple servers exist in a cluster, it's beneficial to designate one server ClamAV duties. Such an arrangement is easy to accomplish.
+
+::: warning DoS risks
+Use `cpcmd rampart:whitelist CLIENT.IP.ADD.RESS` to whitelist each client IP on the ClamAV scanner. There is no protection against malicious usage resulting in information disclosure or denial of service attacks. There is absolutely **zero authentication**. Firewall authorization is the only safety.
+
+You have been warned. See also [ClamAV's official bulletin](https://blog.clamav.net/2016/06/regarding-use-of-clamav-daemons-tcp.html).
+:::
+
+Assuming 1.2.2.1 is the ClamAV scanner and 1.2.2.3 is a participating node using 1.2.2.1 to scan malware:
+
+*On host, 1.2.2.1*:
+
+```bash
+cpcmd scope:set cp.bootstrapper clamav_clamd_tcp_addr 1.2.2.1
+upcp -sb clamav/setup
+# Allow communication from 1.2.2.3 to bypass firewall
+cpcmd rampart:whitelist 1.2.2.3
+```
+
+*On client, 1.2.2.3*
+```
+cpcmd scope:set cp.bootstrapper clamav_clamd_tcp_addr 1.2.2.1
+# Setting true implicitly sets clamav_clamd_local_socket to null
+cpcmd scope:set cp.bootstrapper clamav_client_only true
+upcp -sb clamav/setup
+```
+
+Then perform an EICAR test on client to confirm communication,
+
+```bash
+echo 'K5B!C%@NC[4\CMK54(C^)7PP)7}$RVPNE-FGNAQNEQ-NAGVIVEHF-GRFG-SVYR!$U+U*' | tr '[A-Za-z]' '[N-ZA-Mn-za-m]' > /eicar
+clamdscan /eicar
+rm -f /eicar
+```
+
 ## Troubleshooting
+
 ### 413 Request Entity Too Large on POST
 When sending a large payload (> 256 KB) as a POST, mod_security will reject the content with a `413 Request Entity Too Large` response. This occurs from a combination of the request size and form encoding type ("enctype"). When submitting files, the form enctype should be set as "*multipart/form-data*". A form default encoding type is "*application/x-www-form-urlencoded*" and unsuitable for sending large files ([RFC 1867](https://tools.ietf.org/html/rfc1867) § 3.2). Moreover, specifying "*multipart/form-data*" allows a file to suggest its MIME disposition and character encoding ([RFC 2388](https://tools.ietf.org/html/rfc2388) § 5.6).
 
