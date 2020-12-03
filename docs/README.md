@@ -38,7 +38,3 @@ Use the [Issue Tracker](https://github.com/apisnetworks/apnscp) to post feature 
 ## License
 
 ApisCP is (c) Apis Networks. All components except for third-party modules and [ApisCP modules](https://github.com/apisnetworks/apnscp-modules) are licensed under a [commercial license](https://bitbucket.org/apisnetworks/apnscp/raw/HEAD/LICENSE). Contact licensing@apisnetworks.com for licensing enquiries. Any dissemination of material herein is prohibited without expressed written consent of Apis Networks.
-- Migrate the database
-  ```bash
-  sudo -u cpcollect ./proxy migrate
-  ```
