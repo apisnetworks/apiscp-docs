@@ -14,7 +14,7 @@ yum install -y docker
 /usr/local/apnscp/bin/scripts/yum-post.php install -d docker siteinfo
 mkdir -p /home/virtual/FILESYSTEMTEMPLATE/siteinfo/etc/sysconfig
 cp -dp /etc/sysconfig/docker /home/virtual/FILESYSTEMTEMPLATE/siteinfo/etc/sysconfig/
-systemctl fsmount reload
+systemctl reload fsmount
 ```
 
 Files in `/etc/sysconfig` are typically skipped during filesystem replication. Populate this file to avoid any complications during initialization.
@@ -31,7 +31,7 @@ Reconfigure Docker to expose its Unix socket to an accessible location within th
 echo -e '{\n\t"hosts": ["unix:///var/run/docker.sock", "unix:///.socket/docker.sock"],\n\t"group": "docker"\n}' > /etc/docker/daemon.json
 systemctl restart docker
 ln -s  /.socket/docker.sock /home/virtual/FILESYSTEMTEMPLATE/siteinfo/var/run/docker.sock
-systemctl fsmount reload
+systemctl reload fsmount
 ```
 
 ::: warning CentOS 7 rhsm hotfix
@@ -73,6 +73,7 @@ For example, if the port argument is `--port 8082:8080` then externally, 8082 is
 DirectoryIndex disabled
 
 RewriteEngine On
+RewriteCond %{HTTP:Connection} =upgrade [NC]
 RewriteCond %{HTTP:Upgrade} =websocket [NC]
 RewriteRule ^(.*)$ ws://localhost:8082/$1 [L,QSA,P]
 RewriteRule ^(.*)$ http://localhost:8082/$1 [L,QSA,P]
@@ -129,6 +130,7 @@ RewriteEngine On
 RewriteCond %{HTTPS} !=on
 RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R,L]
 
+RewriteCond %{HTTP:Connection} =upgrade [NC]
 RewriteCond %{HTTP:Upgrade} =websocket [NC]
 RewriteRule ^(.*)$ ws://localhost:9000/$1 [L,QSA,P]
 RewriteRule ^(.*)$ http://localhost:9000/$1 [L,QSA,P]
