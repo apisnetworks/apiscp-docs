@@ -50,6 +50,43 @@ EditDomain -c dns,provider=null -D somesite.com
 
 Providers may also be configured within Nexus for the domain.
 
+## Registering custom providers
+
+**New in 3.2.16**
+
+Providers may be registered outside the ApisCP distribution in `config/custom/` using `\Opcenter\Dns::registerProvider()`. Providers require both a **module** named `Module` and **validator** named `Validator`.
+
+```bash
+cd /usr/local/apnscp
+git clone https://github.com/apisnetworks/apiscp-dns-cloudflare config/custom/cloudflare
+sudo -u apnscp ./composer dumpautoload
+```
+Next register the provider module in `config/custom/boot.php`:
+
+```php
+<?php declare(strict_types=1);
+
+\Opcenter\Dns::registerProvider('mymodule', Opcenter\Dns\Providers\Cloudflare\Module::class);
+// namespace may also be registered instead of the module:
+// \Opcenter\Dns::registerProvider('mymodule', 'Opcenter\Dns\Providers\Cloudflare');
+```
+
+Finally restart ApisCP backend for configuration to update:
+
+```bash
+systemctl restart apiscp
+```
+
+"mymodule" is now a registered DNS provider.
+
+```bash
+EditDomain -c dns,provider=mymodule -c dns,key='[key:cloudflaretoken]' domain.com
+```
+
+::: details Autoload registration
+Astute readers will note that the full class path registered in boot.php didn't change. `dumpautoload` allows custom classes with the same name to override core panel classes.
+:::
+
 ## DNS-only platform
 
 ApisCP may also be configured in DNS-only mode, which disables all services and sets the default DNS provider to PowerDNS. This is helpful in clustering layouts. A DNS-only [license](../LICENSE.md) may be generated within [my.apiscp.com](https://my.apiscp.com) by selecting **DNS-only** from the license type dropdown.

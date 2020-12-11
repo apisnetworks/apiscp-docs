@@ -89,6 +89,13 @@ systemctl list-timers apnscp-flare-check.timer
 # 1 timers listed.
 ```
 
+### Update failure notifications
+**New in 3.2.14**
+
+ApisCP will generate a failure email if `upcp` fails abnormally during non-interactive mode. Update logs are stored in `storage/.upcp.failure` and removed when `upcp` exits with a zero status. ApisCP on each boot looks for this file, sending log contents to the admin email (`cpcmd common:get-email`) if present. `misc:notify-update-failure()` is the corresponding API command.
+
+These notification checks may be disabled permanently by setting `LOG_UPDATE=false` in `/etc/sysconfig/apnscp`.
+
 ## System updates
 
 System updates are delivered via Yum. It is recommended to NOT alter this default. Failing appropriate judgment, this may be changed via `system.update-policy` Scope,
