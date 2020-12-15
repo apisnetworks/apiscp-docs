@@ -32,6 +32,7 @@ A unprivileged user, `cpcollect`, will account collections.
   useradd -rms /sbin/nologin cpcollect
   cd /home/cpcollect
   ```
+  
 - Clone the repository
   ```bash
   sudo -u cpcollect git clone https://github.com/apisnetworks/cp-collect.git /home/cpcollect/cp-collect
@@ -55,6 +56,11 @@ A unprivileged user, `cpcollect`, will account collections.
     ```
 
 - Update the .env file, set the `DB_USERNAME`, `DB_PASSWORD` and `DB_DATABASE` fields.
+
+- Migrate the database
+  ```bash
+  sudo -u cpcollect ./proxy migrate
+  ```
 
 - For each linked server, create an API key, the command will return the key which you'll use on the Collector to add the server.
     ```bash
