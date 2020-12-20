@@ -21,7 +21,7 @@ Copy `/usr/local/apnscp/resources/templates/apache/placeholder.blade.php` to `/u
 ### Suspension page
 All suspended accounts via [SuspendDomain](Plans#suspenddomain) redirect to `/var/www/html/suspend.html`. Suspension rules may be modified by adjusting the rewrite rules.
 
-Copy `/usr/local/apnscp/resources/templates/apache/suspend-rules.blade.php` to `/usr/local/apnscp/config/custom/resources/tempaltes/apache/suspend-rules.blade.php` creating parent directories as needed.
+Copy `/usr/local/apnscp/resources/templates/apache/suspend-rules.blade.php` to `/usr/local/apnscp/config/custom/resources/templates/apache/suspend-rules.blade.php` creating parent directories as needed.
 
 A site once suspended will compile these rules into `/etc/httpd/conf/siteXX/00-suspend`. Rules will not be updated unless suspended again. `admin:collect()` provides a convenient way to do this.
 
