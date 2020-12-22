@@ -132,6 +132,9 @@ The following quickstart assumes **cp-collect** stores domain information within
     git clone https://github.com/apisnetworks/cp-api /var/www/html-api
     cp .env.example .env
     ln -s html-api/public html
+    cd html-api
+    composer install
+    exit
     ```
 
 3. Detect application. Open up logging permissions. Request SSL.
@@ -195,20 +198,25 @@ cp /home/cp/proxy/cp-proxy.sysconf /etc/sysconfig/cp-proxy
 # Now is a good time to edit /etc/sysconfig/cp-proxy!
 cp /home/cp/proxy/cp-proxy.service /etc/systemd/system
 sudo -u cp /bin/bash -ic 'nvm install 10 ; cd /home/cp/proxy/ ; nvm exec npm install'
-systemctl enable cp-proxy
-systemctl start cp-proxy
+systemctl enable --now cp-proxy
 ```
 
-Next connect Apache to it by modifying `/etc/httpd/conf/httpd-custom.conf` within the SSL `VirtualHost` container
+Next connect Apache to it by modifying `/etc/httpd/conf/httpd-custom.conf` within the SSL `VirtualHost` container. Pagespeed is disabled, which is known to cause interference with assets.
 
 ```
 <IfModule ssl_module>
         Listen 443
-        <VirtualHost 66.42.83.159:443 66.42.83.159:443 127.0.0.1:443 [::1]:443 >
+        <VirtualHost 66.42.83.159:443 127.0.0.1:443 [::1]:443 >
                 ServerName cp.mydomain.com
                 SSLEngine On
                 RewriteEngine On
                 RewriteOptions Inherit
+                
+                # Disable gzip compression
+                <IfModule pagespeed_module>
+                    ModPagespeed unplugged
+                </IfModule>
+                
                 # Pass HTTPS status
                 RequestHeader set X-Forwarded-Proto "https"
                 # Add this line, note trailing /
@@ -219,11 +227,20 @@ Next connect Apache to it by modifying `/etc/httpd/conf/httpd-custom.conf` withi
 </IfModule>
 ```
 
+Next, reconfigure ApisCP to listen on a private network for the cp-proxy service.
+
+```bash
+cpcmd scope:set cp.bootstrapper has_proxy_only true
+cpcmd scope:set cp.bootstrapper cp_proxy_ip 127.0.0.1
+# Regenerate httpd-custom.conf in ApisCP
+env BSARGS="--extra-vars=force=yes" upcp -sb apnscp/bootstrap
+```
+
 Run `htrebuild`, then visit [https://cp.mydomain.com](https://cp.mydomain.com/). You're done!
 
 ------
 
-By default, cp-proxy will read from [http://localhost:2082](http://localhost:2082/). On a DNS-server this hosts no domains, which requires configuration below to route.
+By default, cp-proxy will read from [http://127.0.0.1:2082](http://127.0.0.1:2082/). On a DNS-server this hosts no domains, which requires configuration below to route.
 
 ### Configuration
 
@@ -236,9 +253,9 @@ cpcmd scope:set cp.config <SECTION> <NAME> <VALUE>
 | Section | Name                 | Description                                                  | Sample Value                                        |
 | ------- | -------------------- | ------------------------------------------------------------ | --------------------------------------------------- |
 | auth    | secret               | Must be the same across *all* instances. Used to encrypt trusted browsers. | ABCDEFGH                                            |
-| auth    | server_format        | Optional format that appends a domain to the result of *server_query*. \<SERVER> is substituted with result from JSON query. | \<SERVER>.mydomain.com                                       |
+| auth    | server_format        | Optional format that appends a domain to the result of *server_query*. \<SERVER> is substituted with result from JSON query. | \<SERVER>.mydomain.com                              |
 | auth    | server_query         | API endpoint that returns a JSON object with the server name. | https://api.mydomain.com/lookup                     |
-| core    | http_trusted_forward | [cp-proxy](https://github.com/apisnetworks/cp-proxy) service IP address. | 1.2.3.4                                             |
+| core    | http_trusted_forward | [cp-proxy](https://github.com/apisnetworks/cp-proxy) service IP address or 127.0.0.1 if proxy. | 1.2.3.4                                             |
 | misc    | cp_proxy             | Control panel proxy endpoint that cp-proxy resides on.       | [https://cp.mydomain.com](https://cp.mydomain.com/) |
 | misc    | sys_status           | Optional Cachet location for system status                   | https://demo.cachethq.io/                           |
 
@@ -253,6 +270,31 @@ for i in auth,secret auth,server_format auth,server_query core,http_trusted_forw
 	echo "cpcmd scope:set cp.config $section $value '$(cpcmd scope:get cp.config $section $value)'"
 done
 ```
+
+#### Passing IP address
+
+All requests pass `X-Forwarded-For`, which is the client address. Each ApisCP panel installation **must be configured** to trust the cp-proxy server's data. Failure to do so will result in incorrect brute-force protection applied via [Anvil](../SECURITY.md#remote-access) or worse, IP spoofing by a malicious actor.
+
+On all instances that accept traffic from cp-proxy **besides cp-proxy**, set *[core]* => *http_trusted_forward* assuming cp-proxy has the IP address 1.2.3.4:
+
+```bash
+cpcmd scope:set cp.bootstrapper cp_proxy_ip 1.2.3.4
+env BSARGS="--extra-vars=force=yes" upcp -sb apnscp/bootstrap
+```
+
+**On the cp-proxy instance**, set http_trusted_forward to 127.0.0.1:
+
+```bash
+cpcmd scope:set cp.bootstrapper has_proxy_only true
+cpcmd scope:set cp.bootstrapper cp_proxy_ip 127.0.0.1
+env BSARGS="--extra-vars=force=yes" upcp -sb apnscp/bootstrap
+```
+
+:::warning cp-proxy as a solitary service
+Setting `http_trusted_forward` to 127.0.0.1 prevents spoofing from malicious actors when sending a bogus `X-Forwarded-For:` header. Setting `http_trusted_forward` to 1.2.3.4 without restricting public network access via `PrivateNetwork=yes` would allow an attacker to spoof their IP remotely from 1.2.3.4, or in other words allow a customer on your network to brute-force other machines. 
+
+Keeping cp-proxy as a solitary service prevents such internal subterfuge.
+:::
 
 ##### Adding SSL
 
@@ -275,16 +317,7 @@ All configuration is managed within `/etc/sysconfig/cp-proxy`. After making chan
 - **LISTEN_PORT**: port on which cp-proxy listens
 - **LISTEN_ADDRESS**: IPv4/6 address on which cp-proxy listens
 - **SECRET**: used to encrypt session cookie. Generated randomly on service startup, which will cause logouts whenever cp-proxy is restarted. Recommended to define this value.
-
-#### Passing X-Forwarded-For header
-
-All requests pass X-Forwarded-For, which is the client address. Each ApisCPpanel installation **must be configured** to trust the cp-proxy server's data.
-
-On all instances that accept traffic from cp-proxy, set *[core]* => *http_trusted_forward*
-
-```bash
-cpcmd scope:set cp.config core http_trusted_forward 1.2.3.4
-```
+- **STRICT_SSL**: enable peer verification of hostnames when connecting via SSL
 
 #### Multi-homed Hosts
 
