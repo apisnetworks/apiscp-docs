@@ -275,18 +275,28 @@ done
 
 All requests pass `X-Forwarded-For`, which is the client address. Each ApisCP panel installation **must be configured** to trust the cp-proxy server's data. Failure to do so will result in incorrect brute-force protection applied via [Anvil](../SECURITY.md#remote-access) or worse, IP spoofing by a malicious actor.
 
-On all instances that accept traffic from cp-proxy **besides cp-proxy**, set *[core]* => *http_trusted_forward* assuming cp-proxy has the IP address 1.2.3.4:
+On all instances that accept traffic from cp-proxy **besides cp-proxy**, set *[core]* => *http_trusted_forward* assuming cp-proxy has the IP address 1.2.3.4. 
+
+*`cp_proxy_ip` is a special setting in Bootstrapper that populates http_trusted_forward.*
 
 ```bash
-cpcmd scope:set cp.bootstrapper cp_proxy_ip 1.2.3.4
+cpcmd scope:set cp.bootstrapper cp_proxy_ip "1.2.3.4"
 env BSARGS="--extra-vars=force=yes" upcp -sb apnscp/bootstrap
+# Or alternatively
+# cpcmd scope:set cp.config core http_trusted_forward "1.2.3.4"
+#
+# Then in /usr/local/apnscp/config/httpd-custom.conf, add:
+#
+# LoadModule remoteip_module sys/httpd/modules/mod_remoteip.so
+# RemoteIPHeader X-Forwarded-For
+# RemoteIPTrustedProxy 1.2.3.4
 ```
 
 **On the cp-proxy instance**, set http_trusted_forward to 127.0.0.1:
 
 ```bash
 cpcmd scope:set cp.bootstrapper has_proxy_only true
-cpcmd scope:set cp.bootstrapper cp_proxy_ip 127.0.0.1
+cpcmd scope:set cp.bootstrapper cp_proxy_ip "127.0.0.1"
 env BSARGS="--extra-vars=force=yes" upcp -sb apnscp/bootstrap
 ```
 
