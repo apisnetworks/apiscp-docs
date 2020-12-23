@@ -117,6 +117,21 @@ Apps populated as part of ApisCP may be hidden or removed from view using `hide(
     $templateClass->getApplicationFromId('dashboard')->hide();
 ```
 
+`config/custom/templates/site.php`:
+
+```php
+<?php
+    //list of apps to remove from sites
+    $appsRemove=array('terminal','prlanguages','verco','packman','soapkeys','apiexplorer');
+    foreach ($appsRemove as $appRemove){
+        //confirm the app exists before calling remove
+        if ($app = $templateClass->getApplicationFromId($appRemove)) {
+            //remove the app entirely
+            $app->remove();
+        }
+    }
+```
+
 ### App view overrides
 
 Any app that uses Blade templates (`views/` directory) is eligible to override components of the template structure. Create the same structure in `config/custom/apps/<name>` as is in `apps/<name>`. For example to override `apps/ssl/views/partials/certificate-detected.blade.php`, copy that file to `config/custom/apps/ssl/views/partials/certificate-detected.blade.php`. ApisCP will load the view from this location first. It is advisable to copy the entire application over (*App overrides*) as application structure may change between releases.
