@@ -2,7 +2,7 @@
 
 rspamd can operate in a few flavors depending upon the number of servers you have, how much memory you can set aside, and whether you can trust the data fed into the system.
 
-All commands use `cpcmd`  to interact with apnscp's API. All commands assume you're up-to-date with apnscp via `upcp`. After running the sequence of commands, run `upcp -b` to run [Bootstrapper](https://github.com/apisnetworks/apnscp-playbooks).
+All commands use `cpcmd`  to interact with ApisCP's API. All commands assume you're up-to-date with ApisCP via `upcp`. After running the sequence of commands, run `upcp -b` to run [Bootstrapper](Bootstrapper.md).
 
 For the less attentive variety `cpcmd scope:set system.integrity-check 1` performs the same operation as `upcp -b` but sends an email digest to the [admin email](https://hq.apiscp.com/apnscp-3-0-beta-released/#bootstrapper-job-support) upon completion.
 
@@ -35,7 +35,7 @@ cpcmd scope:set cp.bootstrapper rspamd_worker_socket somehost:someport
 
 ## Low memory without Redis
 
-Setting `has_low_memory` will put apnscp into a miserly mode stripping many auxiliary features, including Redis (backend becomes SQLite), neural learning, conversational whitelisting, and greylisting.
+Setting `has_low_memory` will put ApisCP  into a miserly mode stripping many auxiliary features, including Redis (backend becomes SQLite), neural learning, conversational whitelisting, and greylisting.
 
 ```bash
 cpcmd scope:set cp.bootstrapper has_low_memory true

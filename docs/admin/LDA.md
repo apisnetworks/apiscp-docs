@@ -1,8 +1,8 @@
 ---
-title: Mail delivery (maildrop)
+title: maildrop
 ---
 
-Local delivery agent ("LDA") handles last mile delivery of mail locally to the server. maildrop is utilized as the LDA agent for [Postfix](Smtp.md). maildrop was chosen for syntactic familiarity with other services, but a message may be easily dispatched to another service for final delivery.
+Local delivery agent ("LDA") handles last mile delivery of mail locally to the server. [maildrop](https://www.courier-mta.org/maildrop/) is utilized as the LDA agent for [Postfix](Smtp.md). maildrop was chosen for syntactic familiarity with other services, but a message may be easily dispatched to another service for final delivery.
 
 ## Delivery pipeline
 
