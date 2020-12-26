@@ -1,4 +1,6 @@
-# SMTP
+---
+title: Postfix
+---
 
 SMTP provides outbound mail relaying for the server. This is typical low-hanging fruit for hackers and a frequent attack vector. ApisCP provides a few means to secure SMTP, including denying outbound SMTP access to any non-mail process. Direct SMTP access is a common technique used to circumvent mail logs and TCP sockets are anonymous, which can make tracking down the origin quite difficult. [StealRat](https://www.abuseat.org/cmsvuln.html) for example uses this technique.
 
@@ -108,7 +110,7 @@ example.com  error:Bad domain!
 
 > After editing, run `postmap /etc/postfix/transport` to update the database.
 
-## SRS forwards
+## SRS
 
 Sender rewriting scheme ("SRS") alters the envelope sender to match the intermediate forwarding server thus inhibiting an SPF violation on the sender's domain (qux.com).
 

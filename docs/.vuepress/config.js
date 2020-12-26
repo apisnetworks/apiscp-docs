@@ -214,11 +214,20 @@ module.exports = {
             "admin/Docker",
             {
               title: "Mail",
-              children: [
-                "admin/Smtp",
-                "admin/LDA",
-                "admin/Filtering",
-                "admin/Majordomo",
+	      children: [
+	        "admin/Mail.md",
+		 {
+	           title: "Services",
+                   children: [
+                     "admin/Smtp",
+		     "admin/Dovecot",
+                     "admin/rspamd",
+                     "admin/SpamAssassin",
+                     "admin/LDA",
+	             "admin/Authlib",
+                     "admin/Majordomo",
+                   ]
+	        },
                 {
                   title: "Providers",
                   children: [
