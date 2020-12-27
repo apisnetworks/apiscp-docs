@@ -107,6 +107,28 @@ curl -i \
 [{"code":"iifGi10LQpKo6cAk2oNKSMMvgz5t2ZC4qcOHN5W8iyssD85TZzYHKhIxUcCB","available":1,"issued":1591601554,"created_at":1591601554,"common_name":"server123"}]
 ```
 
+### Listing redemptions by code
+
+**GET** `vendor/code/ID`  
+A list of all codes generated may be retrieved through this endpoint.
+
+```bash
+curl -i \
+	--cacert ./apnscp.ca \
+	-E ./license.pem \
+	-H "Content-Type: application/json" \
+	-X GET \
+	"https://license.apiscp.com/vendor/code/iifGi10LQpKo6cAk2oNKSMMvgz5t2ZC4qcOHN5W8iyssD85TZzYHKhIxUcCB"
+```
+
+**SAMPLE RESPONSE**
+
+```bash
+[{"id":"1","certificate_id":91,"ip":"192.168.0.147","created_at":1591693179}]
+```
+
+Note: **certificate_id** is the license ID. **id** is sequential redemption ID, which is unused in vendor licensing.
+
 ## Managing licenses
 
 ### Listing licenses
