@@ -531,7 +531,7 @@ ansible-playbook bootstrap.yml --tags=php/install-pecl-module --extra-vars=php_v
 For easier package-based multiPHP management, ApisCP includes support for [Remi PHP](https://rpms.remirepo.net/). If installing on CentOS or RedHat 8, change "7" to "8".
 
 ```bash
-yum install http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+yum install http://rpms.remirepo.net/enterprise/remi-release-$(rpm -E '%{rhel}').rpm
 ```
 
 Then to install say PHP 7.4 with ionCube loader, MySQL, OPCache PECL:
