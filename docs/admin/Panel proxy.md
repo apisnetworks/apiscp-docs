@@ -306,6 +306,10 @@ Setting `http_trusted_forward` to 127.0.0.1 prevents spoofing from malicious act
 Keeping cp-proxy as a solitary service prevents such internal subterfuge.
 :::
 
+:::tip Improving security
+systemd network isolation can be enabled to restrict intraserver communication to just the named services: mysql, postgresql, and cp-proxy.  Set `proxy_intraserver_only=true` in Bootstrapper, then run `env BSARGS="--extra-vars=force=yes" upcp -sb apnscp/bootstrap`. This makes an assumption that the API lookup **does not** reside on the same server (*[auth]* => *server_query* is different than local). If such a configuration were required, create a systemd override that adds `httpd.service` to `JoinsNamespaceOf`.
+:::
+
 #### Billing compatibility
 
 [WHMCS module](https://github.com/lhdev/apiscp-whmcs) passes the active client IP address as `X-Forwarded-For` for firewall checks. When using cp-proxy in conjunction with supported billing modules, it is necessary to add the billing server to the list of trusted forwards. Specifying a list of IP addresses, ApisCP will filter internal and external addresses.
