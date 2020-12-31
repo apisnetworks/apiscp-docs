@@ -54,7 +54,8 @@ EditDomain -c rampart,max=-1 otherdomain.com
 Additionally, `rampart:whitelist()` (without arguments) allows the caller to whitelist its public IP if not previously whitelisted. `rampart:temp($ip = null, $duration = 7200)` works similarly with a temporary whitelisting that deauthorizes after the set interval (*default: 7200 seconds*). These features may be invoked with [Beacon](https://github.com/apisnetworks/beacon) to simplify batch scripting with dhcp clients.
 
 ### Delegation precedence
-**New in v3.2.18**
+**New in 3.2.18**
+
 Delegation is placed in the `ignorelist` ipset. This takes precedence after administrative ingress rules, but before brute-force rejection rules. Thus a delegated whitelist entry is only protected from brute-force rejection. Delegated whitelisting may use the `whitelist` ipset, which takes precedence before any administrative rules are applied giving the IP address absolute permission. Likewise when `rampart:whitelist()` is called by admin, these entries are always added to the `whitelist` ipset.
 
 ```bash
