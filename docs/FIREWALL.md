@@ -37,12 +37,12 @@ Single quotes are not compulsory, but help the shell (Bourne shell) discriminate
 Site Administrators can whitelist a limited number of IP addresses by through **Account** > **Whitelisting**. This value can be toggled per-site by adjusting *rampart*,*max*. If set to `DEFAULT` it inherits *rampart*,*max* service value. A few specific values for *rampart*,*max* imply specific meanings:
 
 - `-1`: unlimited whitelisting entries (OS limit)
-
 - `0`: disable whitelisting
-
 - `> 0`: up to n whitelist entries
 
-A whitelist trumps all other filters, including blacklists. **Delegated whitelisting is hierarchically equivalent to an administrative whitelist** via `cpcmd rampart:whitelist`. Each whitelist entry is held by a site. These values are codified in *rampart*,*whitelist* as a list of IPv4/IPv6 addresses. When a site is deleted, the whitelist is not released until all sites that hold a reference to the whitelist have been removed.
+A delegated whitelist entry permits access even if the IP would have been banned by brute-force protection. Delegated whitelisting uses the same API call, `rampart:whitelist()`, but is not equivalent to whitelisting as admin, which bypasses any firewall rules and allows absolute access. *See [Delegation precedence](#delegation-precedence) below for changing this behavior.* 
+
+Entries are codified in *rampart*,*whitelist* as a list of IPv4/IPv6 addresses. When a site is deleted, the whitelist is not released until all sites that hold a reference to the whitelist have been removed.
 
 ```bash
 # Permit 20 whitelisted IPs to domain.com
@@ -53,6 +53,25 @@ EditDomain -c rampart,max=-1 otherdomain.com
 
 Additionally, `rampart:whitelist()` (without arguments) allows the caller to whitelist its public IP if not previously whitelisted. `rampart:temp($ip = null, $duration = 7200)` works similarly with a temporary whitelisting that deauthorizes after the set interval (*default: 7200 seconds*). These features may be invoked with [Beacon](https://github.com/apisnetworks/beacon) to simplify batch scripting with dhcp clients.
 
+### Delegation precedence
+**New in 3.2.18**
+
+Delegation is placed in the `ignorelist` ipset. This takes precedence after administrative ingress rules, but before brute-force rejection rules. Thus a delegated whitelist entry is only protected from brute-force rejection. Delegated whitelisting may use the `whitelist` ipset, which takes precedence before any administrative rules are applied giving the IP address absolute permission. Likewise when `rampart:whitelist()` is called by admin, these entries are always added to the `whitelist` ipset.
+
+```bash
+# Put 1.2.3.4 in whitelist
+cpcmd rampart:whitelist 1.2.3.4
+# Put 2.3.4.5 in ignorelist
+cpcmd -d domain.com rampart:whitelist 2.3.4.5
+```
+
+Delegation set name is controlled via *[rampart]* => *delegation_set*. *delegation_set* may be either `ignorelist` or `whitelist`. When converting over, manually rename the set.
+
+```bash
+cpcmd scope:set cp.config rampart delegation_set ignorelist
+ipset swap whitelist ignorelist
+systemctl restart apiscp
+```
 
 ## Blacklisting
 

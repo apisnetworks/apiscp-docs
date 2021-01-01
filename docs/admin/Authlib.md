@@ -28,7 +28,6 @@ authtest foo@domain.com
 #Encrypted Password: (none)
 #Cleartext Password: (none)
 #           Options: (none)
-
 ```
 
 `getent` can be used to resolve the group ID ("gid") to its site storage.

@@ -452,42 +452,21 @@ Multiversion comes in two flavors, native (also called "multiPHP") and Remi, nam
 
 ### Native builds
 
-ApisCP ships with 1 PHP release for simplicity, but can support multiple versions as necessary. Additional versions may be built using Bootstrapper. A Scope is provided, *apache.php-multi*, that facilitates building new versions.
+ApisCP ships with 1 PHP release for simplicity, but can support multiple versions as necessary. Additional versions may be built using Bootstrapper. A Scope is provided, *php.multi*, that facilitates building new versions.
 
 ```bash
 # Add additional compile-time flags to 7.4 and build it
 cpcmd scope:set cp.bootstrapper php74_build_flags "--with-password-argon2"
 # Add PHP 7.4 support
-cpcmd scope:set apache.php-multi 7.4
+cpcmd scope:set php.multi 7.4
 # Remove PHP 7.4
-cpcmd scope:set apache.php-multi '[7.4:false]'
+cpcmd scope:set php.multi '[7.4:false]'
 ```
 
 All native multiPHP builds are located in /.socket/php/multiphp/native. OPCache is configured automatically.
 
-A site may be reconfigured to utilize the multiPHP release by manually adding an override. There is no direct means to switch versions in the panel yet.
-
-In /etc/systemd/system, create a directory named after the pool and suffixed with ".d". Pools are named php-fpm-siteXX-NAME. For example, to override pool named apis.com on site1, create a directory named *php-fpm-site1-apis.com.d/* and a file named "override.conf".
-
-`systemctl edit php-fpm-site1-apis.com` is equivalent to the above operation.
-
-```
-[Service]
-# The next line overrides the previously inherited ExecStart
-ExecStart=
-# DO NOT surround in quotes, it would be treated as a literal if so
-ExecStart=/.socket/php/multiphp/native/7.4/sbin/php-fpm --nodaemonize --fpm-config=/etc/php-fpm.d/sites/apis.com.conf
-```
-
-Then restart the service,
-
-```bash
-systemctl restart php-fpm-site1-apis.com
-```
-
-Configuration may be overrode by account owners ("Site Administrators") by placing  accompanying configuration in /etc/phpXX.d.
-
 #### Automatic builds/updates
+
 **New in 3.2.6**
 
 `php_multiphp` is a Bootstrapper setting that allows automated builds at install and updates during monthly platform checks. Versions should be defined as a list of MAJOR.MINOR versions; MAJOR.MINOR.PATCH works but would never update past initial install.
@@ -496,16 +475,16 @@ Configuration may be overrode by account owners ("Site Administrators") by placi
 cpcmd scope:set cp.bootstrapper php_multiphp '[5.6,7.2]'
 upcp -sb php/multiphp
 # Similar to above, but add 7.1
-cpcmd scope:set apache.php-multi '[5.6,7.1]'
+cpcmd scope:set php.multi '[5.6,7.1]'
 # Reports 5.6, 7.1, and 7.2
-cpcmd scope:get apache.php-multi
+cpcmd scope:get php.multi
 # Remove PHP 7.2
-cpcmd scope:set apache.php-multi '[7.2:false]'
+cpcmd scope:set php.multi '[7.2:false]'
 # Report active multiPHP versions 5.6, 7.1
-cpcmd scope:get apache.php-multi
+cpcmd scope:get php.multi
 ```
 
-The latest version of 5.6 and 7.2 would build as multiPHP releases. 
+The latest version of 5.6 and 7.2 would build as multiPHP releases. Any extensions defined either globally (`pecl_extensions`) or per-version (`pecl_phpXX`) are also installed as needed.
 
 #### Installing modules
 
@@ -526,49 +505,19 @@ cd /usr/local/apnscp/resources/playbooks
 ansible-playbook bootstrap.yml --tags=php/install-pecl-module --extra-vars=php_version=7.4 --extra-vars=multiphp_build=true
 ```
 
-### Remi PHP
+### Remi builds
 
 For easier package-based multiPHP management, ApisCP includes support for [Remi PHP](https://rpms.remirepo.net/). If installing on CentOS or RedHat 8, change "7" to "8".
 
 ```bash
-yum install http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+yum install http://rpms.remirepo.net/enterprise/remi-release-$(rpm -E '%{rhel}').rpm
 ```
 
 Then to install say PHP 7.4 with ionCube loader, MySQL, OPCache PECL:
 
 ```bash
-yum install -y php74-php-ioncube-loader php74-php-pecl-mysql php74-php-opcache
+yum install -y php74-php-fpm php74-php-ioncube-loader php74-php-pecl-mysql php74-php-opcache
 ```
-
-A site may be reconfigured to utilize the Remi PHP release by manually adding an override. There is no direct means to switch versions in the panel yet.
-
-In /etc/systemd/system, create a directory named after the pool and suffixed with ".d". Pools are named php-fpm-siteXX-NAME. For example, to override pool named apis.com on site1, create a directory named *php-fpm-site1-apis.com.d/* and a file named "override.conf".
-
-`systemctl edit php-fpm-site1-apis.com` is equivalent to the above operation.
-
-```
-[Service]
-# The next line overrides the previously inherited ExecStart
-ExecStart=
-# DO NOT surround in quotes, it would be treated as a literal if so
-ExecStart=/usr/bin/scl enable php74 -- php-fpm --daemonize --fpm-config=/etc/php-fpm.d/sites/apis.com.conf
-```
-
-Then restart the service,
-
-```bash
-systemctl restart php-fpm-site1-apis.com
-```
-
-This is very similar to default configuration with a few key differences:
-
-1. SCL is used to shim a new path, "php-fpm" is picked up in this shimmed path. /usr/sbin/php-fpm would be incorrect.
-2. An empty `ExecStart=` clears any previous ExecStart directives. Without this, ExecStart would be appended to the inherited ExecStart= command that starts PHP-FPM.
-3. `--nodaemonize` changes to `--daemonize` to ensure systemd picks up the scl to php-fpm process image change.
-
-PHP runtimes are located in `php<MAJOR><MINOR>-runtime` packages. `php<MAJOR><MINOR>` is a dummy package that pulls in dependency packages, including runtime.
-
-SCL collection configuration is defined in /etc/scl/conf. Remi PHP versions are named php\<MAJOR>\<MINOR>.
 
 #### Installing modules
 
@@ -618,7 +567,7 @@ su apis.com
 
 Do not attempt to install a module directly; it is already relocated. Once satisfied, you may run into permission issues if PHP-FPM runs as an unprivileged system user ("apache") rather than the account owner. `su -s /bin/bash -G ADMINUSER apache` would setup a similar environment to systemd prior to launch.
 
-### Remi vs Native
+### Native vs Remi
 
 Remi is an easier system to manage when juggling a variety of PHP versions, but it comes at some cost to performance and potential dependency management.
 
@@ -627,6 +576,128 @@ Remi is an easier system to manage when juggling a variety of PHP versions, but 
 3. Remi is not officially supported by Apis Networks for support. PHP bundled with ApisCP is built with features to address nearly all hosting inquiries over the last 15 years.
 4. Remi builds do not provide configuration adjustments to Site Administrators.
 5. Each PHP release may have different library requirements. `yum-post.php depends` will do its best to resolve these for you. After setup, verify it works correctly in an account (`su domain.com`) by running `scl enable phpXX -- php -r 'phpinfo();' > /dev/null` to attempt to load all extensions. This will pull in PHP extensions and hopefully provide some hint at what - if anything - is missing.
+
+### Switching versions
+
+#### API
+**New in 3.2.18**
+
+Use `cpcmd -d domain.com php:pool-set-version $VERSION` to set the pool version for a site. All versions can be listed by `cpcmd -d domain.com php:pool-versions`.
+
+Likewise end-users may adjust their pools via **Web** > **PHP Pools**. Pools may be restricted using a [policy map](#policy-maps).
+
+#### Manual
+
+::: warning Override precedence
+Manually setting PHP versions takes precedence over the API. This may be useful to lock a site to use a specific pool.
+:::
+
+##### Native
+
+In /etc/systemd/system, create a directory named after the pool and suffixed with ".d". Pools are named php-fpm-siteXX-NAME. For example, to override pool named apis.com on site1, create a directory named *php-fpm-site1-apis.com.d/* and a file named "override.conf".
+
+`systemctl edit php-fpm-site1-apis.com` is equivalent to the above operation.
+
+```
+[Service]
+# The next line overrides the previously inherited ExecStart
+ExecStart=
+# DO NOT surround in quotes, it would be treated as a literal if so
+ExecStart=/.socket/php/multiphp/native/7.4/sbin/php-fpm --nodaemonize --fpm-config=/etc/php-fpm.d/sites/apis.com.conf
+```
+
+Then restart the service,
+
+```bash
+systemctl restart php-fpm-site1-apis.com
+```
+
+##### Remi
+
+In /etc/systemd/system, create a directory named after the pool and suffixed with ".d". Pools are named php-fpm-siteXX-NAME. For example, to override pool named apis.com on site1, create a directory named *php-fpm-site1-apis.com.d/* and a file named "override.conf".
+
+`systemctl edit php-fpm-site1-apis.com` is equivalent to the above operation.
+
+```
+[Service]
+# The next line overrides the previously inherited ExecStart
+ExecStart=
+# DO NOT surround in quotes, it would be treated as a literal if so
+ExecStart=/usr/bin/scl enable php74 -- php-fpm --daemonize --fpm-config=/etc/php-fpm.d/sites/apis.com.conf
+```
+
+Then restart the service,
+
+```bash
+systemctl restart php-fpm-site1-apis.com
+```
+
+This is very similar to **native** with a few key differences:
+
+1. SCL is used to shim a new path, "php-fpm" is picked up in this shimmed path. /usr/sbin/php-fpm would be incorrect.
+2. An empty `ExecStart=` clears any previous ExecStart directives. Without this, ExecStart would be appended to the inherited ExecStart= command that starts PHP-FPM.
+3. `--nodaemonize` changes to `--daemonize` to ensure systemd picks up the scl to php-fpm process image change.
+
+PHP runtimes are located in `php<MAJOR><MINOR>-runtime` packages. `php<MAJOR><MINOR>` is a dummy package that pulls in dependency packages, including runtime.
+
+SCL collection configuration is defined in /etc/scl/conf. Remi PHP versions are named php\<MAJOR>\<MINOR>.
+
+### Policy maps
+**New in 3.2.18**
+
+A policy map remembers what PHP version is assigned to a given pool or account as well as setting several important parameters. Each policy map is generated from a template and saved to the account under `siteXX/info/php-policy.yml`. When hand-editing a policy, run `EditDomain --reconfig siteXX` to regenerate its configuration. If a pool version change is desired, then run `cpcmd -d siteXX php:pool-restart` after `EditDomain`.
+
+```yaml
+global:
+  # defaults to system version
+  # Bootstrapper value: system_php_version
+  version:
+  # Max PHP-FPM workers
+  # PHP-FPM value: pm.max_children
+  workers: {{ max(NPROC+2, 5) }}
+  # Max threads dedicated per server for queuing
+  # Apache value: <Proxy max=n>
+  threads: 3
+  # Max backlog
+  # PHP-FPM value: listen.backlog
+  backlog: 30
+  # Connection timeout
+  # Apache value: <Proxy acquire=n>
+  connect: 5s
+  # Maximum memory *per* PHP-FPM worker (keep low!)
+  # PHP value: memory_limit
+  memory: {{ (int)min(\Opcenter\System\Memory::stats()['memtotal']/1024*0.15,384) }}M
+pools:
+  # Per-pool configuration is not supported yet!
+  # "mydomain.com":
+  #   workers: 5
+  #   version: null or specific version
+# List of versions to disallow
+blacklist:
+  # - 5.6
+  # - 7.0
+# List of versions to allow
+# Omit to allow all versions
+whitelist:
+```
+
+As this is a Blade template, it's also possible to template the configuration.
+
+```yaml
+global:
+  # Set default PHP interpreter to 5.6 for legacy plans
+  @if ($svc->getServiceValue('siteinfo', 'plan') === 'legacy')
+  
+  version: '5.6'
+  @else
+  
+  version: '8.0'
+  @endif
+  
+  workers: {{ max(NPROC+2, 5) }}
+```
+
+Note the additional spacing after each conditional statement. This is a formatting peculiarity of Blade that joins the following line on compilation.
 
 ## Composer
 
