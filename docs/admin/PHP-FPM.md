@@ -647,6 +647,8 @@ SCL collection configuration is defined in /etc/scl/conf. Remi PHP versions are 
 
 A policy map remembers what PHP version is assigned to a given pool or account as well as setting several important parameters. Each policy map is generated from a template and saved to the account under `siteXX/info/php-policy.yml`. When hand-editing a policy, run `EditDomain --reconfig siteXX` to regenerate its configuration. If a pool version change is desired, then run `cpcmd -d siteXX php:pool-restart` after `EditDomain`.
 
+☝ See [master branch](https://gitlab.com/apisnetworks/apnscp/-/blob/master/resources/templates/apache/php/policy.blade.php) for latest policy template.
+
 ```yaml
 global:
   # defaults to system version
@@ -655,6 +657,9 @@ global:
   # Max PHP-FPM workers
   # PHP-FPM value: pm.max_children
   workers: {{ max(NPROC+2, 5) }}
+  # Max idle duration before a PHP-FPM worker quits
+  # PHP-FPM value: pm.process_idle_timeout
+  idle_timeout: 60s
   # Max threads dedicated per server for queuing
   # Apache value: <Proxy max=n>
   threads: 3
@@ -664,9 +669,11 @@ global:
   # Connection timeout
   # Apache value: <Proxy acquire=n>
   connect: 5s
-  # Maximum memory *per* PHP-FPM worker (keep low!)
-  # PHP value: memory_limit
-  memory: {{ (int)min(\Opcenter\System\Memory::stats()['memtotal']/1024*0.15,384) }}M
+  # All php_admin settings - cannot be overrode
+  php_settings:
+    # Maximum memory *per* PHP-FPM worker (keep low!)
+    # PHP value: memory_limit
+    memory_limit: {{ (int)min(\Opcenter\System\Memory::stats()['memtotal']/1024*0.15,384) }}M
 pools:
   # Per-pool configuration is not supported yet!
   # "mydomain.com":
