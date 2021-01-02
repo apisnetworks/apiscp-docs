@@ -39,6 +39,8 @@ ERROR: test_benchmark: command does not exist
 
 When in debug mode, housekeeping and cron services are disabled as well as job runner. Housekeeping/cron tasks may not be invoked traditionally. Job runner invocation is covered under [Jobs](#jobs).
 
+Verbosity may be selectively controlled via `env VERBOSE=n cpcmd` where *n* is a corresponding level in the table above. Verbosity cannot be selectively changed in the frontend. Set *[core]* => *debug_backtrace_qualifier* then target sessions for debug mode below.
+
 ## Targeted frontend debug
 
 `misc:debug-session(string $id, bool $mode = true)` enables debugging for a frontend session (DAV, UI, SOAP). Session identifier may be retrieved from a browser session by accessing the `session.id` property. `session.debug` encodes whether debug mode is enabled.
