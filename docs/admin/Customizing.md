@@ -211,6 +211,20 @@ Any file in fail2ban may be overridden with a corresponding `.local` file. It ta
 **⚠️ DO NOT TOUCH:** /etc/my.cnf.d/apnscp.conf  
 **Customization file:** /etc/my.cnf.d/*  
 
+Additionally, configuration may be overrode in Bootstrapper using `mysql_custom_config`. These values are set in `/etc/my.cnf.d/apnscp.cnf` and may be substituted in lieu of a higher order override.
+
+Create a special variable named `mysql_custom_config` in `/root/apnscp-vars-runtime.yml`. This is a dict that accepts any number of MySQL server directives that takes precedence.
+
+**Sample**
+
+```yaml
+mysql_custom_config:
+  # Disable max_join_size protection
+  max_join_size: -1
+```
+
+Then run `upcp -sb mysql/install` to update configuration.
+
 ## phpMyAdmin
 
 **⚠️ DO NOT TOUCH:** /var/www/html/phpMyAdmin/config.inc.php  
