@@ -223,3 +223,42 @@ For each device whitelist firewall using firewall-cmd.
 ```bash
 firewall-cmd --permanent --zone=public --add-source=192.168.100.1
 ```
+
+## Customizing
+
+### Triggering dump before backup
+
+Set `manual_database_backups=true` in Bootstrapper. 
+
+```bash
+cpcmd scope:set cp.bootstrapper manual_database_backups true
+upcp -sb apnscp/crons
+```
+
+Database backups may be synchronously performed as,
+
+```bash
+/usr/bin/apnscp_php /usr/local/apnscp/bin/scripts/backup_dbs.php
+```
+
+Backup schedules may also be ignored for database backups with `--force`.
+
+Create a new job definition that is similar to the existing "Incremental" definition.
+
+Modify the backup template base.conf by copying it to local.d. Then add the new job definition.
+
+```bash
+cp /etc/bacula/conf.d/servers/base.conf /etc/bacula/local.d/servers/base.conf
+```
+
+Add the following in the **Job { ... }** definition before the closing brace in local.d/servers/base.conf
+
+```
+RunScript {
+    RunsWhen = Before
+    FailJobOnError = No
+    Command = "/usr/bin/apnscp_php /usr/local/apnscp/bin/scripts/backup_dbs.php --force"
+  }
+```
+
+Restart Bacula. `systemctl restart bacula-dir`
