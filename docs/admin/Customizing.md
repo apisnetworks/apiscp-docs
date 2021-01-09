@@ -19,7 +19,7 @@ A placeholder page is created whenever an account, addon domain, or subdomain is
 Copy `/usr/local/apnscp/resources/templates/apache/placeholder.blade.php` to `/usr/local/apnscp/config/custom/resources/templates/apache/placeholder.blade.php` creating parent directories as needed. index.html may not be updated once written.
 
 ### Suspension page
-All suspended accounts via [SuspendDomain](Plans#suspenddomain) redirect to `/var/www/html/suspend.html`. Suspension rules may be modified by adjusting the rewrite rules.
+All suspended accounts via [SuspendDomain](Plans#suspenddomain) redirect to `/var/www/html/suspend.html`. A suspension page is not provided by default in ApisCP but may be created by the admin. Suspension rules may be modified by adjusting the rewrite rules.
 
 Copy `/usr/local/apnscp/resources/templates/apache/suspend-rules.blade.php` to `/usr/local/apnscp/config/custom/resources/templates/apache/suspend-rules.blade.php` creating parent directories as needed.
 
@@ -115,6 +115,61 @@ Apps populated as part of ApisCP may be hidden or removed from view using `hide(
     $templateClass->getApplicationFromId('nexus')->remove();
     // allow Dashboard access, but remove from side menu
     $templateClass->getApplicationFromId('dashboard')->hide();
+    // remove "foo" app. Note if this does not exist it is a no-op
+    $templateClass->getApplicationFromId('foo')->hide();
+    // alternatively to check if "foo" exists
+    if ($templateClass->getApplicationFromId('foo')->exists()) {
+        // do something
+    }
+```
+
+#### Menu reset
+**New in 3.2.18**
+
+When working with custom configurations, it may be desired to reset all menu items. `clear()` empties all menu and statistics.
+
+```php
+<?php
+	$templateClass->clear();
+	// create a DNS-only layout
+	$templateClass->create_link(
+		'Dashboard',
+		'/apps/dashboard',
+		true,
+		null,
+		''
+	);
+```
+
+::: warning Dashboard required
+`/apps/dashboard` must be a valid URI in all menus as this serves as the destination after login.
+:::
+
+#### Plan-specific menu
+** New in 3.2.18**
+
+Per-plan menus may be used following the naming scheme `ROLE`-`PLAN`. For example, to use a custom menu layout for the plan "dns-only" that applies to Site Administrators, create the following file `config/custom/templates/site-dns-only.php`.  If found, this menu will be used instead of `config/custom/templates/site.php`.
+
+Plan-specific menus behave otherwise the same as a custom menu. To clear all menu items use `clear()`.
+
+```php
+<?php
+	$templateClass->clear();
+	// create a DNS-only layout
+	$templateClass->create_link(
+		'Dashboard',
+		'/apps/dashboard',
+		true,
+		null,
+		''
+	);
+	$templateClass->create_link(
+		'DNS Manager',
+		'/apps/dns',
+		true,
+		null,
+		''
+	);
 ```
 
 ### App view overrides
