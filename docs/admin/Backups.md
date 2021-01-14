@@ -262,3 +262,16 @@ RunScript {
 ```
 
 Restart Bacula. `systemctl restart bacula-dir`
+
+## Troubleshooting
+
+### Malformed message... Maximum permitted 1000000
+
+Bacula may report this in its messages. Malformed messages happen from rogue clients, typically vulnerability scans. Ensure firewall restrictions are in place to protect ports 9101/TCP+UDP, 9102/TCP+UDP, 9103/TCP+UDP are properly firewalled and that `firewalld` service is running that runs a restrictive policy by default.
+
+```bash
+# Verify firewalld running
+systemctl status firewalld
+# Restart firewalld
+systemctl restart firewalld
+```

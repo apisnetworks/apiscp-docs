@@ -979,3 +979,21 @@ cd /usr/local/apnscp
 ```
 
 The play will be located in `resources/playbooks/migrations`.
+
+A migration consists of two parts: **up** and **down.** **up** is used when a migration is first run. **down** is used to revert changes (similar structure exists in database migrations). **down** is  not required to implement, but encouraged.
+
+Migrations are run whenever panel code is updated via [upcp](UPGRADING.md) or may be invoked manually. Once automatically run, a migration is committed to database (`apnscp.migrations` table in MySQL).
+
+```bash
+cd /usr/local/apnscp/
+./artisan make:migration --platform test
+# Created Migration: 2021_01_14_000006_test
+cd resources/playbooks
+# Test it manually
+ansible-playbook migrator.yml --tags=up --extra-vars=migrations=2021_01_14_000006_test
+# Commit migration to database
+cd /usr/local/apnscp
+./artisan migrate --force
+```
+
+Migrations are run in batches. `./artisan migrate:rollback` will rollback all migrations run in the *last batch*, which is to say all migrations run in the last invocation of `upcp`.

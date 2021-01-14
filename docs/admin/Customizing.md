@@ -261,6 +261,11 @@ Any file in fail2ban may be overridden with a corresponding `.local` file. It ta
 *See also*
 - [MANUAL 0.8](https://www.fail2ban.org/wiki/index.php/MANUAL_0_8#Configuration) (fail2ban.org) - covers configuration/override in detail
 
+## haproxy
+
+**⚠️ DO NOT TOUCH:** /etc/haproxy/haproxy.cfg  
+**Customization file:** /etc/haproxy/conf.d/*  
+
 ## MySQL
 
 **⚠️ DO NOT TOUCH:** /etc/my.cnf.d/apnscp.conf  
