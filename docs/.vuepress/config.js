@@ -114,7 +114,8 @@ module.exports = {
           children: [
             "CONVENTIONS",
             "SECURITY",
-            "admin/Mass hosting"
+            "admin/Mass hosting",
+            "OVERVIEW"
           ]
         },
         {
