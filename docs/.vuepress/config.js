@@ -115,13 +115,13 @@ module.exports = {
             "CONVENTIONS",
             "SECURITY",
             "admin/Mass hosting",
-            "OVERVIEW"
           ]
         },
         {
           title: "Getting Started",
           collapsable: false,
           children: [
+            "ARCHITECTURE",
             "INSTALL",
             "UPGRADING",
             "LICENSE",

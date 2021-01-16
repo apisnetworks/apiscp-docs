@@ -1,4 +1,4 @@
-# Overview
+# Architecture
 
 ApisCP uses a variety of services managed directly by ApisCP with minimal configuration. The diagram and table summarize components and relevant documentation for each segment.
 
@@ -13,7 +13,7 @@ ApisCP uses a variety of services managed directly by ApisCP with minimal config
 |                              | Proxy         | [Frontend panel proxy](./admin/Panel%20proxy.md) (*optional*) |
 |                              | Redis         | Temporary storage                                            |
 | **BoxFS** (filesystem)       |               |                                                              |
-|                              | OverlayFS     | [Account segregation](Filesystem.md) and copy-up             |
+|                              | OverlayFS     | [Account segregation](./admin/Filesystem.md) and copy-up             |
 | **Mail**                     |               |                                                              |
 |                              | haproxy       | SSL/TLS termination                                          |
 |                              | Dovecot       | [IMAP/POP3](./admin/Dovecot.md)                              |
@@ -38,7 +38,7 @@ ApisCP uses a variety of services managed directly by ApisCP with minimal config
 |                              | ModSec        | [Malware protection](./admin/ModSecurity.md)                 |
 |                              | ClamAV        | Malware scanner                                              |
 | **Firewall**                 |               |                                                              |
-|                              | Rampart       | [Threat deterrent, firewall](./admin/FIREWALL.md)            |
+|                              | Rampart       | [Threat deterrent, firewall](./FIREWALL.md)            |
 | **Resource enforcement**     |               |                                                              |
 |                              | cgroups       | [Per-account resource limitations](./admin/Resource%20enforcement.md) |
 | **Statistics**               |               |                                                              |
