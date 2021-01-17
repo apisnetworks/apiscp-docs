@@ -42,7 +42,7 @@ Likewise, /etc/shadow contents reflect passwords of users in the account and not
 Maxmind GeoIP2 and GeoLite2 City services may be used to provide geolocation services to authentication access notices (credential changes, unrecognized devices). GeoIP2 is an [API service](https://www.maxmind.com/en/geoip2-precision-services) that may be configured using `auth.geoip-key` [Scope](admin/Scopes.md). GeoIP2 is a paid service from Maxmind. 
 
 ```bash
-cpcmd scope:set auth.geoip-key '[user:1234,key:key-name]'
+cpcmd scope:set auth.geoip-key '[id:1234,key:key-name]'
 ```
 
 GeoLite2 is a free database hosted on-premise that allows similar geolocation data. After [registering](https://dev.maxmind.com/geoip/geoip2/geolite2/) for access to the database, locate `GeoLite2-City.mmdb` in `/usr/local/apnscp/resources/storehouse`. Registration is required to consent to various privacy/marketing regulations.

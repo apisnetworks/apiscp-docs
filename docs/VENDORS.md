@@ -165,7 +165,7 @@ curl -i \
 	--cacert ./apnscp.ca \
 	-E ./license.pem \
 	-H "Content-Type: application/json" \
-	-X GET \
+	-X DELETE \
 	"https://license.apiscp.com/vendor/license/91"
 ```
 
