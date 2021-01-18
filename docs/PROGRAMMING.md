@@ -374,6 +374,10 @@ Given the propensity for conflicts to exist between multiple modules, it is reco
 
 All apps are located under `apps/`. The "App ID" is the folder under which the application is located. A sample application named "test" is bundled with ApisCP. A controller must be named after the App ID and end in ".php". The default view may be named after the App ID and end in ".tpl" or located as views/index.blade.php if using Blade.
 
+::: warn Naming restrictions
+Apps may not have underscore ("_") in the name. autoload will automatically convert - to _ during namespace resolution. Use "-" as a delimiter, which is URL-friendly.
+:::
+
 ## Controller/Model
 
 Controller/Model logic is located in apps/*\<APP NAME>*/*\<APP NAME>*.php and instantiated first. The class name must be named Page and placed in a namespace named after the app ID. An example app named "Test" is located under apps/test/.

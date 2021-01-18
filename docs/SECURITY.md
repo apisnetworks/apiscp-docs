@@ -24,6 +24,36 @@ Anvil provides an exponential backoff algorithm as it approaches 20 attempts to 
 
 Other services, including FTP, SSH, and mail use fail2ban to restrict unauthorized access.
 
+### Restricting authorization
+
+A second factor of authentication can exist in the form of IP restrictions. IP restrictions may be set in **Account** > **Settings** > **Security** or programmatically using `auth:restrict-ip($ip, $gate = NULL)`. An authentication gate, if specified, applies IP restriction to a module of ApisCP. Possible gates include: `UI`, `SOAP`, `DAV`, and `CLI`. When no gate is specified restriction applies to all gates. `auth:remove-ip-restriction($ip, $gate = NULL)` can be used to remove such restrictions. `$ip` accepts either an IP address or CIDR.
+
+A check occurs concomitant with password validation. An IP-based failure is treated the same way internally as a password failure.
+
+::: warning All-or-nothing enablement
+Authorizing access to *any* IP address enables this second factor of authentication to all gates even if 1 gate is specified.
+:::
+
+```bash
+cpcmd -d domain.com auth:get-ip-restrictions
+# Show all IP restrictions, none listed all IPs can login
+cpcmd -d domain.com auth:restrict-ip 64.22.68.1/24 UI
+# Only 64.22.68.1/24 can login to the UI
+# All IPs can login to other services
+cpcmd -d domain.com auth:get-ip-restrictions UI
+# Only 1.2.3.4 can login to all services
+# 64.22.68.1/24 can still login to only UI
+cpcmd -d domain.com auth:restrict-ip 1.2.3.4
+# Remove 1.2.3.4 restriction
+cpcmd -d domain.com auth:remove-ip-restriction 1.2.3.4
+```
+
+### Forcing HTTPS
+
+By default both HTTP and HTTPS are exposed remotely in the UI. `cpcmd scope:set cp.config frontend https_only true` will disable remote HTTP ports (2077, 2082) requiring HTTPS. HTTP-only communication is intended as a bridge to accommodate new users to ApisCP when a self-signed certificate is present, but should be disabled once familiar. 
+
+Unencrypted HTTP traffic over loopback is still permitted such as with cp-proxy.
+
 ## setuid in synthetic roots
 
 All accounts are placed in synthetic roots, which are built up from layers in `/home/virtual/FILESYSTEMTEMPLATE`. It is possible, albeit unlikely, for an attacker to gain elevated permissions through a rogue setuid binary. The binary would need to be placed by root in `/home/virtual/FILESYSTEMTEMPLATE/<service>` and not part of regular RPM packages, which are updated automatically using the Yum Synchronizer built into ApisCP.
