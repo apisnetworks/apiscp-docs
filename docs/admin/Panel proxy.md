@@ -340,7 +340,7 @@ All configuration is managed within `/etc/sysconfig/cp-proxy`. After making chan
 - **CP_TARGET**: initial URL that is fetched, this should be a panel login portal
 - **LISTEN_PORT**: port on which cp-proxy listens
 - **LISTEN_ADDRESS**: IPv4/6 address on which cp-proxy listens
-- **SECRET**: used to encrypt session cookie. Generated randomly on service startup, which will cause logouts whenever cp-proxy is restarted. Recommended to define this value.
+- **SECRET**: an alphanumeric salt used to encrypt session cookie. Generated randomly on service startup, which will expire existing sessions. Define this value if this behavior is undesired
 - **STRICT_SSL**: enable peer verification of hostnames when connecting via SSL
 
 #### Multi-homed Hosts

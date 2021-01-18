@@ -14,7 +14,7 @@ A variety of helpers exist to add, delete, modify, suspend, activate, import, an
 | --dry-run          | edit, delete      | Shows actions without performing                             |
 | --backup           | edit              | Backup metadata prior to editing                             |
 | --reason           | suspend           | Specify suspension reason                                    |
-| --force            | delete            | Delete a domain in a partially edited state                  |
+| --force            | delete, edit      | Delete a domain in a partially edited state. Bypass good judgment. |
 | --since=*timespec* | delete            | Delete domains suspended since *timespec* ("now", "last month", unix timestamp) |
 | --filter           | delete            | Delete domains matching (regex) suspension reason            |
 | --reconfig         | edit              | Reconfigure all services implementing ServiceReconfiguration |
@@ -168,6 +168,7 @@ Plans are covered later in this section. Note the behavior when changing plans i
 **--reset**: reset service parameters. Context-specific, see above note on reset!  
 **--dry-run**: show proposed changes without applying them.  
 **--backup**: create a backup of the metadata prior to editing. This metadata is stored in siteXX/info/backup. Each successive run overwrites this data.  
+**--force**: force change that may put the site in an inconsistent/disabled state after edit such as quota reduction below usage.    
 
 #### Listing services
 
