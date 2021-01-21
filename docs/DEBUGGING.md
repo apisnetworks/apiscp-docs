@@ -73,6 +73,8 @@ All locations are within /var/log unless noted. siteXX is shorthand for /home/vi
 | Apache                    | httpd/error_log            | HTTP startup                                                 |
 | Apache per-site           | siteXX ... httpd/error_log | Per-site error logs, FPM connectivity                        |
 | PHP-FPM                   | siteXX ... php-fpm/POOL    | Per-site PHP errors, notices                                 |
+| HTTP malware | httpd/modsec_audit.log | See [malware scans](./admin/ModSecurity.md) |
+| ClamAV | messages | Only available on scanner |
 | Mail (**all** excl. auth) | maillog                    | SMTP prefixed "postfix". IMAP/POP3 "dovecot". Local delivery "maildrop". Excludes authentication. |
 | Mail auth | secure             | Rejections from invalid passwords via PAM |
 | FTP                       | vsftpd.log                 |                                                              |

@@ -249,6 +249,7 @@ module.exports = {
             "admin/Maps",
             "admin/Benchmarking",
             "admin/Panel proxy",
+            ['https://notes.apiscp.com', 'Task hacks'],
             "DEBUGGING",
           ]
         },

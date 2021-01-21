@@ -59,8 +59,9 @@ A unprivileged user, `cpcollect`, will account collections.
 
 - Migrate the database
   ```bash
+  sudo -u cpcollect ./proxy migrate:install
   sudo -u cpcollect ./proxy migrate
-  ```
+```
 
 - For each linked server, create an API key, the command will return the key which you'll use on the Collector to add the server.
     ```bash
