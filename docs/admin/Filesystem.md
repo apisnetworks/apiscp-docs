@@ -109,6 +109,85 @@ touch /home/virtual/site1/info/services/sampleservice
 A more detailed example is available within [Site and Plan Management](Plans.md#complex-plan-usage) that applies this layer programmatically based on assigned plan.
 :::
 
+## Technical details
+
+BoxFS uses OverlayFS, a union filesystem similar to AUFS and related to UnionFS. OverlayFS exhibits excellent performance over AUFS and is part of mainline kernel. OverlayFS partitions a filesystem into slices called layers. An overlay consists of a single read-write upper layer and zero or more read-only lower layers. Temporary file creation is backed by a physical work directory on a location not contained in upper or lower layers. All lower layers are immutable. Any files modified on these layers are immediately copied up to the upper layer, which is always `shadow/`. 
+
+Upper layers may block lower level files from visibility by setting either the `opaque` xattr or per-file by creating a character device with major/minor 0 that has the same path.
+
+Let's explore blocking out files and directories on `siteinfo` located in `/home/virtual/FILESYSTEMTEMPLATE` with a test account.  
+
+```bash
+AddDomain -c siteinfo,domain=test.test -c siteinfo,admin_user=testuser123 -c dns,enabled=0 -c mail,enabled=0 -c ssh,enabled=1
+su testuser123@test.test -c 'cat /etc/profile'
+```
+
+We'll see the contents of `/etc/profile`, which is inherited from `/home/virtual/FILESYSTEMTEMPLATE/siteinfo/etc/profile`. Checking the file inode confirms this.
+
+```bash
+stat -c "%i %n" /home/virtual/FILESYSTEMTEMPLATE/siteinfo/etc/profile /home/virtual/test.test/etc/profile
+```
+
+/etc/profile is presently in read-only mode read from FST/siteinfo/etc/profile. Remove the file directly from the overlay layer.
+
+```bash
+rm -f /home/virtual/test.test/etc/profile
+# A device is created on the upper directory
+stat /home/virtual/$(get_site test.test)/shadow/etc/profile
+#  File: ‘/home/virtual/site192/shadow/etc/profile’
+#  Size: 0               Blocks: 0          IO Block: 4096   character special file
+#Device: 801h/2049d      Inode: 2542036     Links: 1     Device type: 0,0
+#Access: (0000/c---------)  Uid: (    0/    root)   Gid: (    0/    root)
+
+# Now this file no longer exists
+stat -c "%i %n" /home/virtual/FILESYSTEMTEMPLATE/siteinfo/etc/profile /home/virtual/test.test/etc/profile
+```
+
+Remove the character device, flush filesystem cache by reloading fsmount service, then /etc/profile exists again.
+
+```bash
+rm -f /home/virtual/$(get_site test.test)/shadow/etc/profile
+systemctl reload fsmount
+stat -c "%i %n" /home/virtual/FILESYSTEMTEMPLATE/siteinfo/etc/profile /home/virtual/test.test/etc/profile
+```
+
+Lastly manually blank the file out by creating a character device with 0 major/minor. Because we're operating directly on a lower layer, caches must be manually expunged.
+
+```bash
+mknod /home/virtual/$(get_site test.test)/shadow/etc/profile c 0 0
+systemctl reload fsmount
+stat -c "%i %n" /home/virtual/FILESYSTEMTEMPLATE/siteinfo/etc/profile /home/virtual/test.test/etc/profile
+```
+
+Directories can be blanked out as well by setting the opaque property using xattrs.
+
+```bash
+yum install -y attr
+getfattr -d -m - /home/virtual/$(get_site test.test)/shadow/etc
+# file: home/virtual/site192/shadow/etc
+# trusted.overlay.impure="y"
+# trusted.overlay.origin=0sAPsdAAFnSCL/NEhD+Y0teKomOYfjsxwWAA+80kI=
+ls -1 /home/virtual/test.test/etc/ | wc -l
+```
+
+OverlayFS attributes reside in the **trusted** section. xattrs support user, system, trusted, and security sections that are covered in detail in [xattr(7)](https://man7.org/linux/man-pages/man7/xattr.7.html).
+
+```bash
+setfattr -n trusted.overlay.opaque -v y /home/virtual/$(get_site test.test)/shadow/etc
+systemctl fsmount reload
+# Shows lower count
+ls -1 /home/virtual/test.test/etc/ | wc -l
+```
+
+`/etc` now has files solely from shadow/ ignoring inheritance from siteinfo and ssh services. To clear the opaque behavior, change `trusted.overlay.opaque` to `n`.
+
+```bash
+setfattr -n trusted.overlay.opaque -v n /home/virtual/$(get_site test.test)/shadow/etc
+systemctl fsmount reload
+# Shows the same count as original
+ls -1 /home/virtual/test.test/etc/ | wc -l
+```
+
 ## Problems
 
 ### BoxFS references previous file inode
