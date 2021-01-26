@@ -132,7 +132,7 @@ When working with serialized output in a shell pipeline, wrap output in `xargs -
 
 ## get_config
 
-Get service metadata from domain.
+Get service metadata from site identifier (domain, site id, site).
 
 ### Example
 
@@ -142,11 +142,11 @@ get_config domain.com siteinfo email
 
 ## get_site
 
-Get site name from domain. Same as "site" + `get_site_id` 
+Get site name from domain or site id. Same as "site" + `get_site_id` 
 
 ## get_site_id
 
-Get internal site ID from domain. Returns 1 on failure otherwise 0.
+Get internal site ID from domain or site. Returns 1 on failure otherwise 0.
 
 ### Example
 

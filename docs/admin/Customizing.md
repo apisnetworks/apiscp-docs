@@ -176,6 +176,9 @@ Plan-specific menus behave otherwise the same as a custom menu. To clear all men
 
 Any app that uses Blade templates (`views/` directory) is eligible to override components of the template structure. Create the same structure in `config/custom/apps/<name>` as is in `apps/<name>`. For example to override `apps/ssl/views/partials/certificate-detected.blade.php`, copy that file to `config/custom/apps/ssl/views/partials/certificate-detected.blade.php`. ApisCP will load the view from this location first. It is advisable to copy the entire application over (*App overrides*) as application structure may change between releases.
 
+#### Web App overrides
+Web Apps use a different set of locations for overrides. An app may be overrode by cloning the [git repository](https://github.com/search?q=topic%3Awebapp+org%3Aapisnetworks&type=Repositories) into `config/custom/` (see README.md bundled with each Web App) or by copying the respective file into `config/custom/webapps/APP-NAME/views`. For example, to override the `options-install.blade.php` template bundled with WordPress, the path would be `config/custom/webapps/wordpress/views/options-install.blade.php`.
+
 ### Global constants
 
 Constants may be overrode or added to global scope via `config/custom/constants.php`:
