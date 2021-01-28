@@ -118,7 +118,7 @@ upcp -sb fail2ban/configure-jails
 
 ### Jails
 
-A variety of jails provide granular protection over public services. The following table summarizes these jails.
+A variety of jails provide granular protection over public services. The following table summarizes these jails. *This may also be used as a reference for inbound ports.*
 
 | Jail         | Port protection     | Role                            |
 | ------------ | ------------------- | ------------------------------- |

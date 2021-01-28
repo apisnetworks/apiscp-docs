@@ -146,6 +146,20 @@ INFO: reloading web server in 2 minutes, stay tuned!
 ----------------------------------------
 ```
 
+## Locations
+
+The following table summarizes important locations pertaining to SSL infrastructure. Files are marked with a *.extension* whereas directories include a trailing forward-slash (*/*) for disambiguation.
+
+All locations are prefixed **/etc/pki** unless noted.
+
+| Location                                                     | Remarks                                                      |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| tls/certs/server.pem                                         | System certificate                                           |
+| tls/ca-trust/source/anchors                                  | Location to inject additional certificates (see [Trusting self-signed certificates](#trusting-self-signed-certificates) below) |
+| /usr/local/apnscp/storage/certificates/data/certs/ACME-SERVER | Let's Encrypt account certificates                           |
+| siteXX/fst/etc/httpd/conf.d/                                 | Apache SSL certificates                                      |
+| /etc/haproxy/ssl.d                                           | IMAP/POP3 SSL termination certificates (mirrors httpd/conf.d/) |
+
 ## Storage/issuance process
 
 Certificates are stored under `/usr/local/apnscp/storage/certificates/data/certs/ACME-SERVER` where *ACME-SERVER* is the configured Let's Encrypt signing service (acme-v02.api.letsencrypt.org/directory typically in production). These certificates are read at panel boot as part of housekeeping to determine which certificates should be reissued. Reissuance is bracketed as 10 days before expiration and up to day of expiration. It may be altered via [letsencrypt] => lookahead_days and [letsencrypt] => lookbehind_days respectively.
@@ -247,3 +261,15 @@ cpcmd -d domain.com ssl:install "$(cat /path/to/server.key)" "$(cat /path/to/ser
 SSL will activate in 2 minutes or less depending upon what *[httpd]* => *reload_delay* is set to in [config.ini](https://gitlab.com/apisnetworks/apnscp/blob/master/config/config.ini).
 
 But a greater question exists, why bother with EV when [EV certificates are dead](https://www.troyhunt.com/extended-validation-certificates-are-really-really-dead/)?
+
+## Trusting self-signed certificates
+
+A self-signed certificate is a certificate requested by and signed by the same authority, which is also almost always an untrusted authority. In this case it would be a certificate generated and signed by the server and not Let's Encrypt, ZeroSSL, or any other trusted authority.
+
+Self-signed certificates can be trusted by adding the certificate to `/etc/pki/ca-trust/source/anchors`, then running `update-ca-trust extract`, which in turn will update `/etc/pki/tls/certs/ca-bundle.crt`.
+
+::: tip serverAuth key usage required
+`extendedKeyUsage=serverAuth` must be specified when generating the self-signed certificate for it to be included in ca-bundle.crt otherwise the certificate is included in `ca-bundle.trust.crt`, which is not the default CA location.
+
+**See also** [CA Cert are only added at ca-bundle-trust.crt](https://stackoverflow.com/questions/58725457/ca-cert-are-only-added-at-ca-bundle-trust-crt) (StackOverflow)
+:::
