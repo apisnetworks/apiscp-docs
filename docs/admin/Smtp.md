@@ -148,6 +148,10 @@ This situation arises when the primary domain is *not authorized* to handle mail
 mail('user@example.com', 'Subject Line', 'Email body', ['From' => 'help@apiscp.com']);
 ```
 
+## DKIM signing
+
+DKIM requires rspamd usage. See [rspamd.md](rspamd.md#DKIM-signing) for further information.
+
 ## Splitting delivery IPs
 
 Postfix supports a [sender transport map](http://www.postfix.org/postconf.5.html#sender_dependent_default_transport_maps) that allows a different [transport](http://www.postfix.org/transport.5.html) to be configured by sender (domain or full email).

@@ -106,6 +106,64 @@ upcp -sb
 
 See [PowerDNS](dns/PowerDNS.md) module documentation for further details.
 
+## Bulk record management
+
+`Opcenter\Dns\Bulk` is a collection of tools to manage adding and removing records against all domains on a server. A helper script can be quickly setup in a couple lines of code by creating a file called `fill.php` in `/usr/local/apnscp`:
+
+```php
+<?php
+	include __DIR__ . '/lib/CLI/cmd.php';
+
+	(new \Opcenter\Dns\Bulk())->remove(new \Opcenter\Dns\Record('_dummy_zone.com', [
+		'name' => 'dkim._domainkey', 
+		'rr' => 'TXT', 
+		'parameter' => ''
+	]));
+```
+
+Then run `env DEBUG=1 apnscp_php fill.php` to remove records in bulk.
+
+```bash
+env DEBUG=1 apnscp_php fill.php
+DEBUG   : 1/274 addition - 8 domains in batch
+DEBUG   : 2/274 addition - 5 domains in batch
+DEBUG   : 3/274 addition - 5 domains in batch
+DEBUG   : 4/274 addition - 4 domains in batch
+DEBUG   : 5/274 addition - 5 domains in batch
+# and so on...
+```
+
+Likewise to add a new TXT record called "\_dmarc" use `add()`:
+
+```php
+<?php
+	include __DIR__ . '/lib/CLI/cmd.php';
+
+	(new \Opcenter\Dns\Bulk())->add(new \Opcenter\Dns\Record('_dummy_zone.com', [
+		'name' => '_dmarc', 
+		'rr' => 'TXT', 
+		'parameter' => 'v=DMARC1; p=reject; rua=mailto:postmaster@apiscp.com, mailto:dmarc@apiscp.com; pct=100; adkim=s; aspf=s'
+	]));
+```
+
+Or more succinctly to reapply the DMARC record across all domains after updating *[mail]* => *default_dmarc* in [config.ini](Tuneables.md):
+
+```php
+	include __DIR__ . '/lib/CLI/cmd.php';
+
+	(new \Opcenter\Dns\Bulk())->remove(new \Opcenter\Dns\Record('_dummy_zone.com', [
+		'name' => '_dmarc', 
+		'rr' => 'TXT', 
+		'parameter' => ''
+	]));
+	
+	(new \Opcenter\Dns\Bulk())->add(new \Opcenter\Dns\Record('_dummy_zone.com', [
+		'name' => '_dmarc', 
+		'rr' => 'TXT', 
+		'parameter' => MAIL_DEFAULT_DMARC
+	]));
+```
+
 ## Troubleshooting
 
 ### dns:add_record_conditionally() fails due to duplicate entries

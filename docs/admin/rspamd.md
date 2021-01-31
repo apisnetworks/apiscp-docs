@@ -63,6 +63,36 @@ You can enable learning mail sent to Trash as spam with the following:
 cpcmd scope:set cp.bootstrapper dovecot_learn_spam_folder '{{ dovecot_imap_root }}Trash'
 ```
 
+::: details Jinja templates
 ::: v-pre
-"{{ ... }}" is used for variable expansion in Bootstrapper and must be included. By default the IMAP prefix is "INBOX.".
+"{{ ... }}" is a Jinja construct used for denote variable expansion in Bootstrapper and must be included. By default the IMAP prefix is "INBOX.".
+:::
+
+## DKIM signing
+**New in 3.2.20**
+
+DKIM provides envelope and sender integrity by supplying a cryptographic fingerprint of the message that is easy to verify but difficult to reproduce without knowing the private key. DKIM works similarly to SSL/TLS used to encrypt web traffic.
+
+Two components are required for DKIM:
+- valid DNS TXT record named as `<SELECTOR>._domainkey`
+- `DKIM-Signature` header that stores a signature of one or more headers in their original form
+
+A **selector** may be any alphanumeric sequence of at least 1 and fewer than 16 characters. Selector names are encoded in `DKIM-Signature` as the `s=` parameter. A default selector named `dkim` is used. A new selector may be created using `dkim:roll($selector = null)` *omitting selector adds a digit to the selector name*. Rolling a selector creates a new selector, but does not delete the previous selector. This previous selector may be expired (deleted from DNS) using `dkim:expire($selector)`. 
+
+Selectors should be rotated periodically - every 6 months at most and previous selectors should be expired after 7 days.
+
+First, enable DKIM signing. Once DKIM is configured for the server, setup a DKIM key for all participating sites using `dkim:roll`.
+
+```bash
+cpcmd scope:set mail.dkim-signing true
+sleep 5
+# Wait for ansible-playbook to complete
+while pgrep -f ansible-playbook ; do sleep 1 ; done
+# Enabling debug shows batch operation
+env DEBUG=1 cpcmd dkim:roll DKIM2021
+```
+A new key will be created under `/var/lib/rspamd/dkim/global.DKIM2021.key`. To note, `global` is the domain name (special usage) and `DKIM2021` selector name.
+
+::: tip Bulk DNS modifications
+DNS records may be updated en masse, such as DMARC updates, using a simple PHP script. See [Bulk record management](DNS.md#bulk-record-management) in DNS.md.
 :::

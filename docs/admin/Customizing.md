@@ -146,7 +146,7 @@ When working with custom configurations, it may be desired to reset all menu ite
 :::
 
 #### Plan-specific menu
-** New in 3.2.18**
+**New in 3.2.18**
 
 Per-plan menus may be used following the naming scheme `ROLE`-`PLAN`. For example, to use a custom menu layout for the plan "dns-only" that applies to Site Administrators, create the following file `config/custom/templates/site-dns-only.php`.  If found, this menu will be used instead of `config/custom/templates/site.php`.
 
