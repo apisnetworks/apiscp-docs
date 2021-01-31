@@ -73,6 +73,8 @@ cpcmd scope:set cp.bootstrapper dovecot_learn_spam_folder '{{ dovecot_imap_root 
 
 DKIM provides envelope and sender integrity by supplying a cryptographic fingerprint of the message that is easy to verify but difficult to reproduce without knowing the private key. DKIM works similarly to SSL/TLS used to encrypt web traffic.
 
+![DKIM process](./images/dkim-overview.svg)
+
 Two components are required for DKIM:
 - valid DNS TXT record named as `<SELECTOR>._domainkey`
 - `DKIM-Signature` header that stores a signature of one or more headers in their original form
