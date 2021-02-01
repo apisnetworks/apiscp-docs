@@ -149,6 +149,7 @@ Likewise to add a new TXT record called "\_dmarc" use `add()`:
 Or more succinctly to reapply the DMARC record across all domains after updating *[mail]* => *default_dmarc* in [config.ini](Tuneables.md):
 
 ```php
+<?php
 	include __DIR__ . '/lib/CLI/cmd.php';
 
 	(new \Opcenter\Dns\Bulk())->remove(new \Opcenter\Dns\Record('_dummy_zone.com', [
@@ -162,6 +163,24 @@ Or more succinctly to reapply the DMARC record across all domains after updating
 		'rr' => 'TXT', 
 		'parameter' => MAIL_DEFAULT_DMARC
 	]));
+```
+
+### Bulk filtering
+
+A second parameter, `$where`, is a closure to test whether to apply the record for the given domain. `$where` receives two parameters, `apnscpFunctionInterceptor` handler and a `Record` object, which is the proposed record to add or remove.
+
+```php
+<?php
+	include __DIR__ . '/lib/CLI/cmd.php';
+
+	(new \Opcenter\Dns\Bulk())->remove(new \Opcenter\Dns\Record('_dummy_zone.com', [
+		'name' => '_dmarc',
+		'rr' => 'TXT',
+		'parameter' => ''
+	]), function (\apnscpFunctionInterceptor $afi, \Opcenter\Dns\Record $r) {
+        // only remove the record if server authorized to handle mail
+        return $afi->email_transport_exists($r['zone']);
+    });
 ```
 
 ## Troubleshooting
