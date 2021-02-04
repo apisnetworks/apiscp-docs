@@ -67,6 +67,7 @@ systemctl restart apiscp
 | -b      | Run [Bootstrapper](https://github.com/apisnetworks/apnscp-bootstrapper) reporting only changes |
 | -s      | Skip updating code (e.g. upcp -sb, Bootstrap without updating panel) |
 | -a      | Run Bootstrapper if the latest release contains changes to playbook |
+| -w      | Wait for Bootstrapper to finish running. Exits 1 if Bootstrapper not running. 0 if waited. |
 | --reset | Reset panel code, including all changes, to match Gitlab     |
 | --flare   | Check for FLARE signal. Exit status 0 if received, 1 if none available |
 

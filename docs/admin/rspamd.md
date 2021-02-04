@@ -83,7 +83,16 @@ A **selector** may be any alphanumeric sequence of at least 1 and fewer than 16 
 
 Selectors should be rotated periodically - every 6 months at most and previous selectors should be expired after 7 days.
 
-First, enable DKIM signing. Once DKIM is configured for the server, setup a DKIM key for all participating sites using `dkim:roll`.
+DKIM requires rspamd, which can work cooperatively with [SpamAssassin](SpamAssassin.md) or independently.
+
+```bash
+# Switch exclusively to rspamd
+cpcmd scope:set mail.spam-filter rspamd
+# or enable rspamd in piggyback mode
+cpcmd scope:set mail.rspamd-piggyback true
+```
+
+Next, enable DKIM signing. Once DKIM is configured for the server, setup a DKIM key for all participating sites using `dkim:roll`.
 
 ```bash
 cpcmd scope:set mail.dkim-signing true

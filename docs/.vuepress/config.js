@@ -81,7 +81,7 @@ module.exports = {
       },
       {
         text: "Getting Started",
-        link: "/install"
+        link: "/INSTALL"
       },
       {
         text: "Administration",
