@@ -3,11 +3,13 @@
 ApisCP does not yet provide direct support for Docker, but it's easy to integrate into ApisCP. 
 
 ## Installation
-Install the `docker` package using `yum`, then replicate it into the [filesystem template](Filesystem.md#filesystem-template).
 
 ::: warning Unsafe for multi-tenant operations
 The instructions contained herein assume you are the only person managing accounts on this server. 
 :::
+
+### CentOS 7
+Install the `docker` package using `yum`, then replicate it into the [filesystem template](Filesystem.md#filesystem-template).
 
 ```bash
 yum install -y docker
@@ -19,31 +21,57 @@ systemctl reload fsmount
 
 Files in `/etc/sysconfig` are typically skipped during filesystem replication. Populate this file to avoid any complications during initialization.
 
+::: warning CentOS 7 rhsm hotfix
+Broken package dependencies create a circular link in CentOS 7 for RedHat's subscription manager, required by Docker. Remove the dangling link, then download the CA/intermediate certs directly from RedHat ([CentOS #14785](https://bugs.centos.org/view.php?id=14785)):
+
+```bash
+rm -f /etc/rhsm/ca/redhat-uep.pem
+openssl s_client -showcerts -servername registry.access.redhat.com -connect registry.access.redhat.com:443 </dev/null 2>/dev/null | openssl x509 -text > /etc/rhsm/ca/redhat-uep.pem
+cp -fpldR /etc/rhsm /home/virtual/FILESYSTEMTEMPLATE/siteinfo/etc/
+```
+:::
+
+### CentOS 8/Stream
+
+`docker-ce` package replaces `docker` in CentOS 8. CentOS 8 replaces Docker with [Podman](https://developers.redhat.com/blog/2020/11/19/transitioning-from-docker-to-podman/) as a noteworthy alternative. To run Docker on a CentOS 8+ platform, Cockpit must be removed as well as an additional repository added that contains `docker-ce` and dependencies.
+
+```bash
+dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+dnf install -y --allowerasing docker-ce
+/usr/local/apnscp/bin/scripts/yum-post.php install -d docker-ce siteinfo
+systemctl reload fsmount
+```
+
+Docker's default configuration inhibits listening in other locations. It will be overrode with a custom systemd service definition that omits `-H fd://` (see [#22339](https://github.com/moby/moby/issues/22339), [#21559](https://github.com/moby/moby/issues/21559), [#25471](https://github.com/moby/moby/issues/25471), [PR#27473](https://github.com/moby/moby/pull/27473)). 
+
+```bash
+mkdir -p /etc/systemd/system/docker.service.d
+cat << EOF > /etc/systemd/system/docker.service.d/override.conf
+[Service]
+# This clears any ExecStart= inherited from docker.service
+ExecStart=
+ExecStart=/usr/bin/dockerd --containerd=/run/containerd/containerd.sock
+EOF
+systemctl daemon-reload
+```
+
+### Final setup
+
 Add a group named `docker`. This group will be used to authorize any user to use the Docker service. We'll come back to this later, adding the group for each site that will have Docker access.
 
 ```bash
-groupadd --system docker
+groupadd --system docker 2> /dev/null
 ```
 
 Reconfigure Docker to expose its Unix socket to an accessible location within the filesystem template.
 
 ```bash
+systemctl enable --now docker
 echo -e '{\n\t"hosts": ["unix:///var/run/docker.sock", "unix:///.socket/docker.sock"],\n\t"group": "docker"\n}' > /etc/docker/daemon.json
 systemctl restart docker
 ln -s  /.socket/docker.sock /home/virtual/FILESYSTEMTEMPLATE/siteinfo/var/run/docker.sock
 systemctl reload fsmount
 ```
-
-::: warning CentOS 7 rhsm hotfix
-Broken package dependencies create a circular link in CentOS 7 for RedHat's subscription manager, required by Docker. Remove the dangling link, then download the CA/intermediate certs directly from RedHat ([CentOS #14785](https://bugs.centos.org/view.php?id=14785)):
-
-```bash
-rm -f /etc/rhsm/ca/redhat-uep.pem 
-openssl s_client -showcerts -servername registry.access.redhat.com -connect registry.access.redhat.com:443 </dev/null 2>/dev/null | openssl x509 -text > /etc/rhsm/ca/redhat-uep.pem
-cp -fpldR /etc/rhsm /home/virtual/FILESYSTEMTEMPLATE/siteinfo/etc/
-
-```
-:::
 
 ## Authorizing Docker usage per site
 For each site to enable Docker, create the group then add the Site Administrator (or any sub-user) to the `docker` group.
