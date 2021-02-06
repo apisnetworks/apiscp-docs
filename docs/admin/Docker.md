@@ -166,6 +166,23 @@ RewriteRule ^(.*)$ http://localhost:9000/$1 [L,QSA,P]
 
 That's all there is!
 
+## Adding docker-compose
+
+`docker-compose` is a [tool](https://docs.docker.com/compose/) for defining and running multi-container Docker applications. It requires Python 3.6+, which can be installed on a per-site basis.
+
+```bash
+su apiscp.com
+# Compile Python 3.6.5
+pyenv install 3.6.5
+# Set Python 3.6.5 globally for this account
+pyenv global 3.6.5
+# Install docker-compose
+pip install docker-compose
+# Confirm it's installed
+docker-compose  -v
+# Reports: "docker-compose version 1.28.2, build unknown"
+```
+
 ## Security
 
 This current implementation of Docker **is not suitable in a multi-administrator environment**. Users within other domains may see and manage Docker containers. There are plans to implement RBAC and bring Docker as a permanent fixture to ApisCP, but for now **only one authorized user may use Docker on a server**.
