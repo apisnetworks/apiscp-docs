@@ -86,6 +86,19 @@ Confirmation will be similar, reporting the virus found.
 
 ![Lua EICAR test](./images/eicar-lua-test.png)
 
+## Whitelisting
+
+Signatures may be whitelisted using `virus-scanner.signature-whitelist` [Scope](./Scopes.md). Each signature is normalized into a format understood by ClamAV. For example to whitelist `{HEX}EICAR.TEST.3.UNOFFICIAL(44d88612fea8a8f36de82e1278abb02f:68)` from the above example:
+
+```bash
+cpcmd scope:set virus-scanner.signature-whitelist {HEX}EICAR.TEST.3.UNOFFICIAL(44d88612fea8a8f36de82e1278abb02f:68)
+```
+
+Internally the signature will be saved as `{HEX}EICAR.TEST.3` to `/var/lib/clamav/custom-whitelist.ign2`. Whitelisted signatures can be retrieved using the complementary method, `get`.
+
+```bash
+cpcmd scope:get virus-scanner.signature-whitelist
+```
 
 ## Remote anti-virus
 
@@ -126,6 +139,9 @@ rm -f /eicar
 ```
 
 ## Troubleshooting
+
+### 406 Not Acceptable on POST
+ClamAV has determined the file to contain potential malware. Run the file through [VirusTotal.com](https://virustotal.com) first to confirm the file does not contain malware and this is a false positive. The signature may be whitelisted following the "[Whitelisting](#whitelisting)" section above.
 
 ### 413 Request Entity Too Large on POST
 When sending a large payload (> 256 KB) as a POST, mod_security will reject the content with a `413 Request Entity Too Large` response. This occurs from a combination of the request size and form encoding type ("enctype"). When submitting files, the form enctype should be set as "*multipart/form-data*". A form default encoding type is "*application/x-www-form-urlencoded*" and unsuitable for sending large files ([RFC 1867](https://tools.ietf.org/html/rfc1867) § 3.2). Moreover, specifying "*multipart/form-data*" allows a file to suggest its MIME disposition and character encoding ([RFC 2388](https://tools.ietf.org/html/rfc2388) § 5.6).
