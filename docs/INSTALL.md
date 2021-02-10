@@ -304,7 +304,7 @@ nameserver 8.8.8.8
 ApisCP can be configured to automatically update itself every night using `scope:set`
 
 ```bash
-cpcmd scope:set cp.nightly-update 1
+cpcmd scope:set cp.nightly-updates 1
 ```
 
 Alternatively ApisCP can be updated manually with`upcp`. Playbooks can be run unconditionally using `upcp -b` or `upcp -a` if `resources/playbooks` has changed since last update.
