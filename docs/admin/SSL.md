@@ -186,7 +186,9 @@ apnscp_php bin/scripts/reissueAllCertificates.php /usr/local/apnscp/storage/cert
 
 ## Troubleshooting
 
-ApisCP provides an SSL debug mode in config.ini. Verbosity is increased that may help ferret out failures in reissuance. Let's assume the server is failing to issue; it can be easily extended on a per-site basis by adding `-d siteXX` or `-d domain.com` to cpcmd.
+ApisCP provides an easy way to request SSL certificates from Let's Encrypt's staging server. The staging server grants much higher [rate-limits](https://letsencrypt.org/docs/rate-limits/) on SSL issuance. *Certificates issued through "Fake LE Intermediate X1" are untrusted in browser.*
+
+To proceed, enable [letsencrypt] => debug in config.ini. Verbosity is increased that may help ferret out failures in reissuance. Let's assume the server is failing to issue; it can be easily extended on a per-site basis by adding `-d siteXX` or `-d domain.com` to cpcmd.
 
 ```bash
 cpcmd scope:set cp.config letsencrypt debug true
@@ -212,6 +214,16 @@ DEBUG: dns challenge failed: Challenge failed (response: {"type":"dns-01","statu
 ```
 
 From the above debug log, a HTTP request to 64.22.68.70 failed to produce the challenge request. A quick verification confirms the server address differs from 64.22.68.70 resulting in a failure.
+
+Once the root cause is corrected, reissue the certificate using Let's Encrypt in production mode.
+
+```bash
+cpcmd scope:set cp.config letsencrypt debug false
+cpcmd scope:set cp.debug false
+systemctl restart apiscp
+# This is analogous to setting cp.debug true
+env DEBUG=1 cpcmd letsencrypt:request '[svr1.domain.com]'
+```
 
 ### Validating installed certificates
 
