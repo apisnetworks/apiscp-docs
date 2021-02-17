@@ -4,6 +4,7 @@ ApisCP is designed to work with the following third-party billing platforms out 
 
 - [Blesta](https://docs.blesta.com/display/user/APNSCP) as of 4.8.0
 - [Clientexec](https://github.com/clientexec/apiscp-server) as of 6.3.0
+- [WISECP](https://requests.wisecp.com/en/req/apiscp-hosting-panel-integration) *under development*
 - [WHMCS](https://github.com/LithiumHosting/apnscp-whmcs)
 
 The scope of this documentation is for developers to build custom integration modules for ApisCP.
@@ -158,7 +159,7 @@ $client = \Util_API::create_client(
     [
         'stream_context' => stream_context_create([
              'http' => [
-                  'header' => 'Abort-On: info'
+                  'header' => 'Abort-On: error'
              ]
          ])
      ]

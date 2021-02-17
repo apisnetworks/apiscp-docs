@@ -2,6 +2,8 @@
 
 SSL is provided through [Let's Encrypt](https://letsencrypt.org), a free domain-validated SSL service. ApisCP v3.1 implements ACME v2 protocol, which supports both domain and wildcard SSL certificates as well as DNS, HTTP, and ALPN validation methods. ALPN is not used as a challenge method at this time.
 
+Issuance attempts to protect itself from failures by applying IP verification and allowing hostnames to be removed from the set ("strict mode") if it would satisfy issuance. These behaviors may be configured globally in [config.ini](Tuneables.md) or per-account via Account > Settings > SSL.
+
 ## Initial setup
 
 ApisCP will attempt to request SSL for the server at install time. A resolvable hostname and valid email address are necessary to register with Let's Encrypt. ApisCP does not provide a method to bootstrap DNS for a server at installation. If SSL cannot be acquired at install time, a self-signed certificate is used in the interim.
@@ -37,7 +39,7 @@ systemctl restart apiscp
 
 It may take up to 30 minutes for the negative cache TTL to expire due to a specification baked into SOA records (c.f. [RFC 2308](https://tools.ietf.org/html/rfc2308)).
 
-### Issuance staging
+### Staging
 Issuance may be staged, that is to say authorization generated using `letsencrypt:challenges()`, then solved at a later time using `letsencrypt:solve()`. Once solved, the a certificate may be ordered for the hostname using `letsencrypt:request()` using the pre-solved challenges as a shibboleth. 
 
 ```bash
@@ -160,7 +162,7 @@ All locations are prefixed **/etc/pki** unless noted.
 | siteXX/fst/etc/httpd/conf.d/                                 | Apache SSL certificates                                      |
 | /etc/haproxy/ssl.d                                           | IMAP/POP3 SSL termination certificates (mirrors httpd/conf.d/) |
 
-## Storage/issuance process
+## Issuance process
 
 Certificates are stored under `/usr/local/apnscp/storage/certificates/data/certs/ACME-SERVER` where *ACME-SERVER* is the configured Let's Encrypt signing service (acme-v02.api.letsencrypt.org/directory typically in production). These certificates are read at panel boot as part of housekeeping to determine which certificates should be reissued. Reissuance is bracketed as 10 days before expiration and up to day of expiration. It may be altered via [letsencrypt] => lookahead_days and [letsencrypt] => lookbehind_days respectively.
 
@@ -173,7 +175,28 @@ cpcmd scope:set cp.config letsencrypt lookbehind_days -1
 
 Once a certificate order has completed, it is stored under ACME-SERVER/siteXX. The certificate is then copied into siteXX/fst/etc/httpd/conf/ssl.crt and ssl.key directories. Additionally, if haproxy is used for mail (when `cpcmd scope:get cp.config mail proxy` is "haproxy"), then a PEM is also copied as `/etc/haproxy/ssl.d/siteXX`.
 
-A completed certificate resides in 3 places: Let's Encrypt storage in storage/certificates, Apache config in httpd/conf/ssl.{key,crt}, and haproxy (for SMTP/IMAP/POP3) in /etc/haproxy/ssl.d.
+A completed certificate resides in 3 places: Let's Encrypt storage in storage/certificates, Apache config in `httpd/conf/ssl.{key,crt}`, and haproxy (for SMTP/IMAP/POP3) in `/etc/haproxy/ssl.d`.
+
+### Solver mechanisms
+**New in 3.2.20**
+
+Mechanisms are negotiated on appropriateness. ApisCP will attempt two mechanisms during issuance: `http` and `dns`.
+
+`http` method is used if the hostname is not a wildcard (`*.domain.com`). `dns` is used if the hostname *is* a wildcard or the IP address returned from resolvers configured in /etc/resolv.conf does not match the IP address on the site (`cpcmd -d domain.com dns:get-public-ip`). 
+
+*Note*: `dns` is only used for non-wildcard domains if IP verification is disabled for the request ([config.ini](Tuneables.md) or Account > Settings > SSL in the UI).
+
+Mechanisms may be forced for a given hostname using `letsencrypt:use-mechanism(string $domain, ?string $mechanism)`.
+
+```bash
+# Always force dns validation using domain.com
+cpcmd -d domain.com letsencrypt:use-mechanism domain.com dns
+# Force HTTP validation for wildcard certificate
+# Note: this will never succeed
+cpcmd -d domain.com letsencrypt:use-mechanism '*.domain.com' http
+# Admit it will never succeed and revert to autodiscovery
+cpcmd -d domain.com letsencrypt:use-mechanism '*.domain.com' null
+```
 
 ## Mass reissuance
 
@@ -184,79 +207,11 @@ cd /usr/local/apnscp/
 apnscp_php bin/scripts/reissueAllCertificates.php /usr/local/apnscp/storage/certificates/data/certs/acme-v02.api.letsencrypt.org.directory
 ```
 
-## Troubleshooting
-
-ApisCP provides an easy way to request SSL certificates from Let's Encrypt's staging server. The staging server grants much higher [rate-limits](https://letsencrypt.org/docs/rate-limits/) on SSL issuance. *Certificates issued through "Fake LE Intermediate X1" are untrusted in browser.*
-
-To proceed, enable [letsencrypt] => debug in config.ini. Verbosity is increased that may help ferret out failures in reissuance. Let's assume the server is failing to issue; it can be easily extended on a per-site basis by adding `-d siteXX` or `-d domain.com` to cpcmd.
-
-```bash
-cpcmd scope:set cp.config letsencrypt debug true
-cpcmd scope:set cp.debug true
-systemctl restart apiscp
-cpcmd letsencrypt:request '[svr1.domain.com]'
-```
-
-> `letsencrypt:renew` is a non-destructive command that attempts to renew an existing certificate without alteration. `letsencrypt:append` attempts to issue a new certificate while retaining existing SSL hostnames. `letsencrypt:request` overwrites the given hostname set with a new set of hostnames. A set is written as `'[domain1.com, domain2.com]'`.
-
-Sample output from the command,
-
-```bash
-DEBUG: SSL challenge attempt: svr1.domain.com (http)
-DEBUG: SSL: setting `p0ZAj9RvYFTpysM3jLKjLHOM0Xv4noYtxBTEsSKHTPQ.48DSxJ1RVTfoPH2qk0N-1YyEEzwW4tFQJbfJY-jRmAQ' in `/tmp/acme/.well-known/acme-challenge/p0ZAj9RvYFTpysM3jLKjLHOM0Xv4noYtxBTEsSKHTPQ'
-DEBUG: http challenge failed: Challenge failed (response: {"type":"http-01","status":"invalid","error":{"type":"urn:ietf:params:acme:error:unauthorized","detail":"Invalid response from https:\/\/svr1.domain.com\/.well-known\/acme-challenge\/p0ZAj9RvYFTpysM3jLKjLHOM0Xv4noYtxBTEsSKHTPQ [64.22.68.70]: \"<!DOCTYPE HTML PUBLIC \\\"-\/\/IETF\/\/DTD HTML 2.0\/\/EN\\\">\\n<html><head>\\n<title>404 Not Found<\/title>\\n<\/head><body>\\n<h1>Not Found<\/h1>\\n<p\"","status":403},"url":"https:\/\/acme-staging-v02.api.letsencrypt.org\/acme\/chall-v3\/13971920\/JeF6GA","token":"p0ZAj9RvYFTpysM3jLKjLHOM0Xv4noYtxBTEsSKHTPQ","validationRecord":[{"url":"http:\/\/svr1.domain.com\/.well-known\/acme-challenge\/p0ZAj9RvYFTpysM3jLKjLHOM0Xv4noYtxBTEsSKHTPQ","hostname":"svr1.domain.com","port":"80","addressesResolved":["64.22.68.70"],"addressUsed":"64.22.68.70"},{"url":"https:\/\/svr1.domain.com\/.well-known\/acme-challenge\/p0ZAj9RvYFTpysM3jLKjLHOM0Xv4noYtxBTEsSKHTPQ","hostname":"svr1.domain.com","port":"443","addressesResolved":["64.22.68.70"],"addressUsed":"64.22.68.70"}]}).
-DEBUG: SSL challenge attempt: svr1.domain.com (dns)
-WARNING: Dns_Module::record_exists(): No hosting nameservers configured for `svr1.domain.com', cannot determine if record exists
-ERROR: Dns_Module_Surrogate::__parse: Non-existent DNS record `_acme-challenge'
-DEBUG: Setting DNS TXT record _acme-challenge.svr1.domain.com with value GuIW_r_cARFoVr35VItWGhfwpSxGCRbTKwFE6Z0PYrE
-DEBUG: dns challenge failed: Challenge failed (response: {"type":"dns-01","status":"invalid","url":"https:\/\/acme-staging-v02.api.letsencrypt.org\/acme\/chall-v3\/13971920\/F0RMlg","token":"p0ZAj9RvYFTpysM3jLKjLHOM0Xv4noYtxBTEsSKHTPQ"}).
-
-```
-
-From the above debug log, a HTTP request to 64.22.68.70 failed to produce the challenge request. A quick verification confirms the server address differs from 64.22.68.70 resulting in a failure.
-
-Once the root cause is corrected, reissue the certificate using Let's Encrypt in production mode.
-
-```bash
-cpcmd scope:set cp.config letsencrypt debug false
-cpcmd scope:set cp.debug false
-systemctl restart apiscp
-# This is analogous to setting cp.debug true
-env DEBUG=1 cpcmd letsencrypt:request '[svr1.domain.com]'
-```
-
-### Validating installed certificates
-
-`openssl` is a utility that can quickly check SSL certificates for expiration and subject alternative names, which are used to confirm a SSL certificate's authenticity  when connecting securely to mail or HTTP.
-
-| Service | Port |
-| ------- | ---- |
-| HTTPS   | 443  |
-| SMTPS   | 465  |
-| POP3S   | 995  |
-| IMAPS   | 993  |
-
-Typical usage is `openssl s_client -connect IP:PORT -servername HOSTNAME` where IP is the IP to connect (or server hostname), PORT from the above table, and HOSTNAME is the certificate to examine. HOSTNAME is crucial as it helps the server send the correct certificate at handshake.
-
-For example, `openssl s_client -connect apiscp.com:993 -servername apiscp.com | openssl x509 -noout -fingerprint` and `openssl s_client -connect apiscp.com:993 -servername nexus.apiscp.com | openssl x509 -noout -fingerprint` return different fingerprints because different certificates are sent depending upon the servername parameter.
-
-#### Checking expiration date
-
-A certificate is only valid for the expiration dates it is authorized to serve. All times are in GMT.
-
-`openssl s_client -connect apiscp.com:993 -servername apiscp.com | openssl x509 -noout -dates`
-
-#### Checking SANs
-
-SANs are all hostnames bound to a certificate. -text generates significant data, so filter out the noise using `grep`:
-
-`openssl s_client -connect apiscp.com:993 -servername apiscp.com | openssl x509 -noout -text | grep 'DNS:'`
-
 ## Importing certificates
 
 Let's Encrypt will work for most situations, simple SSL and wildcard SSL. Certificates automatically update 10 days in advance.
 
-What if you want to install an EV (extended validation) certificate? Two options, programmatically via `cpcmd -d domain ssl:install` or you can do it the old fashioned way: move the key in `siteXX/fst/etc/httpd/conf/ssl.key/server.key`, CRT as `server.crt` in `ssl.crt/`, chain in `ssl.crt/bundle.crt`, then in `/etc/httpd/conf/siteXX.ssl/`, create a file named custom with:
+What if you want to install an EV (extended validation) certificate? Two options, programmatically via `cpcmd -d domain.com ssl:install` or you can do it the old fashioned way: move the key in `siteXX/fst/etc/httpd/conf/ssl.key/server.key`, CRT as `server.crt` in `ssl.crt/`, chain in `ssl.crt/bundle.crt`, then in `/etc/httpd/conf/siteXX.ssl/`, create a file named custom with:
 
 ```apache
 SSLCertificateChainFile /home/virtual/siteXX/fst/etc/httpd/conf/ssl.crt/bundle.crt
@@ -285,3 +240,79 @@ Self-signed certificates can be trusted by adding the certificate to `/etc/pki/c
 
 **See also** [CA Cert are only added at ca-bundle-trust.crt](https://stackoverflow.com/questions/58725457/ca-cert-are-only-added-at-ca-bundle-trust-crt) (StackOverflow)
 :::
+
+## Troubleshooting
+
+ApisCP provides an easy way to request SSL certificates from Let's Encrypt's staging server. The staging server grants much higher [rate-limits](https://letsencrypt.org/docs/rate-limits/) on SSL issuance. *Certificates issued through "Fake LE Intermediate X1" are untrusted in browser.*
+
+To proceed, enable [letsencrypt] => debug in config.ini. Verbosity is increased that may help ferret out failures in reissuance. Let's assume the server is failing to issue; it can be easily extended on a per-site basis by adding `-d siteXX` or `-d domain.com` to cpcmd.
+
+```bash
+cpcmd scope:set cp.config letsencrypt debug true
+cpcmd scope:set cp.debug true
+systemctl restart apiscp
+cpcmd letsencrypt:request '[svr1.domain.com]'
+```
+
+::: details renew vs append
+`letsencrypt:renew` is a non-destructive command that attempts to renew an existing certificate without alteration. `letsencrypt:append` attempts to issue a new certificate while retaining existing SSL hostnames. `letsencrypt:request` overwrites the given hostname set with a new set of hostnames. A set is written as `'[domain1.com, domain2.com]'`.
+:::
+
+Sample output from the command,
+
+```bash
+DEBUG: SSL challenge attempt: svr1.domain.com (http)
+DEBUG: SSL: setting `p0ZAj9RvYFTpysM3jLKjLHOM0Xv4noYtxBTEsSKHTPQ.48DSxJ1RVTfoPH2qk0N-1YyEEzwW4tFQJbfJY-jRmAQ' in `/tmp/acme/.well-known/acme-challenge/p0ZAj9RvYFTpysM3jLKjLHOM0Xv4noYtxBTEsSKHTPQ'
+DEBUG: http challenge failed: Challenge failed (response: {"type":"http-01","status":"invalid","error":{"type":"urn:ietf:params:acme:error:unauthorized","detail":"Invalid response from https:\/\/svr1.domain.com\/.well-known\/acme-challenge\/p0ZAj9RvYFTpysM3jLKjLHOM0Xv4noYtxBTEsSKHTPQ [64.22.68.70]: \"<!DOCTYPE HTML PUBLIC \\\"-\/\/IETF\/\/DTD HTML 2.0\/\/EN\\\">\\n<html><head>\\n<title>404 Not Found<\/title>\\n<\/head><body>\\n<h1>Not Found<\/h1>\\n<p\"","status":403},"url":"https:\/\/acme-staging-v02.api.letsencrypt.org\/acme\/chall-v3\/13971920\/JeF6GA","token":"p0ZAj9RvYFTpysM3jLKjLHOM0Xv4noYtxBTEsSKHTPQ","validationRecord":[{"url":"http:\/\/svr1.domain.com\/.well-known\/acme-challenge\/p0ZAj9RvYFTpysM3jLKjLHOM0Xv4noYtxBTEsSKHTPQ","hostname":"svr1.domain.com","port":"80","addressesResolved":["64.22.68.70"],"addressUsed":"64.22.68.70"},{"url":"https:\/\/svr1.domain.com\/.well-known\/acme-challenge\/p0ZAj9RvYFTpysM3jLKjLHOM0Xv4noYtxBTEsSKHTPQ","hostname":"svr1.domain.com","port":"443","addressesResolved":["64.22.68.70"],"addressUsed":"64.22.68.70"}]}).
+DEBUG: SSL challenge attempt: svr1.domain.com (dns)
+WARNING: Dns_Module::record_exists(): No hosting nameservers configured for `svr1.domain.com', cannot determine if record exists
+ERROR: Dns_Module_Surrogate::__parse: Non-existent DNS record `_acme-challenge'
+DEBUG: Setting DNS TXT record _acme-challenge.svr1.domain.com with value GuIW_r_cARFoVr35VItWGhfwpSxGCRbTKwFE6Z0PYrE
+DEBUG: dns challenge failed: Challenge failed (response: {"type":"dns-01","status":"invalid","url":"https:\/\/acme-staging-v02.api.letsencrypt.org\/acme\/chall-v3\/13971920\/F0RMlg","token":"p0ZAj9RvYFTpysM3jLKjLHOM0Xv4noYtxBTEsSKHTPQ"}).
+
+```
+
+From the above debug log, a HTTP request to 64.22.68.70 failed to produce the challenge request. A quick verification confirms the server address differs from 64.22.68.70 resulting in a failure.
+
+Once the root cause is corrected, reissue the certificate using Let's Encrypt in production mode.
+
+```bash
+cpcmd scope:set cp.config letsencrypt debug false
+cpcmd scope:set cp.debug false
+systemctl restart apiscp
+# This is analogous to setting cp.debug true
+env DEBUG=1 cpcmd letsencrypt:request '[svr1.domain.com]'
+```
+
+::: warn Panel vs Let's Encrypt debugging
+Two forms of debugging are used above. Panel debugging for verbose operation (`cp.debug true`) and Let's Encrypt debugging that uses LE's staging server (**Fake LE Intermediate X1**). Staging doesn't impose the same rate-limiting as LE's production server.
+
+Be sure to turn [letsencrypt] => debug off (`cp.config letsencrypt debug false`) once the underlying cause is resolved. SSL must be requested again as well.
+:::
+
+### Validating installed certificates
+
+`openssl` is a utility that can quickly check SSL certificates for expiration and subject alternative names, which are used to confirm a SSL certificate's authenticity  when connecting securely to mail or HTTP.
+
+| Service | Port |
+| ------- | ---- |
+| HTTPS   | 443  |
+| SMTPS   | 465  |
+| POP3S   | 995  |
+| IMAPS   | 993  |
+
+Typical usage is `openssl s_client -connect IP:PORT -servername HOSTNAME` where IP is the IP to connect (or server hostname), PORT from the above table, and HOSTNAME is the certificate to examine. HOSTNAME is crucial as it helps the server send the correct certificate at handshake.
+
+For example, `openssl s_client -connect apiscp.com:993 -servername apiscp.com | openssl x509 -noout -fingerprint` and `openssl s_client -connect apiscp.com:993 -servername nexus.apiscp.com | openssl x509 -noout -fingerprint` return different fingerprints because different certificates are sent depending upon the servername parameter.
+
+#### Checking expiration date
+
+A certificate is only valid for the expiration dates it is authorized to serve. All times are in GMT.
+
+`openssl s_client -connect apiscp.com:993 -servername apiscp.com | openssl x509 -noout -dates`
+
+#### Checking SANs
+
+SANs are all hostnames bound to a certificate. -text generates significant data, so filter out the noise using `grep`:
+
+`openssl s_client -connect apiscp.com:993 -servername apiscp.com | openssl x509 -noout -text | grep 'DNS:'`

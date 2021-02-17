@@ -183,6 +183,12 @@ A second parameter, `$where`, is a closure to test whether to apply the record f
     });
 ```
 
+## Development
+
+### Custom modules
+
+A variety of [modules exist](https://github.com/search?q=topic%3Adns+org%3Aapisnetworks&type=Repositories) on GitHub as boilerplate code. 
+
 ## Troubleshooting
 
 ### dns:add_record_conditionally() fails due to duplicate entries
