@@ -98,11 +98,11 @@ Service accumulators by default permit 3 attempts (`f2b_maxretry`) in a 5 minute
 
 ```bash
 # Change monitoring interval to 15 minutes for Dovecot
-cpcmd scope:set f2b_dovecot_findtime 900
+cpcmd scope:set cp.bootstrapper f2b_dovecot_findtime 900
 # Change bantime for SSH to 1 hour
-cpcmd scope:set f2b_sshd_bantime 3600
+cpcmd scope:set cp.bootstrapper f2b_sshd_bantime 3600
 # Change malware trigger threshold to 5 hits
-cpcmd scope:set f2b_malware_maxretry 5
+cpcmd scope:set cp.bootstrapper f2b_malware_maxretry 5
 # Apply settings
 upcp -sb fail2ban/configure-jails
 ```

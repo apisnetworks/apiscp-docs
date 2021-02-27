@@ -266,7 +266,7 @@ This mode can be quickly toggled after setup using a [configuration scope](admin
 
 #### DNS overrides
 
-DNS servers are altered when `use_robust_dns=true`. From observation, many providers have substandard DNS clusters for usage that can create transient network issues that are very hard to debug. We recommnd using CloudFlare's DNS servers, but others work similarly.
+DNS servers are altered when `use_robust_dns=true`. From observation, many providers have substandard DNS clusters for usage that can create transient network issues that are very hard to debug. We recommend using CloudFlare's DNS servers, but others work similarly.
 
 | Provider   | Server        |
 | ---------- | ------------- |
