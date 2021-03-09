@@ -122,6 +122,46 @@ Bootstrapper will avoid overwriting certain configurations unless explicitly ask
 
 Be sure to skip down to the [Remote API access](#remote-api-access) section to configure the hidden master endpoint.
 
+#### Updating NS records
+
+PowerDNS is configured by default to use "127.0.0.1" for its NS records. In a working environment this is never the right option, but helps bridge learning. [Bulk update](../DNS.md#bulk-record-management)  can be used to clear all NS records on the apex, then provision NS records as  set via `powerdns_nameservers`.
+
+Assuming your new DNS records are `ns1.yourserver.com` and `ns2.yourserver.com`, the following suffices:
+
+```php
+    include __DIR__ . '/lib/CLI/cmd.php';
+
+    $handler = new \Opcenter\Dns\Bulk();
+
+	// empty all NS records on the apex
+	// "_dummy_zone.com" has no effect, but used for completeness with the API
+	$handler->remove(new \Opcenter\Dns\Record('_dummy_zone.com', [
+        'name' => '', 
+        'rr' => 'NS', 
+        'parameter' => ''
+    ]), function (\apnscpFunctionInterceptor $afi, \Opcenter\Dns\Record $r) {
+        return $afi->dns_get_provider() === 'powerdns';
+    });
+
+    $handler->add(new \Opcenter\Dns\Record('_dummy_zone.com', [
+        'name' => '', 
+        'rr' => 'NS', 
+        'parameter' => 'ns1.yourserver.com'
+    ]), function (\apnscpFunctionInterceptor $afi, \Opcenter\Dns\Record $r) {
+        return $afi->dns_get_provider() === 'powerdns';
+    });
+
+    $handler->add(new \Opcenter\Dns\Record('_dummy_zone.com', [
+        'name' => '', 
+        'rr' => 'NS', 
+        'parameter' => 'ns2.yourserver.com'
+    ]), function (\apnscpFunctionInterceptor $afi, \Opcenter\Dns\Record $r) {
+        return $afi->dns_get_provider() === 'powerdns';
+    });
+```
+
+Save the script in `/usr/local/apnscp/update.php` and run `env DEBUG=1 apnscp_php /usr/local/apnscp/update.php` to replace all NS records for domains that use PowerDNS.
+
 #### Periodic maintenance
 
 Sometimes you may want to force a zone update - if changing public nameservers - or prune expired domains since AXFR-based clusters do not afford automated zone removals. These snippets come from [hopefully.online](https://hopefully.online/powerdns-master-slave-cluster):
