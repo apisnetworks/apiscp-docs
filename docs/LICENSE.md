@@ -53,7 +53,7 @@ Alternatively the CLI tool may be used to streamline these steps.
 > info                    : license information  
 > ```
 
-For example, to upgrade a trial license to a paid license `license.php ACTIVATION-CODE "some nickname"`.
+For example, to upgrade a trial license to a paid license `license.php issue ACTIVATION-CODE "some nickname"`.
 
 ## License features
 

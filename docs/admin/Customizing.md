@@ -71,7 +71,11 @@ A master layout named "layout" is provided in `resources/views/`. As with all te
 
 ### App overrides
 
-Copy the app from `apps/<name>` to `config/custom/apps/<name>`.  Role menus, i.e. what is loaded when a corresponding user type logs in (admin, site, user) may be overridden as well. Menus are based on code under `lib/html/templateconfig-<role>.php`. Additional includes may be located under `config/custom/templates/<role>.php`. This is a sample extension for ApisCP when a billing module is configured to allow clients direct access to manage billing:
+Apps may be completely overridden or on a file-per-file basis (such as replacing `application.yml`). 
+
+To override the app entirely, copy it from `apps/<name>` to `config/custom/apps/<name>`.  To override a specific file, create the corresponding directory structure in `config/custom/apps/<name>`, then copy the file over.
+
+Role menus, i.e.  what is loaded when a corresponding user type logs in (admin, site, user) may be overridden as well. Menus are based on code under `lib/html/templateconfig-<role>.php`. Additional includes may be located under `config/custom/templates/<role>.php`. This is a sample extension for ApisCP when a billing module is configured to allow clients direct access to manage billing:
 
 `config/custom/templates/site.php`:
 
@@ -79,11 +83,11 @@ Copy the app from `apps/<name>` to `config/custom/apps/<name>`.  Role menus, i.e
 <?php
 
 $templateClass->create_link(
-        'Billing History',
-        '/apps/billinghistory',
-        cmd('billing_configured'),
-        null,
-        'account'
+        'Billing History',          /* application title */
+        '/apps/billinghistory',     /* application URL */
+        cmd('billing_configured'),  /* conditions to show application */
+        null,                       /* optional application icon */
+        'account'                   /* optional category name */
 );
 
 $templateClass->create_link(
@@ -216,7 +220,7 @@ Grunt is used to build themes from the [SDK](https://github.com/apisnetworks/apn
 ```bash
 git clone https://github.com/apisnetworks/apnscp-bootstrap-sdk
 pushd apnscp-bootstrap-sdk
-npm install -D
+npm install
 env THEME=apnscp grunt watch
 ```
 Now changes may be made to the "apnscp" theme in `scss/themes/apnscp`. It will also be necessary to put either the panel in debug mode using the *cp.debug* scope or by flagging the session as debug. Session is encoded in the browser session as `session.id`. Use this value with misc:debug-session to selectively enable debugging for this session:
