@@ -41,7 +41,7 @@ As an example,  an authenticated user can easily get the provider key from ApisC
 Accounts may use a provider other than what is assigned globally. `dns`,`provider` and `dns`,`key` control these parameters.
 
 ::: danger
-Any configuration set in this manner may be viewed by the Site Adminstrator. Do not store sensitive keys. In fact, PowerDNS is strongly recommended in multi-tenant environments, which stores authentication in an inaccessible location.
+Any configuration set in this manner may be viewed by the Site Administrator. Do not store sensitive keys. In fact, PowerDNS is strongly recommended in multi-tenant environments, which stores authentication in an inaccessible location.
 :::
 
 ```bash
