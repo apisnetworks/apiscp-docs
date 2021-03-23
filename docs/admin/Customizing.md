@@ -107,6 +107,42 @@ $templateClass->create_link(
 );
 ```
 
+### Onboarding tours
+
+**New in 3.2.22**
+
+![Onboarding tour](./images/onboarding-ex.png)
+
+Users may be introduced to a brief demo on the first app view or on demand when `\Page_Renderer::show_tutorial();` is called (see `apps/template/template.php` for sample invocation). Steps are loaded from `application.yml` bundled in `apps/APP NAME/`. As with all application data, this file may be individually overridden by copying `apps/APP NAME/application.yml` to `config/custom/apps/APP NAME/application.yml`. 
+
+`application.yml` does not support inheritance; thus, the overrode file is what is used for application metadata. Parsed metadata remains cached for 24 hours unless the panel is in [debug mode](../DEBUGGING.md#debugging).
+
+```yaml
+# Sample tour data from dashboard/application.yml
+tour:
+  - title: "Welcome to {{ PANEL_BRAND }} 🎉"
+    content: "This demo will walk you through the end-user dashboard component. It's built to be nimble and powerful."
+  - selector: '.usage-gauges > div'
+    title: "Resource usage"
+    content: "A variety of metrics relating to resource consumption lets you know how much you've used."
+  - selector: '#cpu-gauge'
+    title: "CPU usage"
+    content: "CPU resets every 24 hours measuring both system and user time."
+    when: "{{ !\\UCard::get()->is('admin') }}"
+  - selector: "#rampartMarker"
+    title: "Firewall"
+    content: >-
+      Firewall stats are available within the dashboard. See <a class='ui-action-label ui-action-visit-site-tab ui-action'
+      target='apiscp-docs' href='https://docs.apiscp.com/FIREWALL'>FIREWALL.md</a> for advanced usage.
+    when: "{{ \\UCard::get()->is('admin') }}"
+```
+
+`tour` contains all onboarding steps. Each step may optionally present a `title` field that sets the modal title, an optional `selector` highlights callouts. `content` is required. `when` must evaluate to a truthy condition (1, "1", "true", true, "non-empty string") to display. All fields support Blade templating.
+
+::: warning Evaluation at page load
+Onboarding binds to the DOM at page load. Any elements replaced after page load will not receive callout treatment.
+:::
+
 #### Hiding/removing existing apps
 
 Apps populated as part of ApisCP may be hidden or removed from view using `hide()` and `remove()` respectively. Application ID is the basename from the URI path, i.e. for /apps/foo the application ID is "foo" and likewise "quuz" is the application ID for /apps/quuz.
