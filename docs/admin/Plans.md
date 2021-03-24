@@ -178,6 +178,48 @@ Plans are covered later in this section. Note the behavior when changing plans i
 
 `admin:edit_site(string $site, array $opts = [], array $flags = []): bool` allows editing of sites. See [API.md](API.md) for implementing API access.
 
+### Double-throw safety switches
+
+MySQL, PostgreSQL, and DNS permit disablement without removing database configuration (or zone databases) through a double-throw safety switch ("DTSS") feature. When `mysql`, `postgresql`, or `dns` services are disabled, DTSS restricts further usage of creating new databases or users while preserving existing data.
+
+To remove these databases from the account while preserving the account, the following DTSS conditions must be met at the same time. Likewise to preserve existing data, the following value must be set at deletion time.
+
+| Service    | DTSS Condition              | Preservation Condition |
+| ---------- | --------------------------- | ---------------------- |
+| MySQL      | enabled=0, dbaseprefix=None | dbaseprefix=None       |
+| PostgreSQL | enabled=0, dbaseprefix=None | dbaseprefix=None       |
+| DNS        | enabled=0, provider=None    | provider=None          |
+
+For example, consider the following code snippet:
+
+```bash
+AddDomain -c siteinfo,domain=mytestdomain.test -c siteinfo,admin_user=testuser -c dns,provider=powerdns -c dns,enabled=1
+
+# Create a dummy record called foo.mydomain.test on PowerDNS
+cpcmd -d mytestdomain.test dns:add-record mytestdomain.test 'foo' A '1.2.3.4'
+# Confirm record exists
+cpcmd -d mytestdomain.test dns:get-records foo
+
+# Preserve DNS, but disable DNS for now...
+# "null" is the same as "None" - historical quirk
+EditDomain -c dns,provider=null mytestdomain.test
+# Confirm record is missing
+cpcmd -d mytestdomain.test dns:get-records foo
+
+# Revert DNS provider. Zone is preserved.
+EditDomain -c dns,provider=powerdns mytestdomain.test
+# Confirm record exists
+cpcmd -d mytestdomain.test dns:get-records foo
+
+# Remove DNS for good from site
+EditDomain -c dns,provider=null -c dns,enabled=0 mytestdomain.test
+EditDomain -c dns,provider=powerdns -c dns,enabled=1 mytestdomain.test
+# Record now missing
+cpcmd -d mytestdomain.test dns:get-records foo
+```
+
+Likewise setting `provider=None` prior to deletion can be used to preserve DNS upon account deletion. Databases are allocated within each site's filesystem, so while it's possible to preserve databases and grants upon account deletion the underlying databases are still removed.
+
 ## DeleteDomain
 
 Domains may be deleted using `DeleteDomain`. DeleteDomain accepts a list of arguments that may be either the site identifier, domain, aliased domain, or invoice (billing,invoice OR billing,parent_invoice service value). Invoices allow you to quickly group multiple accounts. Invoices are discussed briefly below.
