@@ -296,6 +296,19 @@ ApisCP uses a composition filesystem called [BoxFS](Filesystem.md) that allows f
 - Site Administrators can apply additional directives in `siteXX/etc/php-fpm.d/` that apply to all pools of the site. *Must end in .conf and follow PHP-FPM pool directives*.
 - `.user.ini` in each document root allows for additional configuration. This configuration is cached for 300 seconds per `user_ini.cache_ttl`.
 
+The following table summarizes inheritance behavior for PHP directives. All locations follow debugging path [conventions](../DEBUGGING.md#log-locations). Unless marked atypical, configuration follows normal DIRECTIVE=VALUE syntax. See corresponding section for atypical configuration. *DOCROOT* refers to the document root for the given HTTP resource.
+
+| Location                                  | Editable By | Atypical | Remarks                                                      |
+| ----------------------------------------- | ----------- | :------: | ------------------------------------------------------------ |
+| `FST/siteinfo/etc/php.ini`                | admin       |          | [System-wide configuration](#system-wide-configuration). Reload `fsmount` after edit. |
+| `siteXX/fst/etc/php.ini`                  | admin, site |          | Copy-up from FST. Requires chown for site edit.              |
+| `siteXX/fst/etc/php-fpm.d/sites`          | admin, site |    X     | [Service configuration](#service-configuration). Cannot override php_admin directives. |
+| `resources/templates/apache/php/partials` | admin       |    X     | [Service templates](#service-templates). Intended for creation-time configuration. Overrides php_admin. |
+| `siteXX/info/php-policy.xml`              | admin       |    X     | [Policy Maps](#policy-maps). Mixed configuration. Can override php_admin if templated. |
+| `DOCROOT/.user.ini`                       | site        |          | [User overrides](#user-overrides). 5 minute reload interval. Cannot override php_admin. |
+
+
+
 ### System-wide configuration
 
 System-wide changes may be made to `/home/virtual/FILESYSTEM/siteinfo/etc/php.ini`. In single-mount installations, this is linked directly to `/etc/php.ini`. Once edited, layer cache must be flushed upward.
@@ -305,7 +318,7 @@ systemctl reload fsmount
 systemctl restart php-fpm
 ```
 
-**This fails if** a site has modified /etc/php.ini within their account root (copy-up semantics of BoxFS). In such situations, an override may be applied either in `/home/virtual/FILESYSTEMTEMPLATE/siteinfo/etc/phpXX.d/file.ini` or by overriding the PHP-FPM service template. When applied in etc/phpXX.d/, a site owner may remove or edit the file from the account. For a permanent, uneditable solution, see **Site templates** below.
+**This fails if** a site has modified `/etc/php.ini` within their account root ([copy-up semantics](./Filesystem.md#technical-details) of BoxFS). In such situations, an override may be applied either in `/home/virtual/FILESYSTEMTEMPLATE/siteinfo/etc/phpXX.d/file.ini` or by overriding the PHP-FPM service template. When applied in etc/phpXX.d/, a site owner may remove or edit the file from the account. For a permanent, uneditable solution, see **Site templates** below.
 
 ::: warning
 `/etc/phpXX.d` is not the same as `/home/virtual/FILESYSTEMTEMPLATE/siteinfo/etc/phpXX.d`. Files placed in /etc/phpXX.d are not propagated like in /etc/php.ini.
