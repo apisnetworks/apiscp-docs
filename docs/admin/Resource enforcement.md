@@ -154,9 +154,13 @@ As an alternative, range can be used to examine the sum over a window.
 
 ## CPU
 
-CPU utilization comes in two forms: user and system (real time is the sum of user + system). User time is spent incrementing over a loop, adding numbers, or templating a theme. System time is when a process communicates with the kernel directly to perform a privileged function, such as opening a file, forking a process, or communicating over a network socket.
+CPU utilization comes in two forms: **user** and **system** (*real time* is the sum of user + system). User time is spent incrementing over a loop, adding numbers, or templating a theme. System time is when a process communicates with the kernel directly to perform a privileged function, such as opening a file, forking a process, or communicating over a network socket.
 
-In typical operation, user will always be an order of magnitude higher than system. `time` can help you understand how. Don't worry if it doesn't make sense yet, we'll walk through it.
+**User time** is raw processing, number crunching. In typical operation, user will always be an order of magnitude higher than system. 
+
+`strace` (short for system trace) helps break down the **system calls** during a program's execution. Don't worry if it doesn't make sense yet, we'll walk through it. `time` allows us to see the proportion of user to system time during execution.
+
+Let's look at a trivial example that checks filesystem attributes on / and increments a variable.
 
 ```bash
 strace -c -- /bin/sh -c 'time  (let SUM=0; for i in $(seq 1 1000) ; do SUM+=$i ; stat / > /dev/null; done)'
@@ -195,9 +199,69 @@ sys     0m1.336s
 ------ ----------- ----------- --------- --------- ----------------
 100.00    1.336381                   100         2 total
 ```
+Each **system call** corresponds to an escalation in code that interacts with the kernel. `wait4` for example asks the kernel to wait until a process exits then return its exit code. `mmap` maps a text file into memory preferring to read it from memory instead of disk if possible. `fstat` asks the kernel to ask the hard drive to return what metadata it knows about a file and so on. The remaining *user* time is spent incrementing SUM by 1 and the loop counter.
+
+### Weighting usage
+
+Usage may be apportioned based on demand using `cgroup`,`cpuweight`. Weighting works on a scale from [1, 1000] with the default value 100 representing equal value. CPU scheduling works on time slices with  *1 unit of time* split n ways between all competing tasks. Higher valued processes are given scheduling priority during this *unit of time*. A unit of time is completely arbitrary and dependent how quickly the CPU can process work.
+
+![Sample CPU scheduling](./images/cpu-scheduling.svg)
+
+*Given 1 unit of time, we see TASK A has a 1.5x weighting to TASK B + TASK C (independent). TASK D is weighted 0.5x. TASK A is weighted 3x more to TASK D.*
+
+Let's convert this to `cgroup`,`cpuweight` parameters. TASK A comes from site1, TASK B from site2, TASK C from site3, and TASK D from site4:
+
+```bash
+EditDomain -c cgroup,cpuweight=150 site1
+EditDomain -c cgroup,cpuweight=100 site2
+EditDomain -c cgroup,cpuweight=100 site3
+EditDomain -c cgroup,cpuweight=50 site4
+```
+
+That's it!
+
+Impact can be evaluated real-time too. Take for example a pair of computationally intense processes. Its default cpuweight is 100. Evaluate the accumulated CPU time over 30 seconds. Decrease CPU weight, then re-evaluate.
+
+![CPU example before cpuweight treatment](./images/cpu-top-before.png)
+
+Assuming these tasks are from `site1`. You can get the cgroup group by checking `/proc/PID/cgroup`.
+
+```bash
+cat /proc/18446/cgroup 
+# Note the cpuacct,cpu group is /site1
+let x1=$(cat /sys/fs/cgroup/cpuacct/site1/cpuacct.usage)
+sleep 30
+echo $(($(cat /sys/fs/cgroup/cpuacct/site1/cpuacct.usage) - $x1))
+# Reports 58993202755
+
+# Apply CPU weighting treatment to give it 0.5x weighting
+let x1=$(cat /sys/fs/cgroup/cpuacct/site1/cpuacct.usage)
+sleep 30
+echo $(($(cat /sys/fs/cgroup/cpuacct/site1/cpuacct.usage) - $x1))
+# Reports 57876992031, 1.89% reduction in CPU usage over 20 seconds
+```
+
+*Weighting doesn't always produce a proportional reduction in CPU usage* because there is still idle CPU that can be utilized by the process (cf. **load average** in the introduction). cpuweight does make a difference under heavy utilization with significant resource contention where multiple processes are vying for CPU timeslices by prioritizing cgroup tasks with heavier weighting. For cumulative usage, use `cgroup`,`cpu` to limit the maximal 24 hour consumption.
+
+![top after CPU weighting](./images/cpu-top-after.png)
+
+:::tip Bandwidth control
+CPU bandwidth controls allow throttling as well as burstability, but is not yet a feature of ApisCP. These can be controlled via /sys/fs/cgroup/siteXX/cpu.cfs\_{period,quota}\_us
+:::
+
+### Limiting cumulative usage
+
+`cgroup`,`cpuweight` balances CPU usage among a variety of tasks. If we want to restrict how much CPU can be used in a 24-hour period, then `cgroup`,`cpu` establishes this limit. [Metrics](./Metrics.md) must be enabled to accumulate this data over a rolling 24 hour window. Overages are not actively patrolled or enforced at this time. Periodic usage can be queried using `admin:get-usage`.
+
+```bash
+cpcmd admin:get-usage cgroup
+# Or to restrict to a few sites
+cpcmd admin:get-usage cgroup '[site1,site2,site3]'
+```
+
 ### Site Administrator glance
 
-For Site Administrators, "user" and "system" are 24 hour recorded totals using the same mechanism that counts run-queue size and task duration. As there are 86,400 seconds in a day per logical core, in theory the maximal value would approach 86,400 seconds * \<n processors>, but as several hundred processes run on a server it would be impossible for any one task group to ever reach this total (like absolute zero).
+When [telemetry](Metrics.md) is enabled, Site Administrators have a 24-hour glance of both "user" and "system" time available in the Dashboard and **Account** > **Summary** > **CPU Usage**. As there are 86,400 seconds in a day per logical core, in theory the maximal CPU value would approach 86,400 seconds * \<n processors>, but as several hundred processes run on a server it would be impossible for any one task group to ever reach this total.
 
 ## Process
 
@@ -253,8 +317,6 @@ IO and CPU weighting may be set via ioweight and cpuweight respectively. ioweigh
 # Halve IO priority, double CPU priority
 EditDomain -c cgroup,ioweight=50 -c cgroup,cpuweight=200 domain.com
 ```
-
-
 
 
 ## Emergency stopgaps

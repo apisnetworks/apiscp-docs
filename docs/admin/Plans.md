@@ -218,7 +218,7 @@ EditDomain -c dns,provider=powerdns -c dns,enabled=1 mytestdomain.test
 cpcmd -d mytestdomain.test dns:get-records foo
 ```
 
-Likewise setting `provider=None` prior to deletion can be used to preserve DNS upon account deletion. Databases are allocated within each site's filesystem, so while it's possible to preserve databases and grants upon account deletion the underlying databases are still removed.
+Likewise setting `provider=None` prior to deletion can be used to preserve DNS upon account deletion. Databases are allocated within each site's filesystem, so while it's possible to preserve MySQL/PostgreSQL databases and grants upon account deletion the underlying databases are still removed.
 
 ## DeleteDomain
 
