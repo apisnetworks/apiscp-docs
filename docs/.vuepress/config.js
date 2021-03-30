@@ -71,8 +71,8 @@ module.exports = {
     editLinkText: 'Help us improve this article!',
     smoothScroll: true,
     algolia: {
-      apiKey: 'd2f15fd1086962aaabb924f6aa693249',
-      indexName: 'apnscp-docs',
+      apiKey: '40a665fc96b49b38dc8620bad6372c9a',
+      indexName: 'apiscp',
     },
     nav: [
       {
