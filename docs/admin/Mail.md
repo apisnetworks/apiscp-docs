@@ -51,15 +51,16 @@ cpcmd scope:set mail.rspamd-piggyback true
 
 Message delivery is determined by reputation. Higher reputation increases the likelihood a message will be properly delivered to its intended recipient. Several components influence reputation. The following table summarizes these features. Higher conformance is correlated to higher delivery success.
 
-| Requirement                                 | Purpose               |
-| ------------------------------------------- | --------------------- |
-| [FCrDNS](#fcrdns)                           | Competency check      |
-| [SPF](#spf)                                 | Sender authorization  |
-| [DKIM](rspamd.md#dkim-signing)              | Sender authentication |
-| [DMARC](#dmarc)                             | Violation disposition |
-| [IP reputation](#ip-reputation)             | Sending patterns      |
-| [Well-formed headers](#well-formed-headers) | Competency check      |
-| [FBL](#feedback-loops)                      | Sender violations     |
+| Requirement                                 | Purpose                 |
+| ------------------------------------------- | ----------------------- |
+| [FCrDNS](#fcrdns)                           | Competency check        |
+| [SPF](#spf)                                 | Sender authorization    |
+| [DKIM](rspamd.md#dkim-signing)              | Sender authentication   |
+| [DMARC](#dmarc)                             | Violation disposition   |
+| [IP reputation](#ip-reputation)             | Sending patterns        |
+| [Well-formed headers](#well-formed-headers) | Competency check        |
+| [FBL](#feedback-loops)                      | Sender violations       |
+| [Multiple IPs](#multiple-ips)               | Unexpected interruption |
 
 Mail may be tested using [mail-tester.com](https://mail-tester.com).
 
@@ -257,3 +258,25 @@ Headers fall under "use good judgment". Certain mail providers, such as GMail, r
 FBLs inform you of sending violations from users on your network. Whenever a user marks a message a spam, the participating service will send a copy of the email to the FBL address. Policing FBLs will help you keep spam off your network before it magnifies into greater consequence. [emailfeedbackloops.com](https://www.emailfeedbackloops.com/how-to-apply-for-feedback-loops.php) contains a tiered list of participating providers.
 
 FBL participation is typically limited to the [ASN contact](https://www.ultratools.com/tools/asnInfo) for an IP address range and are not accessible to an operator of a VPS. As a rule of thumb, participate with AOL, Hotmail, and Yahoo.
+
+### Multiple IPs
+
+Lastly, multiple IP addresses *is strongly recommended*. Having additional IP addresses on standby provides mitigation when a mail service provider blocks mail to their server without providing a means to delist. GMail for example uses time-based delisting, you cannot manually request a delisting - it must expire and expiry time is based on reputation.
+
+Having additional IPs allows for a "hot" IP address to cool down once the problematic account has been resolved on the server. 
+
+::: tip Justification required
+ARIN justification ([RFC 2050](https://tools.ietf.org/html/rfc2050) § 2.1) is required for additional IPv4 addresses. Justification is beyond the scope of this document.
+:::
+
+To switch an IP address, use `postconf`,
+
+```bash
+# Set Postfix to connect to SMTP servers using 1.2.3.4
+postconf -o smtp_bind_address=1.2.3.4
+postfix reload
+```
+
+More advanced [round-robin configurations](http://postfix.1071664.n5.nabble.com/round-robin-map-with-ipv4-and-ipv6-td104719.html) are available as well as sender-dependent transport maps that use sender domains to [bind to IPs](Smtp.md#splitting-delivery-ips) on-the-fly.
+
+Always keep **at least one IP address** on standby.

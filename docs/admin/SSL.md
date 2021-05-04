@@ -32,7 +32,7 @@ Add the domain, then create a DNS record either from command-line or within the 
 AddDomain -c siteinfo,domain=mydomain.com -c siteinfo,admin_user=someuser
 cpcmd -d mydomain.com dns:add-record mydomain.com svr1 A "$(curl -s http://myip4.apiscp.com/)"
 # If IPv6, use the following command:
-cpcmd -d mydomain.com dns:add-record mydomain.com svr1 AAAA "$(curl -s http://myip4.apiscp.com/)"
+cpcmd -d mydomain.com dns:add-record mydomain.com svr1 AAAA "$(curl -s http://myip6.apiscp.com/)"
 # Restart ApisCP to attempt another SSL authorization from Let's Encrypt
 systemctl restart apiscp
 ```

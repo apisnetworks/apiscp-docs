@@ -201,6 +201,7 @@ module.exports = {
                   children: [
                     "admin/webapps/Discourse",
                     "admin/webapps/Ghost",
+                    "admin/webapps/Laravel",
                     "admin/webapps/Nextcloud",
                     "admin/webapps/WordPress",
                     "admin/webapps/Go",
