@@ -320,6 +320,10 @@ systemctl restart php-fpm
 
 **This fails if** a site has modified `/etc/php.ini` within their account root ([copy-up semantics](./Filesystem.md#technical-details) of BoxFS). In such situations, an override may be applied either in `/home/virtual/FILESYSTEMTEMPLATE/siteinfo/etc/phpXX.d/file.ini` or by overriding the PHP-FPM service template. When applied in etc/phpXX.d/, a site owner may remove or edit the file from the account. For a permanent, uneditable solution, see **Site templates** below.
 
+Any changes should be located at the end of php.ini so as not to conflict with [base directives](https://gitlab.com/apisnetworks/apnscp/-/blob/master/resources/playbooks/roles/php/create-configuration/defaults/main.yml) block applied by ApisCP. 
+
+*Last instance of a directive always wins in php.ini.*
+
 ::: warning
 `/etc/phpXX.d` is not the same as `/home/virtual/FILESYSTEMTEMPLATE/siteinfo/etc/phpXX.d`. Files placed in /etc/phpXX.d are not propagated like in /etc/php.ini.
 :::
