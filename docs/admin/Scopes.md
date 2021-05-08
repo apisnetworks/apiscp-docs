@@ -16,6 +16,15 @@ A list of available scopes can be gathered with `cpcmd scope:list`. All scopes c
 
 `scope:set` reconfigures a scope and initiates any reconfiguration tasks associated with reassignment. Before altering a system value, check scopes first as these will be overwritten with `upcp -b` (run Bootstrapper).
 
+### Append-only scopes
+
+A couple scopes are append-only, which are intended to permanently set features. The following table summarizes the scopes and manual undo operation.
+
+| Scope                             | Undo                                        |
+| --------------------------------- | ------------------------------------------- |
+| rampart.fail2ban-whitelist        | `ignoreip` entry in /etc/fail2ban/jail.conf |
+| virus-scanner.signature-whitelist | /var/lib/clamav/custom-whitelist.ign2       |
+
 ## Adding new Scopes
 
 Additional Scopes may be latched on at boot using the bootloader of ApisCP. Inside `config/custom`, create a file named `boot.php` if it does not exist already. We'll need to register two things, one an autoload path and second, the actual Scope association.

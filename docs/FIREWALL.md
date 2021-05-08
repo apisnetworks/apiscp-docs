@@ -18,6 +18,14 @@ Whitelists may be IP address (64.22.68.1) or CIDR range (64.22.68.1/24). `rampar
 
 ![Firewall overview](./images/firewall-diagram.svg)
 
+::: warning rampart.fail2ban-whitelist append-only
+`rampart.fail2ban-whitelist` is one of few append-only [Scopes](./admin/Scopes.md), which means values may be added to it but not removed directly. This usage is intended for permanent changes. 
+
+For temporary whitelisting, use `cpcmd rampart:whitelist` which uses a separate whitelist (ipset). Entries may be added or removed (see below). Any users who behave badly will still trigger Rampart's protection mechanism, but won't be blocked. Users will be greeted with a notice in the panel of what lines triggered the block.
+:::
+
+
+
 ## Whitelisting
 
 ApisCP restricts access to all ports except for well-known services (HTTP, FTP, mail, SSH) and optional services (CP, user daemons). A second whitelist, which allows access to blocked ports as well as overrides Rampart can be set using `cpcmd rampart:whitelist`:

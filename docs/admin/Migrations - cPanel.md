@@ -44,10 +44,10 @@ Never run ImportDomain where the decompressed backup source is in the current wo
 
 ## Account creation
 
-An import will faithfully restore whatever options were used in creation. Conflicts may arise and can be remedied by overriding creation options using `-c service,parameter=value`. For example to change the storage to 10 GB in a restore,
+An import will faithfully restore whatever options were used in creation. Conflicts may arise and can be remedied by overriding creation options using `-c service,parameter=value`. For example to remove a domain limit imposed by `MAXADDON=` (*addon and parked domains are same to ApisCP*) and change the storage to 10 GB in a restore,
 
 ```bash
-ImportDomain -c diskquota,quota=10 -c diskquota,units=G --format=cpanel /path/to/cpmove-backup.tar.gz
+ImportDomain -c aliases,max=None -c diskquota,quota=10 -c diskquota,units=G --format=cpanel /path/to/cpmove-backup.tar.gz
 ```
 
 ### Dumping parsed configuration
@@ -112,9 +112,14 @@ Web Apps emphasize principle of least-privilege where possible, meaning the Web 
 
 ### Bypasses
 
+#### DNS import
+**New in 3.2.24**
+
+DNS records are read from backup as-is. To bypass any DNS record importation relying instead on ApisCP-generated records, add `--no-dns`.
+
 #### DNS activation
 
-DNS will update to the current server at conclusion of import. This behavior may be disabled by passing `--no-activate` to `ImportDomain`.
+DNS will update to the current server at conclusion of import. This behavior may be disabled by passing `--no-activate` to `ImportDomain`. `--no-dns` implies this.
 
 #### Web App scan/update
 
