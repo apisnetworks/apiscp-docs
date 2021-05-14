@@ -215,11 +215,13 @@ What if you want to install an EV (extended validation) certificate? Two options
 
 ```apache
 SSLCertificateChainFile /home/virtual/siteXX/fst/etc/httpd/conf/ssl.crt/bundle.crt
+# Enable SSL service if not enabled already
+EditDomain -c ssl,enabled=1 siteXX
 ```
 
-Followed by a configuration rebuild and reload: `htrebuild && systemctl reload httpd`
+Followed by a configuration rebuild and reload: `htrebuild`.
 
-Alternatively, the API method `ssl:install` does this automatically. Arguments are key file, certificate, and optional bundle:
+Alternatively, the API method `ssl:install` does this automatically as well as confirm the private and public key match. Argument order is private key, certificate, and optional bundle:
 
 ```bash
 cpcmd -d domain.com ssl:install "$(cat /path/to/server.key)" "$(cat /path/to/server.crt)" "$(cat /path/to/bundle.crt)"
