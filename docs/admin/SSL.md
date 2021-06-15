@@ -286,7 +286,7 @@ systemctl restart apiscp
 env DEBUG=1 cpcmd letsencrypt:request '[svr1.domain.com]'
 ```
 
-::: warn Panel vs Let's Encrypt debugging
+::: warning Panel vs Let's Encrypt debugging
 Two forms of debugging are used above. Panel debugging for verbose operation (`cp.debug true`) and Let's Encrypt debugging that uses LE's staging server (**Fake LE Intermediate X1**). Staging doesn't impose the same rate-limiting as LE's production server.
 
 Be sure to turn [letsencrypt] => debug off (`cp.config letsencrypt debug false`) once the underlying cause is resolved. SSL must be requested again as well.
