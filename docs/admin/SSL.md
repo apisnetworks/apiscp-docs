@@ -215,7 +215,11 @@ What if you want to install an EV (extended validation) certificate? Two options
 
 ```apache
 SSLCertificateChainFile /home/virtual/siteXX/fst/etc/httpd/conf/ssl.crt/bundle.crt
-# Enable SSL service if not enabled already
+```
+
+Next enable SSL service if not enabled already.
+
+```bash
 EditDomain -c ssl,enabled=1 siteXX
 ```
 

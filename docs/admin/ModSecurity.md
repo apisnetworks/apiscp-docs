@@ -91,7 +91,7 @@ Confirmation will be similar, reporting the virus found.
 Signatures may be whitelisted using `virus-scanner.signature-whitelist` [Scope](./Scopes.md). Each signature is normalized into a format understood by ClamAV. For example to whitelist `{HEX}EICAR.TEST.3.UNOFFICIAL(44d88612fea8a8f36de82e1278abb02f:68)` from the above example:
 
 ```bash
-cpcmd scope:set virus-scanner.signature-whitelist {HEX}EICAR.TEST.3.UNOFFICIAL(44d88612fea8a8f36de82e1278abb02f:68)
+cpcmd scope:set virus-scanner.signature-whitelist '{HEX}EICAR.TEST.3.UNOFFICIAL(44d88612fea8a8f36de82e1278abb02f:68)'
 ```
 
 Internally the signature will be saved as `{HEX}EICAR.TEST.3` to `/var/lib/clamav/custom-whitelist.ign2`. Whitelisted signatures can be retrieved using the complementary method, `get`.

@@ -36,7 +36,7 @@ Lastly, create a `.htaccess` file in `/var/www/hq/public` with the following lin
 PassengerEnabled on
 PassengerStartupFile current/index.js
 PassengerAppType node
-PassengerAppRoot /var/www/ghost
+PassengerAppRoot /var/www/hq
 PassengerNodejs /home/myadmin/.nvm/versions/node/v12.16.3/bin/node
 ```
 

@@ -416,6 +416,16 @@ security.limit_extensions=.php .phar .html .htm
 
 Then restart the affected pool, `systemctl restart php-fpm-siteXX` where siteXX is the site marker or do an en masse restart with `systemctl restart php-fpm`.
 
+### /tmp location
+
+**New in 3.2.25**
+
+[PrivateTmp](https://www.freedesktop.org/software/systemd/man/systemd.exec.html#PrivateTmp=) is enabled by default for PHP-FPM sites. On-disk sessions, temporary files, and file uploads are stored on a temporary RAM disk under `/tmp` without the ability to see other files in /tmp, run programs directly, elevate permissions, or create block devices (`mount -o noexec,nosuid,nodev`). Files created here receive a boost in I/O speed, but memory is a limited resource. Larger sites that receive significant file uploads or make use of `tempnam()`, `tmpfile()` calls in PHP can exhaust available storage.
+
+These sites may be relocated to the [account filesystem root](Filesystem.md) in `/home/virtual/siteXX/fst/tmp`. On-disk sessions, temporary files, and file uploads will be stored on within the account and likewise be counted toward the account filesystem quota. Set `privatetmp: true` in the [policy map](#policy-maps). Once modified, run `EditDomain --reconfig domain.com`.
+
+Making this change will also grant the PHP-FPM process access to view files within /tmp for that account as well as allow others on the account to interact with those files.
+
 ## HTTP configuration
 
 ### PHP-FPM timeout
@@ -659,7 +669,7 @@ PHP runtimes are located in `php<MAJOR><MINOR>-runtime` packages. `php<MAJOR><MI
 
 SCL collection configuration is defined in /etc/scl/conf. Remi PHP versions are named php\<MAJOR>\<MINOR>.
 
-### Policy maps
+## Policy maps
 **New in 3.2.18**
 
 A policy map remembers what PHP version is assigned to a given pool or account as well as setting several important parameters. Each policy map is generated from a template and saved to the account under `siteXX/info/php-policy.yml`. When hand-editing a policy, run `EditDomain --reconfig siteXX` to regenerate its configuration. If a pool version change is desired, then run `cpcmd -d siteXX php:pool-restart` after `EditDomain`.
@@ -691,6 +701,12 @@ global:
     # Maximum memory *per* PHP-FPM worker (keep low!)
     # PHP value: memory_limit
     memory_limit: {{ (int)min(\Opcenter\System\Memory::stats()['memtotal']/1024*0.15,384) }}M
+  # Boolean. Set PrivateTmp=true in PHP-FPM systemd unit file. PrivateTmp=true puts the account
+  # under system /tmp, which is backed by tmpfs. This boosts performance for session reads,
+  # temporary file storage, and prevents execution of files - but an active site can fill /tmp,
+  # which has limited storage.
+  # When unset defaults to [httpd] => fpm_privatetmp
+  privatetmp:
 pools:
   # Per-pool configuration is not supported yet!
   # "mydomain.com":
@@ -762,7 +778,7 @@ journalctl -n20 -u php-fpm-siteXX-domain.com
 Correct the underlying cause to remedy the problem. In this case increase disk quota: `EditDomain -c diskquota,quota=10000 -D apisnetworks.test`.
 
 ::: tip Scroll up
-PHP-FPM will attempt to restart 3 times logging each failure. Because of this behavior the root cause may not be immediately apparently in the last 13 lines (*4 diagnostic lines per failure + 1 final failure*).
+PHP-FPM will attempt to restart 3 times logging each failure. Because of this behavior the root cause may not be immediately apparent in the last 13 lines (*4 diagnostic lines per failure + 1 final failure*).
 :::
 
 ### Verifying pool socket status

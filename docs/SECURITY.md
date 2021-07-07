@@ -2,15 +2,34 @@
 
 All security notices should be sent to security@apisnetworks.com. Turnaround time is within 24 hours. The following are considerations acknowledged during development of ApisCP.
 
-## Password storage
+## Passwords
+
+### Storage
 
 Passwords are stored using native password formats. Account passwords are stored using a custom [HMAC SHA512](https://access.redhat.com/articles/1519843) hashing process with 5,000 rounds, which puts its complexity approximate to bcrypt. Once an account password is in the system, it cannot be recovered.
 
 Database passwords are randomly chosen from a pool of 62 characters (a-Z0-9) with 16 characters. This provides enough variation to defeat contemporary password cracking. These passwords are stored in plain-text in the user's home directory. These files are restricted read access to anyone beside the owner.
 
-### UI password storage
+#### UI storage
 
 Passwords are stored within the active session when a user logs into control panel if [auth] => retain_ui_password is set to true (default). Passwords are encrypted using AES-256-GCM (RFC5288). Authentication tag is stored as a client session cookie. [auth] => secret serves as its encryption key. __debugInfo() is overriden to disallow any object dumps that would expose its initialization vector. Sessions are stored in a MySQL database with access only to the ApisCP user; this user is configured with a randomly generated 30-character password. ApisCP itself is limited access except to the ApisCP system user, which is unique. An attacker would need both access to the client's browser as well as server configuration to decrypt a password. Disabling password storage will disable SSO to webmail, but otherwise will not affect performance.
+
+### Password changes
+
+Notifications are generated whenever a password is changed. If the user changes their own password, then a notice is generated to the email address on record (`common:get-email()`). Passwords for roles subordinate to the active user notify the supervising role. Notifications are summarized below.
+
+| Role      | Changes | Notifies |
+| --------- | ------- | -------- |
+| Appliance | Self    | Self     |
+| Appliance | Site    | Site     |
+| Appliance | User    | Site     |
+| Site      | Self    | Self     |
+| Site      | User    | User     |
+| User      | Self    | Self     |
+
+### Password resets
+
+Resets are different from a change in that the end-user has no control over the password generated. A reset is useful to quickly lock out a potentially compromised account, forcing a new password for the target user. A notice is dispatched to the email address on record for the user, if set, as well as reported in postback. Resets may be engaged as Appliance Administrator under **Nexus** or for Site Administrators under **User** > **Manage Users**. Likewise `auth:reset-password($user, $site)` will reset a password for the user. `$user` may be nulled if the Site Administrator is desired.
 
 ## API access
 

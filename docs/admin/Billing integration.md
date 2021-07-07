@@ -4,6 +4,7 @@ ApisCP is designed to work with the following third-party billing platforms out 
 
 - [Blesta](https://docs.blesta.com/display/user/APNSCP) as of 4.8.0
 - [Clientexec](https://github.com/clientexec/apiscp-server) as of 6.3.0
+- [HostBill](https://hostbillapp.com/products-services/apiscp/) as of 2021/06/28
 - [WISECP](https://docs.wisecp.com/en/kb/apiscp) as of 2.3
 - [WHMCS](https://github.com/LithiumHosting/apnscp-whmcs)
 
@@ -11,7 +12,7 @@ The scope of this documentation is for developers to build custom integration mo
 
 ## Custom integration
 
-A billing framework is provided to facilitate integration into third-party services. ApisCP tracks sites by its "billing invoice", a service value within the billing class named "invoice". Subordinate sites are parented to the same master account when its *billing*,*parent_invoice* service value matches the parent.
+A billing framework is provided to facilitate integration into third-party services. ApisCP tracks sites by its "billing invoice", a service value within the billing class named "invoice". Subordinate sites are parented to the same master account when its *billing*,*parent_invoice* service value matches the parent. 
 
 ### Account groups
 
