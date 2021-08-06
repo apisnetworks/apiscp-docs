@@ -171,7 +171,6 @@ One last thing we can do is put the `.htaccess` on a diet. Remove all of the sup
 After removing the unnecessary directives, .htaccess shrunk by 32.8% (8960 bytes to 6014 bytes). Page throughput likewise improved to **4224.36 req/second**, a gain of 11.6% just by removing superfluous directives. 
 
 <center><b>.htaccess size matters</b></center>    
-
 #### Removing .htaccess
 
 Apache's biggest strength is too its biggest weakness: flexibility. Because users may override settings in `.htaccess` at their discretion, Apache must backtrack and check all previous directories before reaching a verdict. With SSD and NVMe SSD, the overhead of these stat() checks is greatly ameliorated, but we can achieve higher throughput in the name of benchmarks.
@@ -202,7 +201,7 @@ Run `htrebuild`, then benchmark. Performance skyrocketed from **4224 req/second 
 
 #### Optimizing render
 
-ApisCP ships with PageSpeed to transparently rewrite and cache HTML. 70 microseconds is quite fast. The difference between 70 and 7 microseconds (14k and 140k pages per second) isn't appreciable to cross the just noticeable difference threshold,, but what is is rendering performance that can be orders of magnitude higher. Apache has excellent integration with PageSpeed which can be combined with its cache to save rendered, optimized copies.
+ApisCP ships with PageSpeed to transparently rewrite and cache HTML. 70 microseconds is quite fast. The difference between 70 and 7 microseconds (14k and 140k pages per second) isn't appreciable to cross the just noticeable difference threshold, but what is is rendering performance that can be orders of magnitude higher. Apache has excellent integration with PageSpeed which can be combined with its cache to save rendered, optimized copies.
 
 Edit `/etc/httpd/conf/site130/wp-test` as noted in the above example and add `ModPagespeedRewriteLevel CoreFilters` after `UnsetEnv no-cache`. Next, run `htrebuild` to rebuild the configuration.
 
@@ -235,7 +234,6 @@ The difference is staggering: compared to decreasing page transmission time by 6
 In 2017, Akamai found a [100 ms delay](https://www.akamai.com/uk/en/about/news/press/2017-press/akamai-releases-spring-2017-state-of-online-retail-performance-report.jsp) in website load time can decrease conversion rates by 7%. Improving page transmission by 65 microseconds has less of a net effect than improving render times. Moreover, the JND threshold in humans in approximately [50 milliseconds](https://www.sciencedirect.com/science/article/pii/S0042698901001602) (769x more than page transmission gains). Page throughput is important, but it's not everything.
 
 <center><b>Always focus optimizations where the yield can be greatest.</b></center>  
-
 ### Concurrency
 
 Benchmarks are designed to model real-world scenarios with artificial, deterministic usage patterns. It's an oxymoron to believe any such correlation exists between benchmarks and typical usage scenarios, but what benchmarks provide is the theoretical peak throughput. *It's all downhill from there!*

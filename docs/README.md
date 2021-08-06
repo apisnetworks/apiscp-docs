@@ -1,6 +1,6 @@
 ---
 home: true
-tagline: Managing an ApisCP plaform 
+tagline: Managing an ApisCP platform 
 actionText: Get Started →
 actionLink: /INSTALL/
 features:

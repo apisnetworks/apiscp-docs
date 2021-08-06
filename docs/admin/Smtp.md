@@ -2,9 +2,24 @@
 title: Postfix
 ---
 
-SMTP provides outbound mail relaying for the server. This is typical low-hanging fruit for hackers and a frequent attack vector. ApisCP provides a few means to secure SMTP, including denying outbound SMTP access to any non-mail process. Direct SMTP access is a common technique used to circumvent mail logs and TCP sockets are anonymous, which can make tracking down the origin quite difficult. [StealRat](https://www.abuseat.org/cmsvuln.html) for example uses this technique.
+[Postfix](http://www.postfix.org) provides SMTP service for ApisCP. SMTP is typical low-hanging fruit for hackers and a frequent attack vector. ApisCP provides a few means to secure SMTP, including denying outbound SMTP access to any non-mail process. Direct SMTP access is a common technique used to circumvent mail logs and TCP sockets are anonymous, which can make tracking down the origin quite difficult. [StealRat](https://www.abuseat.org/cmsvuln.html) for example uses this technique.
 
 All TCP communication locally to 25 or 587 must be authenticated to preserve an audit trail. This behavior can be toggled with Bootstrapper, set `postfix_relay_mynetworks` to `true`. Be warned that if the machine were compromised and an attacker connects to 127.0.0.1:25 to relay mail there is no direct means to infer which process created the rogue connections.
+
+## Configuration
+
+`postconf` is a tool to inspect Postfix configuration. Likewise, many adjustable parameters are available in [`mail/configure-postfix`](https://gitlab.com/apisnetworks/apnscp/-/blob/master/resources/playbooks/roles/mail/configure-postfix/defaults/main.yml) of [Bootstrapper](Bootstrapper.md). For example, to see the current value of `disable_vrfy_command`:
+
+```bash
+postconf disable_vrfy_command
+# disable_vrfy_command = yes
+```
+
+All Postfix configuration is available under [postconf(5)](http://www.postfix.org/postconf.5.html).
+
+::: warning Bootstrapper prevails
+Be careful of using `postconf -o name=value` to adjust a value. Bootstrapper may overwrite this value! All overwrites are listed in [`vars/main.yml`](https://gitlab.com/apisnetworks/apnscp/-/blob/master/resources/playbooks/roles/mail/configure-postfix/vars/main.yml). `postfix_custom_config` is a special top-level variable that overrides Postfix configuration. See [Customizing.md](Customizing#postfix) for further information.
+:::
 
 ## Smart host support
 
@@ -20,7 +35,19 @@ Likewise smart host support may be disabled by setting mail.smart-host to "false
 
 Watch out! If the next hop is bracketed, the brackets must be doubly quoted "'[some.place]'" to ensure it's not automatically parsed as an array. Brackets bypass additional MX lookups on the hostname.
 
+### Logging SASL username
+
+Enabling authenticated SASL header allows any relay to track SMTP behavior on a user level. MailChannels, [for example](https://mailchannels.zendesk.com/hc/en-us/articles/200262640-Setting-up-for-Postfix), recommends enabling this feature for granular reputation.
+
+```bash
+cpcmd scope:set cp.bootstrapper postfix_add_sasl_auth_header true
+upcp -sb mail/configure-postfix
+```
+
+Once enabled, the username used to authenticate is logged within the Received: header. Doing so will expose user accounts, so make sure the relay that uses this information likewise removes it from the header. When doing so, if [DKIM](rspamd.md#DKIM-signing) is used, Received headers should not be signed per [RFC 4871 § 5.1](https://datatracker.ietf.org/doc/html/rfc4871#section-5.1) as Received headers would ultimately be tampered. DKIM signing does not include the Received header by default.
+
 ### Secure authentication
+
 ApisCP will determine the best authentication criteria using `mail.smart-host` Scope. You can adjust whether opportunistic TLS, required TLS, DANE, or no encryption is used by changing `postfix_smtp_tls_security_level`:
 
 | Setting     | Description                                                  |

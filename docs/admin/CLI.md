@@ -70,7 +70,7 @@ To see all commands containing "pass" for the Site Administrator of site1,
 misc:list-commands "*pass*"
 ```
 
-`misc:l` is shorthand for this usage.
+Both `cpcmd misc:l` and `cpcmd -l` are shorthand usage for this command.
 
 ### Introspecting commands
 
