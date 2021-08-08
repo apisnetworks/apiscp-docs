@@ -28,11 +28,12 @@ cat > /var/www/html/test-upload.html <<- EOF
 <! DOCTYPE html>
 <html>
 <body>
-<form action="upload.php" method="post" enctype="multipart/form-data">
+<form action="test-upload.html" method="post" enctype="multipart/form-data">
 <input type="file" name="file" id="fileToUpload">
 <input type="submit" value="Upload Test" name="submit">
 </form>
 </body>
+</html>
 EOF
 ```
 
@@ -50,11 +51,11 @@ EICAR characters are transliterated using ROT-13 to avoid detection by anti-viru
 
 Additional logging evidence will be present in /var/log/messages and /var/log/httpd.
 
-```text
+```
 Feb 12 14:48:56 testing clamd[6668]: fd[12]: {HEX}EICAR.TEST.3.UNOFFICIAL(44d88612fea8a8f36de82e1278abb02f:68) FOUND
 ```
 
-```text
+```
 # via modsec_audit.log
 192.168.0.147 192.168.0.147 - - [12/Feb/2020:14:53:25 --0500] "POST /test-upload.html HTTP/1.1" 406 249 "-" "-" XkRXtW8X20xyKcESfznVdwAAAE4 "-" /20200212/20200212-1453/20200212-145325-XkRXtW8X20xyKcESfznVdwAAAE4 0 2276 md5:175e0cfd277ec488f0c1b401e06b68c0 
 
@@ -99,6 +100,48 @@ Internally the signature will be saved as `{HEX}EICAR.TEST.3` to `/var/lib/clama
 ```bash
 cpcmd scope:get virus-scanner.signature-whitelist
 ```
+
+## Malware bypass
+
+**New in 3.2.26**
+
+Malware scans may be bypassed using a special environment variable in the request. An optional value may be specified as a secret to prevent a client from purposefully defeating malware protection.
+
+```bash
+# Allow bypass marker usage
+cpcmd scope:set cp.bootstrapper modsec_clamav_marker True
+# Update HTTP configuration
+upcp -sb apache/modsecurity
+```
+
+| Marker Value         | Purpose                                |
+| -------------------- | -------------------------------------- |
+| True                 | Enable bypass usage                    |
+| False                | Disable bypass usage                   |
+| *alphanumeric value* | Requires .htaccess to match this value |
+
+For example, if `modsec_clamav_marker` does not specify a value, then the following [.htaccess](https://kb.apiscp.com/guides/htaccess-guide/) directive bypasses scans:
+
+```
+SetEnv BYPASS_SCAN ""
+```
+
+If `modsec_clamav_marker` is `acba3trCZ`, then the following [.htaccess](https://kb.apiscp.com/guides/htaccess-guide/) directive would allow a client to bypass scanning:
+
+```
+SetEnv BYPASS_SCAN "acba3trCZ"
+```
+
+Likewise the server secret would be set with,
+
+```bash
+# Allow bypass marker usage
+cpcmd scope:set cp.bootstrapper modsec_clamav_marker acba3trCZ
+# Update HTTP configuration
+upcp -sb apache/modsecurity
+```
+
+Specifying a marker value allows periodic rotation of protection keys.
 
 ## Remote anti-virus
 
@@ -154,3 +197,8 @@ upcp -sb apache/modsecurity
 ```
 
 A preferred workaround is to correct the form by specifying `enctype="multipart/form-data"` for the offending code as this is the correct way to submit large files and binary data.
+
+### Slow upload
+
+Each file created by the web server is scanned with ClamAV when enabled. Uploading a multitude of files, such as during a WordPress site import using a plugin, will result in extended processing times. Bypassing scans using an [environment variable](#malware-bypass) is recommended for short-term usage.
+
