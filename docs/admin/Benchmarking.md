@@ -171,6 +171,7 @@ One last thing we can do is put the `.htaccess` on a diet. Remove all of the sup
 After removing the unnecessary directives, .htaccess shrunk by 32.8% (8960 bytes to 6014 bytes). Page throughput likewise improved to **4224.36 req/second**, a gain of 11.6% just by removing superfluous directives. 
 
 <center><b>.htaccess size matters</b></center>    
+
 #### Removing .htaccess
 
 Apache's biggest strength is too its biggest weakness: flexibility. Because users may override settings in `.htaccess` at their discretion, Apache must backtrack and check all previous directories before reaching a verdict. With SSD and NVMe SSD, the overhead of these stat() checks is greatly ameliorated, but we can achieve higher throughput in the name of benchmarks.
