@@ -166,6 +166,39 @@ These changes will be reflected on future imports.
 
 Migration will attempt to use PHP's PharData handler to decompress files. It's based on USTAR, which has [limitations](https://www.gnu.org/software/tar/manual/html_chapter/tar_8.html) that may result in a cPanel backup generated in POSIX.1-2001 standards to fail. Use `--no-builtin` to disable the builtin handler from attempting to read the backup.
 
+### Empty MySQL credentials
+
+Prior to MySQL 5.7.5 released in [2014](https://dev.mysql.com/doc/relnotes/mysql/5.7/en/news-5-7-5.html), MySQL accepted passwords created in an insecure hash format that was used prior to 4.1. From speculation, accounts that were created prior to this change were abandoned from a [secure upgrade pathway by cPanel](https://forums.cpanel.net/threads/mysql-upgrade-to-v-5-6-old-style-passwords-cpanel-explanation.649945/).
+
+ApisCP will not permit empty database passwords as that would allow just knowing the username, which can be derived from `getent passwd`, authority to connect. Passwords must be set for the primary user before an backup will succeed.
+
+This can easily be done in two steps,
+
+```bash
+# Connect to the MySQL database, access the "mysql" system table
+mysql mysql
+```
+
+Followed by optionally validating the proposed changes,
+```sql
+SELECT user, host FROM user WHERE password = '';
+```
+
+The above displays all username and IPs/resolved hostnames in which a password is not required to connect to MySQL.
+
+Likewise these can be updated using a somewhat arbitrary password using the following command,
+
+```sql
+UPDATE user SET password = PASSWORD(SHA2(RAND()*POW(10,16), 256)) WHERE password = '';
+```
+Users will be required to set a new password in ApisCP via Databases > MySQL Manager > List Users.
+
+::: tip Resolved hostnames
+ApisCP does not use rDNS (resolved hostnames) in determining authentication as it is based on arbitrary PTR records without forward confirmation like with email, more formally called [FCrDNS](https://en.wikipedia.org/wiki/Forward-confirmed_reverse_DNS). 
+
+Hostname-based authentication *without FCrDNS* is an slow, insecure mechanism.
+:::
+
 ## Two-stage migrations
 
 A two-stage migration is a conservative technique to allow users to preview their domains before committing to the finalized migration. This allows unlimited time for a user to [preview](https://kb.apiscp.com/dns/previewing-your-domain/) their domain. `change_dns.php` may be used to update DNS once changes have been finalized.
