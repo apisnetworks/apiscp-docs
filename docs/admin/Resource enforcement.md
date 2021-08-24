@@ -69,6 +69,14 @@ This affects quota enforcement globally, so use wisely. Likewise don't forget to
 xfs_quota -xc 'enable -ugv' "$(findmnt -n -o source --target /home/virtual)"
 ```
 
+### Quota ghosting
+
+Deleting, then recreating a site may refer to the old usage figures for a brief time. Flushing the filesystem cache immediately will allow for these quota values to update.
+
+```bash
+echo 3 > /proc/sys/vm/drop_caches
+```
+
 ## Bandwidth
 
 Bandwidth is tallied every night during logrotation. Logrotation runs via `/etc/cron.daily/logrotate`. Its start time may be adjusted using *cron.start-range* [Scope](Scopes.md). A secondary task, `bwcron.service` runs every night at 12 AM server time (see *system.timezone* Scope). Enforcement is carried out during this window. Disposition is configured by the **bandwidth** [Tuneable](Tuneables.md). The following table summarizes several options.
@@ -121,7 +129,7 @@ A site may consume up to 512 MB of memory before the OOM killer is invoked. When
 "OOM" is an initialism for "out of memory". Killer is... a killer. OOM killer is invoked by the kernel to judiciously terminate processes when it's out of memory either on the system or control group.
 :::	
 
-Using [Metrics](Metrics.md), OOM events can be easily tracked. `cpcmd -d domain.com telemetry:get c-cgroup-oom` reports the latest OOM value for a site. A free-form query is also available that provides similar information for all sites.
+Using [Metrics](Metrics.md), OOM events can be easily tracked. `cpcmd -d domain.com telemetry:get c-memory-oom` reports the latest OOM value for a site. A free-form query is also available that provides similar information for all sites against the PostgreSQL database, normally `appldb`.
 
 ```sql
 SELECT 
