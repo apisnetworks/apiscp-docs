@@ -122,6 +122,46 @@ Bootstrapper will avoid overwriting certain configurations unless explicitly ask
 
 Be sure to skip down to the [Remote API access](#remote-api-access) section to configure the hidden master endpoint.
 
+#### Exposed master
+
+In the above, a hidden master is used which obscures the server that handles updates. If we promote **primary nameserver** to master, which removes a hidden master setup, then the diagram changes slightly.
+
+![AXFR cluster layout](./powerdns-axfr-exposed-cluster.svg)
+
+On the **primary nameserver** NS1, *assuming 1.2.3.5 is a slave nameserver with the nameserver names ns1.domain.com and ns2.domain.com respectively*, add the following configuration:
+
+```bash
+cpcmd scope:set cp.bootstrapper powerdns_enabled true
+cpcmd scope:set cp.bootstrapper powerdns_zone_type master
+cpcmd scope:set cp.bootstrapper powerdns_custom_config '["allow-axfr-ips":"1.2.3.5","also-notify":"1.2.3.5","master":"yes"]'
+cpcmd scope:set cp.bootstrapper powerdns_webserver_enable true
+cpcmd scope:set cp.bootstrapper powerdns_nameservers '[ns1.domain.com,ns2.domain.com]'
+env BSARGS="--extra-vars=force=yes" upcp -sb software/powerdns
+```
+
+On the **slave(s)**, *assuming the master is 1.2.3.4 with the hostname ns1.domain.com*, add the following configuration:
+
+```bash
+cpcmd scope:set cp.bootstrapper powerdns_enabled true
+cpcmd scope:set cp.bootstrapper powerdns_zone_type slave
+cpcmd scope:set cp.bootstrapper powerdns_custom_config '["allow-notify-from":"1.2.3.4","slave":"yes","superslave":"yes"]'
+cpcmd scope:set cp.bootstrapper powerdns_webserver_enable false
+cpcmd scope:set cp.bootstrapper powerdns_nameservers '[ns1.domain.com,ns2.domain.com]'
+cpcmd scope:set cp.bootstrapper powerdns_supermaster '[ip:1.2.3.4,nameserver:ns1.domain.com,account:master]'
+cpcmd scope:set cp.bootstrapper powerdns_api_uri 'https://ns1.domain.com/dns/api/v1'
+env BSARGS="--extra-vars=force=yes" upcp -sb software/powerdns
+```
+
+Lastly, on the **hosting nodes**, *assuming all DNS zone traffic is sent to primary nameserver at ns1.domain.com (IP address 1.2.3.4) with the API key from `/etc/pdns/pdns.conf` of `abc1234`*, configure each to use the same API key and endpoint discussed below.
+
+```bash
+cpcmd scope:set cp.bootstrapper powerdns_api_uri 'https://ns1.domain.com/dns/api/v1'
+cpcmd scope:set cp.bootstrapper powerdns_nameservers '[ns1.domain.com,ns2.domain.com]'
+cpcmd scope:set cp.bootstrapper powerdns_api_key 'abc1234'
+cpcmd scope:set cp.bootstrapper powerdns_zone_type 'master'
+env BSARGS="--extra-vars=force=yes" upcp -sb software/powerdns
+```
+
 #### Updating NS records
 
 PowerDNS is configured by default to use "127.0.0.1" for its NS records. In a working environment this is never the right option, but helps bridge learning. [Bulk update](../DNS.md#bulk-record-management)  can be used to clear all NS records on the apex, then provision NS records as  set via `powerdns_nameservers`.
@@ -129,38 +169,67 @@ PowerDNS is configured by default to use "127.0.0.1" for its NS records. In a wo
 Assuming your new DNS records are `ns1.yourserver.com` and `ns2.yourserver.com`, the following suffices:
 
 ```php
-    include __DIR__ . '/lib/CLI/cmd.php';
+include __DIR__ . '/lib/CLI/cmd.php';
 
-    $handler = new \Opcenter\Dns\Bulk();
+$handler = new \Opcenter\Dns\Bulk();
 
-	// empty all NS records on the apex
-	// "_dummy_zone.com" has no effect, but used for completeness with the API
-	$handler->remove(new \Opcenter\Dns\Record('_dummy_zone.com', [
-        'name' => '', 
-        'rr' => 'NS', 
-        'parameter' => ''
-    ]), function (\apnscpFunctionInterceptor $afi, \Opcenter\Dns\Record $r) {
-        return $afi->dns_get_provider() === 'powerdns';
-    });
+// empty all NS records on the apex
+// "_dummy_zone.com" has no effect, but used for completeness with the API
+$handler->remove(new \Opcenter\Dns\Record('_dummy_zone.com', [
+    'name' => '', 
+    'rr' => 'NS', 
+    'parameter' => ''
+]), function (\apnscpFunctionInterceptor $afi, \Opcenter\Dns\Record $r) {
+    return $afi->dns_get_provider() === 'powerdns';
+});
 
-    $handler->add(new \Opcenter\Dns\Record('_dummy_zone.com', [
-        'name' => '', 
-        'rr' => 'NS', 
-        'parameter' => 'ns1.yourserver.com'
-    ]), function (\apnscpFunctionInterceptor $afi, \Opcenter\Dns\Record $r) {
-        return $afi->dns_get_provider() === 'powerdns';
-    });
+$handler->add(new \Opcenter\Dns\Record('_dummy_zone.com', [
+    'name' => '', 
+    'rr' => 'NS', 
+    'parameter' => 'ns1.yourserver.com'
+]), function (\apnscpFunctionInterceptor $afi, \Opcenter\Dns\Record $r) {
+    return $afi->dns_get_provider() === 'powerdns';
+});
 
-    $handler->add(new \Opcenter\Dns\Record('_dummy_zone.com', [
-        'name' => '', 
-        'rr' => 'NS', 
-        'parameter' => 'ns2.yourserver.com'
-    ]), function (\apnscpFunctionInterceptor $afi, \Opcenter\Dns\Record $r) {
-        return $afi->dns_get_provider() === 'powerdns';
-    });
+$handler->add(new \Opcenter\Dns\Record('_dummy_zone.com', [
+    'name' => '', 
+    'rr' => 'NS', 
+    'parameter' => 'ns2.yourserver.com'
+]), function (\apnscpFunctionInterceptor $afi, \Opcenter\Dns\Record $r) {
+    return $afi->dns_get_provider() === 'powerdns';
+});
 ```
 
 Save the script in `/usr/local/apnscp/update.php` and run `env DEBUG=1 apnscp_php /usr/local/apnscp/update.php` to replace all NS records for domains that use PowerDNS.
+
+#### Updating SOA records
+**New in 3.2.26**
+
+[SOA](https://en.wikipedia.org/wiki/SOA_record) controls several important replication attributes of a DNS zone. Changing primary nameservers or modifying zone defaults would necessitate updating SOA records. This can be done in a similar fashion using `Opcenter\Dns\Bulk`. For convenience `replace()` can accept a `Record` object or closure, which will be called with the matching record. If a closure is used, the closure may return `false` to skip modifying the record otherwise the second parameter, a `Record` object, is used as replacement.
+
+It is the responsibility of the closure to modify the `Record` resource;
+
+```php
+include __DIR__ . '/lib/CLI/cmd.php';
+$handler = new \Opcenter\Dns\Bulk();
+
+// PowerDNS doesn't let us delete the record; only replace() works
+// "_dummy_zone.com" has no effect, but used for completeness with the API
+$handler->replace(new \Opcenter\Dns\Record('_dummy_zone.com', [
+    'name'      => '',
+    'rr'        => 'SOA'
+]), function (\apnscpFunctionInterceptor $afi, \Opcenter\Dns\Record $r) {
+    // update "rname" parameter
+    $r->setMeta('rname', 'ns1.foobar.com');
+    // update negative cache TTL
+    $r->setMeta('ttl', 300);
+    
+    // return false to skip processing the record`
+    return $afi->dns_get_provider() === 'powerdns';
+});
+```
+
+More examples are available in [DNS.md](../DNS.md#bulk-record-management).
 
 #### Periodic maintenance
 

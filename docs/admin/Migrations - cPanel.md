@@ -164,7 +164,7 @@ These changes will be reflected on future imports.
 
 ### Decompression oddities
 
-Migration will attempt to use PHP's PharData handler to decompress files. It's based on USTAR, which has [limitations](https://www.gnu.org/software/tar/manual/html_chapter/tar_8.html) that may result in a cPanel backup generated in POSIX.1-2001 standards to fail. Use `--no-builtin` to disable the builtin handler from attempting to read the backup.
+Migration will attempt to use PHP's PharData handler to decompress files. It's based on USTAR, which has [limitations](https://www.gnu.org/software/tar/manual/html_node/Formats.html#Formats) that may result in a cPanel backup generated in POSIX.1-2001 standards to fail. Use `--no-builtin` to disable the builtin handler from attempting to read the backup.
 
 ### Empty MySQL credentials
 

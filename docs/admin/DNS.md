@@ -114,7 +114,7 @@ See [PowerDNS](dns/PowerDNS.md) module documentation for further details.
 <?php
 	include __DIR__ . '/lib/CLI/cmd.php';
 
-	(new \Opcenter\Dns\Bulk())->remove(new \Opcenter\Dns\Record('_dummy_zone.com', [
+	(new \Opcenter\Dns\Bulk)->remove(new \Opcenter\Dns\Record('_dummy_zone.com', [
 		'name' => 'dkim._domainkey', 
 		'rr' => 'TXT', 
 		'parameter' => ''
@@ -139,7 +139,7 @@ Likewise to add a new TXT record called "\_dmarc" use `add()`:
 <?php
 	include __DIR__ . '/lib/CLI/cmd.php';
 
-	(new \Opcenter\Dns\Bulk())->add(new \Opcenter\Dns\Record('_dummy_zone.com', [
+	(new \Opcenter\Dns\Bulk)->add(new \Opcenter\Dns\Record('_dummy_zone.com', [
 		'name' => '_dmarc', 
 		'rr' => 'TXT', 
 		'parameter' => 'v=DMARC1; p=reject; rua=mailto:postmaster@apiscp.com, mailto:dmarc@apiscp.com; pct=100; adkim=s; aspf=s'
@@ -152,13 +152,13 @@ Or more succinctly to reapply the DMARC record across all domains after updating
 <?php
 	include __DIR__ . '/lib/CLI/cmd.php';
 
-	(new \Opcenter\Dns\Bulk())->remove(new \Opcenter\Dns\Record('_dummy_zone.com', [
+	(new \Opcenter\Dns\Bulk)->remove(new \Opcenter\Dns\Record('_dummy_zone.com', [
 		'name' => '_dmarc', 
 		'rr' => 'TXT', 
 		'parameter' => ''
 	]));
-	
-	(new \Opcenter\Dns\Bulk())->add(new \Opcenter\Dns\Record('_dummy_zone.com', [
+
+	(new \Opcenter\Dns\Bulk)->add(new \Opcenter\Dns\Record('_dummy_zone.com', [
 		'name' => '_dmarc', 
 		'rr' => 'TXT', 
 		'parameter' => MAIL_DEFAULT_DMARC
@@ -173,7 +173,7 @@ A second parameter, `$where`, is a closure to test whether to apply the record f
 <?php
 	include __DIR__ . '/lib/CLI/cmd.php';
 
-	(new \Opcenter\Dns\Bulk())->remove(new \Opcenter\Dns\Record('_dummy_zone.com', [
+	(new \Opcenter\Dns\Bulk)->remove(new \Opcenter\Dns\Record('_dummy_zone.com', [
 		'name' => '_dmarc',
 		'rr' => 'TXT',
 		'parameter' => ''
@@ -182,6 +182,144 @@ A second parameter, `$where`, is a closure to test whether to apply the record f
         return $afi->email_transport_exists($r['zone']);
     });
 ```
+
+### Replacements
+
+Previously record modifications were done using two separate tasks. This can create problems if a record isn't removed or if it doesn't exist in the first place. A third operation, `replace()` calls `dns:modify-record()` to make the operation atomic.
+
+```php
+<?php
+	include __DIR__ . '/lib/CLI/cmd.php';
+
+	(new \Opcenter\Dns\Bulk)->replace(
+		// replace A records named "test"
+		new \Opcenter\Dns\Record('_dummy_zone.com', [
+			'name' => 'test',
+			'rr'   => 'A'
+		]),
+		// with the IP address 1.2.3.4
+		new \Opcenter\Dns\Record(
+			'_dummy_zone.com', [
+				'parameter' => '1.2.3.4',
+				'rr'        => 'A'
+		])
+	);
+```
+
+::: tip Always specify rr
+During record canonicalization, the `rr` attribute must be present. This helps ApisCP determine what type of record it is and what treatment *if any* is necessary to standardize it.
+:::
+
+#### Replacing metadata
+
+Many records contain more than just a single parameter. For example, an `MX` record is comprised of a numeric **priority** and target **hostname**. `Record` objects can be altered by specifying their parsed attributes rather than relying on less clear space-delimited placement.
+
+The following example updates both the `rname` and `ttl` [fields](https://en.wikipedia.org/wiki/SOA_record) for all domains that utilize the "[powerdns](dns/PowerDNS.md)" DNS driver. An explicit `false` return in the closure skips modifying any record matched from the first parameter.
+
+```php
+<?php
+	include __DIR__ . '/lib/CLI/cmd.php';
+
+	// empty all NS records on the apex
+	// "_dummy_zone.com" has no effect, but used for completeness with the API
+	(new \Opcenter\Dns\Bulk)->replace(new \Opcenter\Dns\Record('_dummy_zone.com', [
+		'name'      => '',
+		'rr'        => 'SOA'
+	]), function (\apnscpFunctionInterceptor $afi, \Opcenter\Dns\Record $r) {
+		// update "rname" parameter
+		$r->setMeta('rname', 'ns1.mydomain.com');
+		// update negative cache TTL
+		$r->setMeta('ttl', 300);
+
+        // likewise we can statically set the parameter as such
+        // $r['parameter'] = 'ns1.mydomain.com. noc.mydomain.com. 2021090229 3600 1800 604800 300';
+
+		// return false to skip processing the record`
+		return $afi->dns_get_provider() === 'powerdns';
+	});
+```
+
+#### Record metadata
+
+| Resource record | Metadata       | Example                                                      |
+| --------------- | -------------- | ------------------------------------------------------------ |
+| **CAA**         |                | 128 issue "letsencrypt.org"                                  |
+|                 | flags          | 128                                                          |
+|                 | tag            | issue                                                        |
+|                 | data           | letsencrypt.org                                              |
+| **CERT**        |                | IPGP 0 0 1457446EFDE098E5C934B69C7DC208ADDE26C2B797          |
+|                 | type           | IPGP                                                         |
+|                 | key_tag        | 0                                                            |
+|                 | algorithm      | 0                                                            |
+|                 | data           | 1457446EFDE098E5C934B69C7DC208ADDE26C2B797                   |
+| **DNSKEY**      |                | 257 3 5 2018hiZsq1jkCS3osdcAksvcd3oSC0f43OI=                 |
+|                 | flags          | 257                                                          |
+|                 | protocol       | 3                                                            |
+|                 | algorithm      | 5                                                            |
+|                 | data           | 2018hiZsq1jkCS3osdcAksvcd3oSC0f43OI=                         |
+| **DS**          |                | 25924 5 1 0AC4F2E44C582AE809208098F7BE2C44AB947DCC           |
+|                 | key_tag        | 25924                                                        |
+|                 | algorithm      | 5                                                            |
+|                 | digest_type    | 1                                                            |
+|                 | data           | 0AC4F2E44C582AE809208098F7BE2C44AB947DCC                     |
+| **LOC**         |                | 33 46 23.6424 N 84 23 42.59 W 293m 0.00m 10000m 10m          |
+|                 | lat_degrees    | 33                                                           |
+|                 | lat_minutes    | 46                                                           |
+|                 | lat_seconds    | 23.6524                                                      |
+|                 | lat_direction  | N                                                            |
+|                 | long_degrees   | 84                                                           |
+|                 | long_minutes   | 23                                                           |
+|                 | long_seconds   | 42.59                                                        |
+|                 | long_direction | W                                                            |
+|                 | altitude       | 293m                                                         |
+|                 | size           | 0.00m                                                        |
+|                 | precision_horz | 10000m                                                       |
+|                 | precision_vert | 10m                                                          |
+| **MX**          |                | 10 mail.example.com                                          |
+|                 | priority       | 10                                                           |
+|                 | data           | mail.example.com                                             |
+| **NAPTR**       |                | 100 10 "U" "E2U+sip" "!^.\*$!sip:customer-service@example.com!" . |
+|                 | order          | 100                                                          |
+|                 | preference     | 10                                                           |
+|                 | flags          | U                                                            |
+|                 | service        | E2U+sip                                                      |
+|                 | regex          | !^.\*$!sip:customer-service@example.com!                     |
+|                 | data           | .                                                            |
+| **SMIMEA**      |                | 3 0 0 3082036E30820...BE14DA                                 |
+|                 | usage          | 3                                                            |
+|                 | selector       | 0                                                            |
+|                 | matching_type  | 0                                                            |
+|                 | data           | 3082036E30820...BE14DA                                       |
+| **SOA**         |                | master.example.com. hostmater.example.com. 1 3600 1800 86400 600 |
+|                 | mname          | master.example.com                                           |
+|                 | rname          | hostmaster.example.com                                       |
+|                 | serial         | 1                                                            |
+|                 | refresh        | 3600                                                         |
+|                 | retry          | 1800                                                         |
+|                 | expire         | 86400                                                        |
+|                 | ttl            | 600                                                          |
+| **SRV**         |                | 10 50 5611 my.jabberserver.com                               |
+|                 | service        | *embedded in hostname*                                       |
+|                 | protocol       | *embedded in hostname*                                       |
+|                 | name           | *embedded in hostname*                                       |
+|                 | priority       | 10                                                           |
+|                 | weight         | 50                                                           |
+|                 | port           | 5611                                                         |
+|                 | data           | my.jabberserver.com                                          |
+| **SSHFP**       |                | 1 1 0ac4f2e44c582ae809208098f7be2c44ab947dcc                 |
+|                 | algorithm      | 1                                                            |
+|                 | type           | 1                                                            |
+|                 | data           | 0ac4f2e44c582ae809208098f7be2c44ab947dcc                     |
+| **TLSA**        |                | 3 1 1 6343fbfe4ab1...dd14467ee0a7ab70d                       |
+|                 | usage          | 3                                                            |
+|                 | selector       | 1                                                            |
+|                 | matching_type  | 1                                                            |
+|                 | data           | 6343fbfe4ab1...dd14467ee0a7ab70d                             |
+| **URI**         |                | 10 1 "ftp://ftp1.example.com/public"                         |
+|                 | priority       | 10                                                           |
+|                 | weight         | 1                                                            |
+|                 | data           | ftp://ftp1.example.com/public                                |
+
 
 ## Development
 
