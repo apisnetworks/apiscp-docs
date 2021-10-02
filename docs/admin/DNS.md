@@ -185,6 +185,8 @@ A second parameter, `$where`, is a closure to test whether to apply the record f
 
 ### Replacements
 
+**New in 3.2.26**
+
 Previously record modifications were done using two separate tasks. This can create problems if a record isn't removed or if it doesn't exist in the first place. A third operation, `replace()` calls `dns:modify-record()` to make the operation atomic.
 
 ```php

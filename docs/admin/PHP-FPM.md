@@ -22,9 +22,6 @@ PHP-FPM offers several advantages over an ISAPI integration:
 
   **cgroup enforcement is strongly encouraged to prevent abuse**. Set `cgroup,memory` as a minimum to ensure that a user cannot define a static pool that could spawn an egregious number of workers to cause an out-of-memory condition.
 
-- **RewriteBase fixup**
-  `SCRIPT_FILENAME` is rewritten before being passed to proxy. Because of this, PHP scripts on a subdomain or addon domain no longer require `RewriteBase /` to be set greatly reducing confusion on migrating to an ApisCP platform.
-
 - **Multi-tenancy** *PENDING*
   Users may spawn multiple PHP-FPM pools each with different users. For example, it would be possible to create a PHP pool for production and staging in which the production environment adheres to the principles of [Fortification](Fortification.md) and the staging environment is owned entirely by the developer account; both operate under different UIDs.
 

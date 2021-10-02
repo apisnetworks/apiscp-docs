@@ -249,7 +249,7 @@ echo $(($(cat /sys/fs/cgroup/cpuacct/site1/cpuacct.usage) - $x1))
 # Reports 57876992031, 1.89% reduction in CPU usage over 20 seconds
 ```
 
-*Weighting doesn't always produce a proportional reduction in CPU usage* because there is still idle CPU that can be utilized by the process (cf. **load average** in the introduction). cpuweight does make a difference under heavy utilization with significant resource contention where multiple processes are vying for CPU timeslices by prioritizing cgroup tasks with heavier weighting. For cumulative usage, use `cgroup`,`cpu` to limit the maximal 24 hour consumption.
+*Weighting doesn't always produce a proportional reduction in CPU usage* because there is still idle CPU that can be utilized by the process (cf. **load average** in the introduction). `cpuweight` does make a difference under heavy utilization with significant resource contention where multiple processes are vying for CPU timeslices by prioritizing cgroup tasks with heavier weighting. For cumulative usage, use `cgroup`,`cpu` to limit the maximal 24 hour consumption.
 
 ![top after CPU weighting](./images/cpu-top-after.png)
 
@@ -267,9 +267,24 @@ cpcmd admin:get-usage cgroup
 cpcmd admin:get-usage cgroup '[site1,site2,site3]'
 ```
 
-### Site Administrator glance
+#### Site Administrator glance
 
 When [telemetry](Metrics.md) is enabled, Site Administrators have a 24-hour glance of both "user" and "system" time available in the Dashboard and **Account** > **Summary** > **CPU Usage**. As there are 86,400 seconds in a day per logical core, in theory the maximal CPU value would approach 86,400 seconds * \<n processors>, but as several hundred processes run on a server it would be impossible for any one task group to ever reach this total.
+
+### Pinning
+
+**New in 3.2.28**
+
+In multi-core systems it may be desirable to segregate site tiers. For example tier 1 is allocated to CPU #0 whereas tier 2 sites are allocated to CPUs #1 and #2. `cgroup`,`cpupin` sets CPU affinity for all processes by a site.
+
+```bash
+# Set domain.com to use only CPU #0
+EditDomain -c cgroup,cpupin=0 domain.com
+# Set domain.com to use CPUs 0 + 1
+EditDomain -c cgroup,cpupin='[0,1]' domain.com
+```
+
+Groups that are not explicitly pinned to processors will be balanced among cores as needed, including system processes.
 
 ## Process
 
@@ -309,25 +324,60 @@ Program behavior is often unspecified when it can no longer create additional th
 
 ## IO
 
-IO restrictions are classified by read and write. 
-
-```bash
-EditDomain -c cgroup,writebw=2 domain.com
-# Apply the min of blkio,writebw/blkio,writeiops
-# Both are equivalent assuming 4 KB blocks
-EditDomain -c cgroup,writebw=2 -c blkio,writeiops=512 domain.com
-```
-
-IO and CPU weighting may be set via ioweight and cpuweight respectively. ioweight requires usage of the CFQ/BFQ IO elevators.
+IO restrictions are classified by read and write operations. 
 
 ```bash
 # Default weight is 100
 # Halve IO priority, double CPU priority
 EditDomain -c cgroup,ioweight=50 -c cgroup,cpuweight=200 domain.com
+# Set a write bandwidth of 2 MB/s
+EditDomain -c cgroup,writebw=2 domain.com
+# Apply the minimum of blkio,writebw/blkio,writeiops
+# Both are equivalent assuming 4 KB blocks and uniform throughput
+EditDomain -c cgroup,writebw=2 -c cgroup,writeiops=512 domain.com
 ```
 
+`ioweight` requires usage of the CFQ/[BFQ](https://www.kernel.org/doc/html/latest/block/bfq-iosched.html) IO elevators. ApisCP will ignore this value if [IO elevator](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/monitoring_and_managing_system_status_and_performance/setting-the-disk-scheduler_monitoring-and-managing-system-status-and-performance) does not support proportional queueing (i.e. kyber, deadline, noop). `writebw` and `writeiops` are two means of quantifying IO activity. 
 
-## Emergency stopgaps
+::: tip IO elevator
+To find the current IO elevator in use query `/sys/block/DEVICE/queue/scheduler`. The following command will query all block devices on the server and will typically coincide to a single IO scheduler.
+
+```bash
+cat /sys/block/*/queue/scheduler
+```
+:::
+
+`writebw` is a throughput limit whereas `writeiops` is an interval throughput limit measured every second. IOPS will fill up to the filesystem [block size](#storage), 4 KB. `writebw` is better suited for bursts and `writeiops` works better to sustain fairness. These two values may cooperate to provide quick bursts while shaping IO for a site.
+
+```bash
+# Allow for a quick burst in throughput up to 5 MB/s within 1,000 ms 
+# but no more than 2 MB data sustained over 1,000 ms
+EditDomain -c cgroup,writebw=5 -c cgroup,writeiops=512 domain.com
+```
+
+Then to confirm the changes work as intended.
+
+```bash
+su myadmin@domain.com -c 'dd if=/dev/zero of=/tmp/foo bs=4k count=1024 oflag=direct'
+# 1024+0 records in
+# 1024+0 records out
+# 4194304 bytes (4.2 MB, 4.0 MiB) copied, 2.00011 s, 2.1 MB/s
+
+su myadmin@domain.com -c 'dd if=/dev/zero of=/tmp/foo bs=1M count=1 oflag=direct'
+# 1+0 records in
+# 1+0 records out
+# 1048576 bytes (1.0 MB, 1.0 MiB) copied, 0.209713 s, 5.0 MB/s
+```
+
+Note that the throughput in the second command matches `cgroup`,`writebw` because the sustained payload (1 MB) is less than the IOPS limit (2 MB/s).
+
+## Freezer
+
+All CPU processing may be suspended (frozen) when a site is enrolled into the freezer controller. A frozen site suspends all CPU cycles and will not process additional CPU until thawed. **Freezing a site is a temporary, emergency process** as suspended CPU processing can easily create jams: Apache (hot) → PHP-FPM (frozen) or MySQL (hot) → PHP-FPM (frozen).
+
+Use `cgroup:freeze` to freeze a site and `cgroup:thaw` to unfreeze (thaw) the site.
+
+![Freezing and thawing a site](./images/cgroup-freezer.png)
 
 ## Troubleshooting
 

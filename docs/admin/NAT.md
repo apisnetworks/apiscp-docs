@@ -129,7 +129,7 @@ Confirm the IP address bool has been updated in `/etc/virtualhosting/namebased_i
 ```bash
 cpcmd -o json admin:collect null '[ipinfo.namebased:1]' | jq -r 'keys[]' | while read SITE ; do
 	echo "Updating $(get_config $SITE siteinfo domain) - $SITE"
-	EditDomain -c ipinfo,nbaddrs=[] -c ipinfo,namebased=1 -c ipinfo,nb6addrs=[] $i
+	EditDomain -c ipinfo,nbaddrs=[] -c ipinfo,namebased=1 -c ipinfo6,nbaddrs=[] $SITE
 done
 ```
 
