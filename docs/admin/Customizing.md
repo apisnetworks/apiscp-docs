@@ -171,7 +171,7 @@ When working with custom configurations, it may be desired to reset all menu ite
 ```php
 <?php
 	$templateClass->clear();
-	// create a DNS-only layout
+	// Enable only the Dashboard
 	$templateClass->create_link(
 		'Dashboard',
 		'/apps/dashboard',
@@ -182,7 +182,7 @@ When working with custom configurations, it may be desired to reset all menu ite
 ```
 
 ::: warning Dashboard required
-`/apps/dashboard` must be a valid URI in all menus as this serves as the destination after login.
+`/apps/dashboard` must be a valid URI in all menus as this serves as the default destination after login. This may be changed by modifying the [entry app](#changing-entry-app) below. Once changed, it's no longer necessary to include the "Dashboard" app.
 :::
 
 #### Plan-specific menu
@@ -203,6 +203,26 @@ Plan-specific menus behave otherwise the same as a custom menu. To clear all men
 		null,
 		''
 	);
+	$templateClass->create_link(
+		'DNS Manager',
+		'/apps/dns',
+		true,
+		null,
+		''
+	);
+```
+
+#### Changing entry app
+**New in 3.2.28**
+
+`setEntryApp()` allows you to change the entry app on successful login. By default, the value is `dashboard`, which corresponds to the Dashboard app accessed through /apps/dashboard.
+
+```php
+<?php
+	$templateClass->clear();
+	// create a pure DNS-only layout
+	$templateClass->setEntryApp('dns');
+	
 	$templateClass->create_link(
 		'DNS Manager',
 		'/apps/dns',

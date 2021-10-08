@@ -168,6 +168,15 @@ PowerDNS is configured by default to use "127.0.0.1" for its NS records. In a wo
 
 Assuming your new DNS records are `ns1.yourserver.com` and `ns2.yourserver.com`, the following suffices:
 
+First, to change the nameservers records used to *provision new domains*, use Bootstrapper.
+
+```bash
+cpcmd scope:set cp.bootstrapper powerdns_nameservers '[ns1.yourserver.com,ns2.yourserver.com]'
+env BSARGS="--extra-vars=force=yes" upcp -sb software/powerdns
+```
+
+Next, to update NS records for existing domains.
+
 ```php
 include __DIR__ . '/lib/CLI/cmd.php';
 
