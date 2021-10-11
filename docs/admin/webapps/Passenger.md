@@ -17,6 +17,7 @@ A few directives are used. **All directives below are prefixed with Passenger**.
 | Nodejs      | optional full path to `node` executable   | Used when AppType is `node`                                  |
 | Python      | optional full path to `python` executable | Used when AppType is `python`                                |
 | Ruby        | optional full path to `ruby` executable   | Used when AppType is `ruby`                                  |
+| FriendlyErrorPages | default is `on`, `off` hides errors| Shows errors in browser. Set to `off` for production.        |
 
 Integrating these facts above let's install Nodejs 12.16.3, on a subdomain whose [document root](https://kb.apnscp.com/web-content/where-is-site-content-served-from/) is `/var/www/hq/public`. The application resides in `/var/www/hq` and its entry script (startup file) is `/var/www/hq/current/index.js`.
 
