@@ -780,4 +780,6 @@ PHP-FPM will attempt to restart 3 times logging each failure. Because of this be
 
 ### Verifying pool socket status
 
-`systemctl list-dependencies sockets.target` displays all sockets as well as their corresponding status. 🟢 is an active socket, while 🔴 is inactive.
+`systemctl list-sockets --state=failed php-fpm* ` displays all failed sockets, which can be due to the PHP-FPM service failing to start or socket failing to start.
+
+`journalctl -n20 -u php-fpm-siteXX-NAME.service` from the **ACTIVATES** column will give more information up to the last 20 lines as noted above in "[Pool fails to start](#pool-fails-to-start)".

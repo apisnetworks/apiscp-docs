@@ -4,6 +4,8 @@ SSL is provided through [Let's Encrypt](https://letsencrypt.org), a free domain-
 
 Issuance attempts to protect itself from failures by applying IP verification and allowing hostnames to be removed from the set ("strict mode") if it would satisfy issuance. These behaviors may be configured globally in [config.ini](Tuneables.md) or per-account via Account > Settings > SSL.
 
+SSL issuance is governed by Let's Encrypt's [rate-limit policy](https://letsencrypt.org/docs/rate-limits/).
+
 ## Initial setup
 
 ApisCP will attempt to request SSL for the server at install time. A resolvable hostname and valid email address are necessary to register with Let's Encrypt. ApisCP does not provide a method to bootstrap DNS for a server at installation. If SSL cannot be acquired at install time, a self-signed certificate is used in the interim.
