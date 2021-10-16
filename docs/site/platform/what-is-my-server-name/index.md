@@ -7,8 +7,6 @@ date: "2014-11-03"
 
 Your server name is the server on which you are hosted. Your server name can be ascertained in a few different ways:
 
-- Visit [Server Lookup](http://apnscp.com/server-lookup). Enter your domain name.
-    - _In rare situations, a domain may exist on more than 1 server during a server migration in process. See alternative solutions below:_
 - Login to the control panel via https://apnscp.com > **CP Login**. You will be redirected to a URL of the form http://cp._<server>_.apnscp.com.
     - Alternatively, access http://_<domain>_/cpadmin where _<domain>_ is your domain name. You will be redirected to http://cp._<server>_.apnscp.com.
 - Perform a DNS lookup on your domain. An IP address will be returned. Perform a rDNS to find the server name.
