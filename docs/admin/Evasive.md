@@ -46,7 +46,7 @@ Create a file named `custom` in `/etc/httpd/conf/siteXX` where *siteXX* is the s
 
 `DOSEnabled off`
 
-Then rebuild and reload, `htrebuild && system reload httpd`.
+Then rebuild and reload, `htrebuild && systemctl reload httpd`.
 
 ## Filtering individual resources
 
