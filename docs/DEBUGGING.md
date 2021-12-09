@@ -52,7 +52,7 @@ env DEBUG=1 cpcmd misc:debug-session Xqu8WuGaaRHYLoPSdQh5ITi2ZuRkI1Z6
 env DEBUG=1 cpcmd misc:debug-session Xqu8WuGaaRHYLoPSdQh5ITi2ZuRkI1Z6 false
 ```
 
-`session.id` may be retrieved from a JavaScript console, cookie source ("esprit_id" de facto cookie name) or from the source.
+`session.id` may be retrieved from a [JavaScript console](https://balsamiq.com/support/faqs/browserconsole/), cookie source ("esprit_id" de facto cookie name) or from the source.
 
 ![Session ID embedded in page source](./images/debugging-session-id.png)
 

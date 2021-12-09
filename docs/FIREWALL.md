@@ -130,7 +130,7 @@ A variety of jails provide granular protection over public services. The followi
 
 | Jail         | Port protection     | Role                            |
 | ------------ | ------------------- | ------------------------------- |
-| dovecot      | 110, 995, 143, 995  | IMAP/POP3 failures              |
+| dovecot      | 110, 995, 143, 993  | IMAP/POP3 failures              |
 | evasive      | 80, 443             | HTTP brute-force                |
 | malware      | 80, 443             | HTTP uploads containing malware |
 | mysqld       | 3306                | Remote MySQL failures           |

@@ -101,11 +101,13 @@ ansible-playbook bootstrap.yml  --tags=php/install-pecl-module,apnscp/php-filesy
 
 Dense mode accepts the following attributes:
 
-| Parameter | Description                                    |
-| --------- | ---------------------------------------------- |
-| name      | Extension name                                 |
-| zend      | Whether Zend extension                         |
-| extension | Standard extension URI (PECL, URL, local file) |
+| Parameter | Description                                      |
+| --------- | ------------------------------------------------ |
+| name      | Extension name                                   |
+| zend      | Whether Zend extension                           |
+| extension | Standard extension URI (PECL, URL, local file)   |
+| flags     | Flags to pass to configure script                |
+| version   | Specific version to install. git, PECL URIs only | 
 
 Likewise to set as default for all PHP builds,
 
