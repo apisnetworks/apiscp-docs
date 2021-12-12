@@ -1,0 +1,3 @@
+[submodule "docs/site"]
+	path = docs/site
+	url = https://github.com/apisnetworks/apiscp-kb-docs.git
