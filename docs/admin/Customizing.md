@@ -2,7 +2,7 @@
 title: Customizing ApisCP
 ---
 
-ApisCP provides a variety of means to customize your environment. Each service is different and the means to configure it varies. Many services have files that are verboten, don't touch under any circumstance. They are periodically overwritten and the primary means to ensure what you run is what is developed.
+ApisCP provides a variety of means to customize your environment. Each service is different and the means to configure it varies. Many services have files that are verboten, don't touch under any circumstance. They are periodically overwritten and the primary means to ensure what you run is what is developed. CP_ROOT is the panel home, typically either /usr/local/apnscp or /usr/local/apiscp
 
 ## Apache
 
@@ -57,27 +57,27 @@ ApisCP was originally called APNSCP. Internally, in many places, the panel is st
 
 ### View overrides
 
-All views may be copied into `config/custom/resources/views/<path>` from `resources/views/<path>`. Custom views take precedence, including all mail templates. Overriding `layout.blade.php` allows customization to the skeleton of all apps in ApisCP.
+All views may be copied into `CP_ROOT/config/custom/resources/views/<path>` from `CP_ROOT/config/custom/resources/views/<path>`. Custom views take precedence, including all mail templates. Overriding `layout.blade.php` allows customization to the skeleton of all apps in ApisCP.
 
 ::: warning Updating configuration first time
-ApisCP compiles configuration on each start to provide the best possible performance. When creating resource overrides in `config/custom/resources/view` or `config/custom/resources/templates` the first time restart ApisCP so it knows to look in these directories. Prior to making this change, these locations are compiled out on boot.
+ApisCP compiles configuration on each start to provide the best possible performance. When creating resource overrides in `CP_ROOT/config/custom/resources/view` or `CP_ROOT/config/custom/resources/templates` the first time restart ApisCP so it knows to look in these directories. Prior to making this change, these locations are compiled out on boot.
 
 `systemctl restart apiscp`
 :::
 
 #### Layout
 
-A master layout named "layout" is provided in `resources/views/`. As with all templates suffixed "blade.php", it utilizes [Blade](https://laravel.com/docs/5.6/blade). A theme-specific blade may override the master layout by creating an eponymous template in `config/custom/resources/views/`. For example, to override the "apnscp" theme, create a file named `config/custom/resources/views/apnscp.blade.php`. Inheritance is supported via `@extends("layout")` in addition to section injection.
+A master layout named "layout" is provided in `CP_ROOT/config/custom/resources/views/`. As with all templates suffixed "blade.php", it utilizes [Blade](https://laravel.com/docs/5.6/blade). A theme-specific blade may override the master layout by creating an eponymous template in `CP_ROOT/config/custom/resources/views/`. For example, to override the "apnscp" theme, create a file named `CP_ROOT/config/custom/resources/views/apnscp.blade.php`. Inheritance is supported via `@extends("layout")` in addition to section injection.
 
 ### App overrides
 
 Apps may be completely overridden or on a file-per-file basis (such as replacing `application.yml`). 
 
-To override the app entirely, copy it from `apps/<name>` to `config/custom/apps/<name>`.  To override a specific file, create the corresponding directory structure in `config/custom/apps/<name>`, then copy the file over.
+To override the app entirely, copy it from `CP_ROOT/config/custom/apps/<name>` to `CP_ROOT/config/custom/apps/<name>`.  To override a specific file, create the corresponding directory structure in `CP_ROOT/config/custom/apps/<name>`, then copy the file over.
 
-Role menus, i.e.  what is loaded when a corresponding user type logs in (admin, site, user) may be overridden as well. Menus are based on code under `lib/html/templateconfig-<role>.php`. Additional includes may be located under `config/custom/templates/<role>.php`. This is a sample extension for ApisCP when a billing module is configured to allow clients direct access to manage billing:
+Role menus, i.e.  what is loaded when a corresponding user type logs in (admin, site, user) may be overridden as well. Menus are based on code under `lib/html/templateconfig-<role>.php`. Additional includes may be located under `CP_ROOT/config/custom/templates/<role>.php`. This is a sample extension for ApisCP when a billing module is configured to allow clients direct access to manage billing:
 
-`config/custom/templates/site.php`:
+`CP_ROOT/config/custom/templates/site.php`:
 
 ```php
 <?php
@@ -113,7 +113,7 @@ $templateClass->create_link(
 
 ![Onboarding tour](./images/onboarding-ex.png)
 
-Users may be introduced to a brief demo on the first app view or on demand when `\Page_Renderer::show_tutorial();` is called (see `apps/template/template.php` for sample invocation). Steps are loaded from `application.yml` bundled in `apps/APP NAME/`. As with all application data, this file may be individually overridden by copying `apps/APP NAME/application.yml` to `config/custom/apps/APP NAME/application.yml`. 
+Users may be introduced to a brief demo on the first app view or on demand when `\Page_Renderer::show_tutorial();` is called (see `CP_ROOT/config/custom/apps/template/template.php` for sample invocation). Steps are loaded from `application.yml` bundled in `CP_ROOT/config/custom/apps/APP NAME/`. As with all application data, this file may be individually overridden by copying `apps/APP NAME/application.yml` to `CP_ROOT/config/custom/apps/APP NAME/application.yml`. 
 
 `application.yml` does not support inheritance; thus, the overrode file is what is used for application metadata. Parsed metadata remains cached for 24 hours unless the panel is in [debug mode](../DEBUGGING.md#debugging).
 
@@ -147,7 +147,7 @@ Onboarding binds to the DOM at page load. Any elements replaced after page load 
 
 Apps populated as part of ApisCP may be hidden or removed from view using `hide()` and `remove()` respectively. Application ID is the basename from the URI path, i.e. for /apps/foo the application ID is "foo" and likewise "quuz" is the application ID for /apps/quuz.
 
-`config/custom/templates/admin.php`:
+`CP_ROOT/config/custom/templates/admin.php`:
 
 ```php
 <?php
@@ -188,7 +188,7 @@ When working with custom configurations, it may be desired to reset all menu ite
 #### Plan-specific menu
 **New in 3.2.18**
 
-Per-plan menus may be used following the naming scheme `ROLE`-`PLAN`. For example, to use a custom menu layout for the plan "dns-only" that applies to Site Administrators, create the following file `config/custom/templates/site-dns-only.php`.  If found, this menu will be used instead of `config/custom/templates/site.php`.
+Per-plan menus may be used following the naming scheme `ROLE`-`PLAN`. For example, to use a custom menu layout for the plan "dns-only" that applies to Site Administrators, create the following file `CP_ROOT/config/custom/templates/site-dns-only.php`.  If found, this menu will be used instead of `CP_ROOT/custom/templates/site.php`.
 
 Plan-specific menus behave otherwise the same as a custom menu. To clear all menu items use `clear()`.
 
@@ -234,14 +234,14 @@ Plan-specific menus behave otherwise the same as a custom menu. To clear all men
 
 ### App view overrides
 
-Any app that uses Blade templates (`views/` directory) is eligible to override components of the template structure. Create the same structure in `config/custom/apps/<name>` as is in `apps/<name>`. For example to override `apps/ssl/views/partials/certificate-detected.blade.php`, copy that file to `config/custom/apps/ssl/views/partials/certificate-detected.blade.php`. ApisCP will load the view from this location first. It is advisable to copy the entire application over (*App overrides*) as application structure may change between releases.
+Any app that uses Blade templates (`views/` directory) is eligible to override components of the template structure. Create the same structure in `config/custom/apps/<name>` as is in `apps/<name>`. For example to override `CP_ROOT/config/custom/apps/ssl/views/partials/certificate-detected.blade.php`, copy that file to `CP_ROOT/config/custom/apps/ssl/views/partials/certificate-detected.blade.php`. ApisCP will load the view from this location first. It is advisable to copy the entire application over (*App overrides*) as application structure may change between releases.
 
 #### Web App overrides
-Web Apps use a different set of locations for overrides. An app may be overrode by cloning the [git repository](https://github.com/search?q=topic%3Awebapp+org%3Aapisnetworks&type=Repositories) into `config/custom/` (see README.md bundled with each Web App) or by copying the respective file into `config/custom/webapps/APP-NAME/views`. For example, to override the `options-install.blade.php` template bundled with WordPress, the path would be `config/custom/webapps/wordpress/views/options-install.blade.php`.
+Web Apps use a different set of locations for overrides. An app may be overrode by cloning the [git repository](https://github.com/search?q=topic%3Awebapp+org%3Aapisnetworks&type=Repositories) into `CP_ROOT/config/custom/` (see README.md bundled with each Web App) or by copying the respective file into `CP_ROOT/config/custom/webapps/APP-NAME/views`. For example, to override the `options-install.blade.php` template bundled with WordPress, the path would be `CP_ROOT/config/custom/webapps/wordpress/views/options-install.blade.php`.
 
 ### Global constants
 
-Constants may be overrode or added to global scope via `config/custom/constants.php`:
+Constants may be overrode or added to global scope via `CP_ROOT/config/custom/constants.php`:
 
 ```php
 <?php
@@ -257,11 +257,11 @@ Constants may be overrode or added to global scope via `config/custom/constants.
 
 ### DNS template overrides
 
-DNS is generated from a base template in `resources/templates/dns`. Presently mail and dns templates are supported. For each template to override copy the respective template to `config/custom/resources/templates/dns/`. Validate DNS template consistency via `cpcmd dns:validate-template TEMPLATENAME`.
+DNS is generated from a base template in `CP_ROOT/config/custom/resources/templates/dns`. Presently mail and dns templates are supported. For each template to override copy the respective template to `CP_ROOT/config/custom/resources/templates/dns/`. Validate DNS template consistency via `cpcmd dns:validate-template TEMPLATENAME`.
 
 ## Themes
 
-New themes may be created and placed under `public/css/themes` and `public/images/themes`. The default theme may be changed with `cpcmd`:
+New themes may be created and placed under `CP_ROOT/public/css/themes` and `CP_ROOT/public/images/themes`. The default theme may be changed with `cpcmd`:
 
 ```bash
 cpcmd scope:set cp.config style theme newtheme
@@ -289,7 +289,7 @@ It's recommended to create a new theme by copying one of the existing themes. De
 
 ### ApisCP configuration
 
-All configuration must be made to `config/custom/config.ini`. [cpcmd](CLI.md#cpcmd) provides a short-hand tool to edit this file.
+All configuration must be made to `CP_ROOT/config/custom/config.ini`. [cpcmd](CLI.md#cpcmd) provides a short-hand tool to edit this file.
 
 ```bash
 # Show all configuration
@@ -302,7 +302,7 @@ Refer to [config.ini](https://gitlab.com/apisnetworks/apnscp/blob/master/config/
 
 ### HTTP configuration
 
-All changes may be made to `/usr/local/apnscp/config/httpd-custom.conf`. After changing, restart ApisCP, `systemctl restart apiscp`
+All changes may be made to `CP_ROOT/config/httpd-custom.conf`. After changing, restart ApisCP, `systemctl restart apiscp`
 
 ## Dovecot
 
