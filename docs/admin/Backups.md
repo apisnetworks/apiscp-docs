@@ -263,6 +263,8 @@ RunScript {
 
 Restart Bacula. `systemctl restart bacula-dir`
 
+If you're using additional machines, for example one machine1 is your hosting server and machine2 is your backup server you need to complete step 1 on machine1 and the rest on machine2 where the bacula-dir is located on.
+
 ## Troubleshooting
 
 ### Malformed message... Maximum permitted 1000000
@@ -275,3 +277,24 @@ systemctl status firewalld
 # Restart firewalld
 systemctl restart firewalld
 ```
+
+## Additional Notes
+
+Using the install provided my apiscp your backup server will backup itself as the client level will be installed on your backup server, you will need to disable the job or 'null' the backup file to prevent it doing this (if you want too). To 'null' the file go to /etc/bacula/local.d/servers/1/self.conf and edit it as such;
+
+```
+Device {
+Name = self
+Media Type = NULL
+Device Type = Fifo
+Archive Device = /dev/null
+LabelMedia = yes
+Random Access = no
+AutomaticMount = no
+RemovableMedia = no
+MaximumOpenWait = 60
+AlwaysOpen = no
+}
+```
+
+The backup will still run but this way it won't actually backup any data about itself. Only use this if you backup machine is used for backing up other devices and is not used a hosting platform itself. 
