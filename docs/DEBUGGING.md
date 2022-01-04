@@ -120,6 +120,8 @@ FPM pools are grouped by site ID identifier and name. By default, one pool is cr
 
 `php:pool-info(string $pool = '')` reports service information from systemd. This command is equivalent to *systemctl show POOLNAME*. *StatusText* is the plaintext value of php:pool-status.
 
+As these are started per site it is sometimes necessary to stop/start them individually rather than as a server as a whole.
+
 ## Jobs
 
 Laravel Horizon is used for jobs unless `has_low_memory` is enabled (via Bootstrapping or *[cron]* => *low_memory* is set in config.ini). Horizon can be manually launched using:
