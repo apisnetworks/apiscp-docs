@@ -5,7 +5,7 @@ alias: migrations
 
 # Migration procedure
 
-`ImportDomain` consists of two stages, account creation and file migration. Stages may be selectively run. Migrations allow fast restoration into ApisCP. Better yet, ApisCP can be used with [PowerDNS integration](https://github.com/LithiumHosting/apnscp-powerdns) to share DNS servers with cPanel as you transition over.
+`ImportDomain` consists of two stages, account creation and file migration. Stages may be selectively run. Migrations allow fast restoration into ApisCP. Better yet, ApisCP can be used with [PowerDNS integration](../dns/PowerDNS.md) to share DNS servers with cPanel as you transition over.
 
 [![asciicast](https://asciinema.org/a/260493.svg)](https://asciinema.org/a/260493)
 

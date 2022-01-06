@@ -2,7 +2,9 @@
 title: Customizing ApisCP
 ---
 
-ApisCP provides a variety of means to customize your environment. Each service is different and the means to configure it varies. Many services have files that are verboten, don't touch under any circumstance. They are periodically overwritten and the primary means to ensure what you run is what is developed. CP_ROOT is the panel home, typically either /usr/local/apnscp or /usr/local/apiscp
+ApisCP provides a variety of means to customize your environment. Each service is different and the means to configure it varies. Many services have files that are verboten, don't touch under any circumstance. They are periodically overwritten and the primary means to ensure what you run is what is developed. 
+
+[CP_ROOT](../DEBUGGING.md#log-locations) is the panel home, typically either /usr/local/apnscp or /usr/local/apiscp.
 
 ## Apache
 

@@ -13,24 +13,22 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "vuepress": "^1.5.3",
-    "yarn": "^1.22.4"
-  },
-  "devDependencies": {
-    "@vuepress/plugin-active-header-links": "^1.5.3",
-    "@vuepress/plugin-back-to-top": "^1.5.3",
-    "@vuepress/plugin-google-analytics": "^1.5.3",
-    "@vuepress/plugin-medium-zoom": "^1.5.3",
-    "@vuepress/plugin-pwa": "^1.5.3",
-    "eslint": "^6.8.0",
-    "markdown-it-deflist": "^2.0.3",
-    "markdownlint-cli": "^0.21.0",
-    "minimist": ">=1.2.3",
-    "stylelint": "^13.2",
+    "@vuepress/plugin-active-header-links": "^1.8.2",
+    "@vuepress/plugin-back-to-top": "^1.8.2",
+    "@vuepress/plugin-google-analytics": "^1.8.2",
+    "@vuepress/plugin-medium-zoom": "^1.8.2",
+    "@vuepress/plugin-pwa": "^1.8.2",
+    "eslint": "^8.4.1",
+    "markdown-it-deflist": "^2.1.0",
+    "markdownlint-cli": "^0.30.0",
+    "minimist": "^1.2.5",
+    "stylelint": "^14.1.0",
+    "vue": "2.6.14",
+    "vuepress": "^1.8.2",
     "vuepress-plugin-alias": "^1.0.0-beta",
-    "vuepress-plugin-clean-urls": "^1.1",
+    "vuepress-plugin-clean-urls": "^1.1.2",
     "vuepress-plugin-disqus": "^0.2.0",
     "vuepress-plugin-reading-time": "^0.1.1",
-    "vuepress-theme-vuetify": "^1.0"
+    "yarn": "^1.22.17"
   }
 }

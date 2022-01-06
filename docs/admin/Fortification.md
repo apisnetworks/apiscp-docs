@@ -2,7 +2,7 @@
 
 Fortification separates write access from the web server, specifically PHP applications that are a common vector of abuse. If a site is breached through a PHP application, such as a derelict WordPress plugin, then with Fortification enabled an attacker may only modify files explicitly granted access, typically media or cache files. An attacker cannot modify system files, snoop through personal files, or view files belonging to others unless permissions allow.
 
-Detailed recovery techniques are discussed in Audit.md. This document covers the basics of Fortification and how to apply it.
+Detailed recovery techniques are discussed in [Audit.md](Audit.md). This document covers the basics of Fortification and how to apply it.
 
 ## Benefits of Fortification
 
