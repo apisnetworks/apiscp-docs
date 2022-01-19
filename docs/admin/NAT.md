@@ -116,15 +116,22 @@ This may result in domains that have expired to halt automatic SSL renewal.
 ## Problems
 
 ### Changing IPs
-A machine may change either from a private to public network or its public IP change during its lifetime. In such situations, it's necessary to update the IP addresses ApisCP listens on and the IP addresses for each site. [Bootstrapper](Bootstrapper.md) can update all internal IP mappings by passing `force=yes`, which has specific meaning for some tasks.
+A machine may change either from a private to public network or its public IP change during its lifetime. In such situations, it's necessary to update the IP addresses ApisCP listens on and the IP addresses for each site. Two [Scopes](Scopes.md) exist to change IP4 and IP6 pools, `dns.ip4-pool` and `dns.ip6-pool`.  
+
+*Note: these addresses must already be bound to the server. Check with your network provider to determine how to do this on their infrastructure.*
 
 ```bash
-env BSARGS="--extra-vars=force=yes" upcp -sb
+# Change the new IPv4 addresses to 1.2.2.2 and 1.4.5.6
+cpcmd scope:set dns.ip4-pool '[1.2.2.2,1.4.5.6]'
+# Alternatively to update IPv6
+cpcmd scope:set dns.ip6-pool '[2607:f8b0:4002:c08::66,::dead:beef]'
 ```
 
-It is necessary to update the public IP addresses for each site as well. Namebased IP addresses are assigned round-robin at creation. For example if a server has `1.2.2.2` and `1.4.5.6` then site1 is allocated `1.2.2.2`, site2 `1.4.5.6`, site3 `1.2.2.2`, and so on.
+Namebased IP addresses are assigned round-robin at creation. For example if a server has `1.2.2.2` and `1.4.5.6` then site1 is allocated `1.2.2.2`, site2 `1.4.5.6`, site3 `1.2.2.2`, and so on.
 
-Confirm the IP address bool has been updated in `/etc/virtualhosting/namebased_ip_addrs` and `/etc/virtualhosting/namebased_ip6_addrs`, then clear `ipinfo,nbaddrs` and `ipinfo,nb6addrs` respectively for reassignment. Namebased sites may be selected using a [collection](cpcmd-examples.md#collections).
+Confirm the IP addresses have been updated in `/etc/virtualhosting/namebased_ip_addrs` and `/etc/virtualhosting/namebased_ip6_addrs`, then clear `ipinfo,nbaddrs` and `ipinfo,nb6addrs` respectively for reassignment. 
+
+Both Scopes will attempt to update these IP addresses. It may also manually be done using a [collection](cpcmd-examples.md#collections).
 
 ```bash
 cpcmd -o json admin:collect null '[ipinfo.namebased:1]' | jq -r 'keys[]' | while read SITE ; do
