@@ -3,7 +3,7 @@ title: Helpers
 ---
 ApisCP provides a variety of command-line helpers that allow you to interact with your accounts. For example, you may want to put the panel in [headless mode](https://github.com/apisnetworks/apnscp-playbooks#toggling-headless-mode), which disables web-based access, automate account management, or even too run a command as another site.
 
-All helpers live under `/usr/local/apnscp/bin`. All commands except for `cpcmd` must be run as root. `sudo su -` is a quick way to become root if you aren't already.
+All helpers live under `{{ $themeConfig.APNSCP_ROOT }}/bin`. All commands except for `cpcmd` must be run as root. `sudo su -` is a quick way to become root if you aren't already.
 
 ::: tip
 *Domain binaries: AddDomain, EditDomain, DeleteDomain, ActivateDomain, and SuspendDomain are covered in [Plans.md](Plans.md). ImportDomain and ExportDomain are covered in [Migrations.md](Migrations.md). This document covers other helpers.
@@ -156,39 +156,83 @@ get_site_id example.com
 ```
 
 ## Scripts
-All ApisCP scripts are available under `{{ $themeConfig.APNSCP_ROOT }}/bin/scripts`. All scripts make use of the apnscp CLI framework and require invocation with `apnscp_php` to operate.
+All ApisCP scripts are available under `{{ $themeConfig.APNSCP_ROOT }}/bin/scripts`. All scripts make use of the ApisCP CLI framework and require invocation with `apnscp_php` to operate.
 
-### change_dns.php
+### backup_dbs.php
 
-Bulk change DNS for an account.
+Perform bulk database backups. This can be manually invoked before a [system backup](./Backups#triggering-database-backups) to ensure a fresh export of databases.
+
+### ban_spam.sh
+
+Blocks any IP addresses with more than 100 open connections to a server.
 
 ### changelogparser.php
 
-Summarize apnscp changes.
+Summarize ApisCP changes from `git log`.
+
+### change_dns.php
+
+Bulk change DNS for an account. IPs may be changed for a single domain by specifying `-d DOMAIN` or for all accounts for which DNS is enabled by specifying `--all`. 
+
+```bash
+cd /usr/local/apnscp/bin/scripts
+# Reduce TTL for all domains to 15 seconds
+./change_dns.php --all --ttl=15
+
+# For all IPs that match "site:ip-address"  change the IP to 45.12.23.4
+./change_dns.php -d site1 --new=45.12.23.4
+# Command above is equivalent to...
+./change_dns.php -d site1 --old="$(cpcmd -d site1 site:ip-address)"--new=45.12.23.4
+
+# Change IP address for all sites that match old IP address 1.2.3.4. If changed, set a TTL value of 2 hours
+./change_dns.php --all --old=1.2.3.4 --new=3.4.5.6 --ttl=7200
+```
+
+This is a simpler version of [bulk DNS](./DNS.md#bulk-record-management) boilerplate.
+
+### mapCheck.php
+
+[Map](./Maps) helper.
+
+### metricscron.php
+
+[Metrics](./Metrics) compression/rollover helper.
+
+### platformScrub.php
+
+Wrapper for monthly invocation of [upcp -sb](../UPGRADING#upcp-update-helper).
 
 ### reissueAllCertificates.php
 
 Perform a bulk reissue of all certificates. See [SSL.md](SSL.md) for further information.
 
+### storagelog.sh
+
+Periodic storage logging.
+
 ### transfersite.php
 
 Migrate an ApisCP site between servers. See [Migrations](Migrations - server.md) for further information.
 
+### uidCheck.php
+
+Similar to mapCheck.php, scans a system for inconsistencies in UID/GID attached to accounts.
+
 ### yum-post.php
 
-Synchronize a system back into FST.
+[Synchronize packages](./Filesystem#filesystem-template) into FST.
 
 ## Build scripts
 
 ### build/php/php.config
 
-Build PHP for apnscp. To run, change into PHP source directory, then run:
+Build PHP for ApisCP. To run, change into PHP source directory, then run:
 
 `{{ $themeConfig.APNSCP_ROOT }}/build/php/php.config`
 
-PHP will be built with apnscp module requirements.
+PHP will be built with ApisCP module requirements.
 
 ### build/httpd/apxs
-General utility apxs wrapper to build modules specifically for apnscp. Installed modules will be placed under `sys/httpd/private/modules`. Unless the module conflicts with global Apache instance, modules can be used from `sys/httpd/modules`, which is a symlink to `/usr/lib64/httpd/modules`.
+General utility apxs wrapper to build modules specifically for ApisCP. Installed modules will be placed under `sys/httpd/private/modules`. Unless the module conflicts with global Apache instance, modules can be used from `sys/httpd/modules`, which is a symlink to `/usr/lib64/httpd/modules`.
 
 
