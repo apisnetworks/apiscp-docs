@@ -254,7 +254,15 @@ module.exports = {
 			},
 			"admin/Maps",
 			"admin/Benchmarking",
-			"admin/Panel proxy",
+			{
+				title: "Panel proxy",
+				children: [
+					["admin/Panel proxy", "Overview"],
+					["admin/proxy/Collector", "Collector"],
+					["admin/proxy/API", "API"],
+					["admin/proxy/Proxy", "Proxy"],
+				]
+			},
 			['https://notes.apiscp.com', 'Task hacks'],
 			"DEBUGGING",
 			]
