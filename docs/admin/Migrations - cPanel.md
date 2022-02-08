@@ -149,7 +149,38 @@ Following migration, ApisCP will attempt to request SSL for each hostname as wel
 
 `--unsafe-sources` allows importing unchecked, potentially hazardous, backup data including SquirrelMail preference files and Roundcube MySQL directives. The consistency and validity of this data is not checked. **Do not enable this option unless you are confident the backup has not been tampered with**.
 
-### Quota disagreements
+### Reapplying components
+**New in 3.2.32**
+
+`--list-components` enumerates all available components for a given backup. These components are determined by files present within the backup. `--do=COMPONENT` may be specified multiple times to reapply *only* those migration components.
+
+```bash
+ ImportDomain --list-components --format=cpanel cpmove.tar.gz
+# - apachetls
+# - cp
+# - cron
+# - dnszones
+# - homedir
+# - ips
+# - meta
+# - mm
+# - mysqlsql
+# - psql
+# - shadow
+# - shell
+# - userdata
+# - va
+# - version
+
+# Reapply mailing list + database importation steps (mm, mysqlsql)
+ImportDomain --do=mm --do=mysqlsql --no-create --no-bootstrap --no-scan --format=cpanel cpmove.tar.gz
+```
+
+In the above example, `--no-create --no-bootstrap --no-scan` are present. `--no-create` is to prevent account creation which is attempted automatically to ensure importing into a pristine environment. Likewise `--no-bootstrap` and `--no-scan` prevent end-of-import hooks from running, SSL acquisition and Web App updates.
+
+### Troubleshooting
+
+#### Quota disagreements
 
 Quotas are accounted and enforced by the kernel. When migrating from certain hosting platforms that employ quasi-quota accounting by software, such as cPanel, the reported quota for a user may be significantly more than what was previously reported. `--late-quota` will apply storage amnesty, which is a 2x storage boost for 12 hours. **Late quota is only triggered** after account creation. Thus when combined with `--no-create`, `--late-quota` has no effect. Call `site:storage-amnesty` against the account using [cpcmd](CLI.md#cpcmd).
 
@@ -162,11 +193,11 @@ cpcmd scope:set cp.config quota storage_duration 172800
 
 These changes will be reflected on future imports.
 
-### Decompression oddities
+#### Decompression oddities
 
 Migration will attempt to use PHP's PharData handler to decompress files. It's based on USTAR, which has [limitations](https://www.gnu.org/software/tar/manual/html_node/Formats.html#Formats) that may result in a cPanel backup generated in POSIX.1-2001 standards to fail. Use `--no-builtin` to disable the builtin handler from attempting to read the backup.
 
-### Empty MySQL credentials
+#### Empty MySQL credentials
 
 Prior to MySQL 5.7.5 released in [2014](https://dev.mysql.com/doc/relnotes/mysql/5.7/en/news-5-7-5.html), MySQL accepted passwords created in an insecure hash format that was used prior to 4.1. From speculation, accounts that were created prior to this change were abandoned from a [secure upgrade pathway by cPanel](https://forums.cpanel.net/threads/mysql-upgrade-to-v-5-6-old-style-passwords-cpanel-explanation.649945/).
 

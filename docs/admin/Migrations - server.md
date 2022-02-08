@@ -86,7 +86,14 @@ apnscp_php bin/scripts/transfersite.php -c='dns,provider=linode' -c='dns,key=abc
 
 On the source server, mydomain.com may continue to use DigitalOcean as its [DNS provider](https://bitbucket.org/apisnetworks/apnscp/src/master/lib/Module/Provider/Dns/Digitalocean.php?at=master&fileviewer=file-view-default) while the on the target server mydomain.com will use Linode's [DNS provider](https://bitbucket.org/apisnetworks/apnscp/src/master/lib/Module/Provider/Dns/Linode.php?at=master&fileviewer=file-view-default). Once mydomain.com completes its initial stage (stage 0), be sure to update the nameservers for mydomain.com.
 
+## Notification templates
+
+A notification is sent at the end **stage 0** (warmup migration) and **stage 1** (final migration). Migrations are read from `resources/templates/migrations/` and may be overrode following [view/template](Customizing.md#ApisCP) override rules.
+
+Custom templates may be specified using `--template=`. A single argument or CLI
+
 ## Skipping suspension
+
 An account after migration completes is automatically suspended on the source side. In normal operation, this poses no significant complications as DNS TTL is reduced to 2 minutes or less during stage one migration.
 
 `--no-suspend` disables suspension following a successful migration. 
