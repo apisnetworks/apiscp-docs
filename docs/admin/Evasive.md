@@ -31,7 +31,7 @@ Global tracking ignores URI distinctions and looks at all requests originating f
 
 ```bash
 cpcmd scope:set apache.evasive site-count 300
-cpcmd scope:set apache.evasive page-interval 2
+cpcmd scope:set apache.evasive site-interval 2
 ```
 
 Above triggers protection if more than 300 requests are made within 2 seconds.
