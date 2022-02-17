@@ -14,16 +14,6 @@ This is the default mode that unlocks all capabilities including greylisting, co
 cpcmd scope:set cp.bootstrapper rspamd_enabled true
 ```
 
-## Single-server scanning with centralized Redis
-
-rspamd scanning will continue to operate on the current server, but all statistics are sent to a centralized database. This ostensibly confers the advantage of speeding up its learning process.
-
-```bash
-cpcmd scope:set cp.bootstrapper rspamd_enabled true
-cpcmd scope:set cp.bootstrapper rspamd_redis_server redisserver:port
-cpcmd scope:set cp.bootstrapper rspamd_redis_password redispass
-```
-
 ## Centralized scanning
 
 A server can be designated to scan mail exclusively. Additional configuration should be taken to open the firewall ports and restrict trusted network traffic as well on the host machine.
@@ -32,6 +22,41 @@ A server can be designated to scan mail exclusively. Additional configuration sh
 cpcmd scope:set cp.bootstrapper rspamd_enabled true
 cpcmd scope:set cp.bootstrapper rspamd_worker_socket somehost:someport
 ```
+
+## Local scanning with centralized Redis
+
+**New in 3.2.32**
+
+Servers may be configured to use a local Redis instance in standalone (default), offload processing to a central unit in "[centralized scanning](#centralized-scanning)" or process locally but store data in a single Redis instance.
+
+To configure this behavior a few changes are necessary. Assume the rspamd Redis server runs on **1.2.3.4** and a client machine runs on **5.6.7.8**.
+
+On server:
+
+```bash
+cpcmd scope:set cp.bootstrapper rspamd_redis_custom_config '[bind:"*",port:6780]'
+PASSWORD="$(openssl rand -base64 32)"
+cpcmd scope:set cp.bootstrapper rspamd_redis_password "$PASSWORD"
+upcp -sb mail/rspamd
+```
+Grab the Redis password from the master:
+
+```bash
+# Whitelist client machine
+cpcmd scope:set rampart:whitelist 5.6.7.8
+# Get password
+cpcmd scope:get cp.bootstrapper rspamd_redis_password
+```
+
+Next, on the client, reconfigure it to send results to 1.2.3.4.
+```bash
+cpcmd scope:set cp.bootstrapper rspamd_redis_server "1.2.3.4"
+cpcmd scope:set cp.bootstrapper rspamd_redis_password "PASSWORD-FROM-ABOVE-COMMAND"
+upcp -sb mail/rspamd
+```
+
+ApisCP will attempt to detect if the Redis IP is local or remote. If ApisCP cannot properly detect this, it may be forced by setting `rspamd_redis_local` to `True` or `False`.
+
 
 ## Low memory without Redis
 
