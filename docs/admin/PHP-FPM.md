@@ -107,7 +107,7 @@ Dense mode accepts the following attributes:
 | zend      | Whether Zend extension                           |
 | extension | Standard extension URI (PECL, URL, local file)   |
 | flags     | Flags to pass to configure script                |
-| version   | Specific version to install. git, PECL URIs only | 
+| version   | Specific version to install. git, PECL URIs only |
 
 Likewise to set as default for all PHP builds,
 
@@ -421,9 +421,11 @@ Then restart the affected pool, `systemctl restart php-fpm-siteXX` where siteXX 
 
 [PrivateTmp](https://www.freedesktop.org/software/systemd/man/systemd.exec.html#PrivateTmp=) is enabled by default for PHP-FPM sites. On-disk sessions, temporary files, and file uploads are stored on a temporary RAM disk under `/tmp` without the ability to see other files in /tmp, run programs directly, elevate permissions, or create block devices (`mount -o noexec,nosuid,nodev`). Files created here receive a boost in I/O speed, but memory is a limited resource. Larger sites that receive significant file uploads or make use of `tempnam()`, `tmpfile()` calls in PHP can exhaust available storage.
 
-These sites may be relocated to the [account filesystem root](Filesystem.md) in `/home/virtual/siteXX/fst/tmp`. On-disk sessions, temporary files, and file uploads will be stored on within the account and likewise be counted toward the account filesystem quota. Set `privatetmp: true` in the [policy map](#policy-maps). Once modified, run `EditDomain --reconfig domain.com`.
+These sites may be relocated to the [account filesystem root](Filesystem.md) in `/home/virtual/siteXX/fst/tmp`. On-disk sessions, temporary files, and file uploads will be stored on within the account and likewise be counted toward the account filesystem quota. Set `privatetmp: false` in the [policy map](#policy-maps). Once modified, run `EditDomain --reconfig domain.com`.
 
 Making this change will also grant the PHP-FPM process access to view files within /tmp for that account as well as allow others on the account to interact with those files.
+
+This setting may be altered globally in [config.ini](Tuneables.md) under *[httpd]* => *fpm_privatetmp*. Default value is true, to enable PrivateTmp usage.
 
 ## HTTP configuration
 

@@ -50,7 +50,7 @@ cpcmd scope:get cp.bootstrapper rspamd_redis_password
 
 Next, on the client, reconfigure it to send results to 1.2.3.4.
 ```bash
-cpcmd scope:set cp.bootstrapper rspamd_redis_server "1.2.3.4"
+cpcmd scope:set cp.bootstrapper rspamd_redis_server "1.2.3.4:6780"
 cpcmd scope:set cp.bootstrapper rspamd_redis_password "PASSWORD-FROM-ABOVE-COMMAND"
 upcp -sb mail/rspamd
 ```
