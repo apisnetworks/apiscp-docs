@@ -65,11 +65,46 @@ cpcmd scope:set apache.block10 false
 ab -n 1000 -c $(nproc) http://mydomain.com/
 ```
 
+### Baseline benchmark
+Before diving into complex benchmarks, start with a simple benchmark: static resources (index.html) and PHP (index.php). These represent the maximal throughput of  resources and PHP without further tweaks. For most use cases this is adequate without optimizing [.htaccess parsing](#Trimming-.htaccess) that may introduce appreciable overhead.
+
+```bash
+DeleteDomain benchmark.test 2>/dev/null || AddDomain -c siteinfo,domain=benchmark.test -c crontab,enabled=1 -c crontab,permit=1 -c ssh,enabled=1 -c dns,provider=null -c mail,provider=null -c siteinfo,admin_user=benchmark-user
+grep -Eq "benchmark.test\b" /etc/hosts || (echo "$(cpcmd -d benchmark.test site:ip-address) benchmark.test" >> /etc/hosts)
+
+cpcmd scope:set apache.evasive enabled false
+cpcmd scope:set apache.block10 false
+sleep 120
+```
+
+Separate requests into static without caching and PHP without overhead parsing.
+
+```bash
+echo "hello" > /home/virtual/benchmark.test/var/www/html/index.html
+ab -k -n 1000 -c $(nproc) http://benchmark.test/index.html
+```
+
+Likewise a simple PHP script:
+
+```bash
+echo "<?php Hello from PHP" > /home/virtual/benchmark.test/var/www/html/index.php
+ab -k -n 1000 -c $(nproc) http://benchmark.test/index.php
+```
+
+These benchmarks represent the highest feasible throughput on an idle system. Advanced benchmarks follow, including relocating per-request .htaccess parsing [in memory](#Removing-.htaccess).
+
+::: details Static vs Zend VM
+Static will be faster than PHP because it avoids [Zend VM](https://www.npopov.com/2017/04/14/PHP-7-Virtual-machine.html) overhead to render dynamic content. Static files are [memory-mapped segments](https://en.wikipedia.org/wiki/Mmap) without additional overhead beyond memory costs.
+
+*It's a deep dive for those curious.*
+:::
+
+
 ### Fast WordPress benchmark
 Creating a test account to benchmark WordPress is simple with a few CLI commands. Once your done benchmarking, run `DeleteDomain benchmark.test` to remove it (or keep it around for a rainy day).
 
 ```bash
-AddDomain -c siteinfo,domain=benchmark.test -c crontab,enabled=1 -c crontab,permit=1 -c ssh,enabled=1 -c dns,provider=null -c mail,provider=null -c siteinfo,admin_user=benchmark-user
+DeleteDomain benchmark.test 2>/dev/null || AddDomain -c siteinfo,domain=benchmark.test -c crontab,enabled=1 -c crontab,permit=1 -c ssh,enabled=1 -c dns,provider=null -c mail,provider=null -c siteinfo,admin_user=benchmark-user
 grep -Eq "benchmark.test\b" /etc/hosts || (echo "$(cpcmd -d benchmark.test site:ip-address) benchmark.test" >> /etc/hosts)
 cpcmd -d benchmark.test wordpress:install benchmark.test
 cpcmd scope:set apache.evasive enabled false
