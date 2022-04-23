@@ -88,7 +88,6 @@ On the **master**, *assuming 1.2.3.4 and 1.2.3.5 are slave nameservers with the 
 cpcmd scope:set cp.bootstrapper powerdns_enabled true
 cpcmd scope:set cp.bootstrapper powerdns_zone_type master
 cpcmd scope:set cp.bootstrapper powerdns_custom_config '["allow-axfr-ips":"1.2.3.4,1.2.3.5","also-notify":"1.2.3.4,1.2.3.5","master":"yes"]'
-cpcmd scope:set cp.bootstrapper powerdns_webserver_enable true
 cpcmd scope:set cp.bootstrapper powerdns_nameservers '[ns1.domain.com,ns2.domain.com]'
 env BSARGS="--extra-vars=force=yes" upcp -sb software/powerdns
 ```
@@ -99,7 +98,6 @@ On the **slave(s)**, *assuming the master is 1.2.3.3 with the hostname master.do
 cpcmd scope:set cp.bootstrapper powerdns_enabled true
 cpcmd scope:set cp.bootstrapper powerdns_zone_type slave
 cpcmd scope:set cp.bootstrapper powerdns_custom_config '["allow-notify-from":"1.2.3.3","slave":"yes","superslave":"yes"]'
-cpcmd scope:set cp.bootstrapper powerdns_webserver_enable false
 cpcmd scope:set cp.bootstrapper powerdns_nameservers '[ns1.domain.com,ns2.domain.com]'
 cpcmd scope:set cp.bootstrapper powerdns_supermaster '[ip:1.2.3.3,nameserver:ns1.domain.com,account:master]'
 cpcmd scope:set cp.bootstrapper powerdns_api_uri 'https://master.domain.com/dns/api/v1'
@@ -286,6 +284,17 @@ In the above example, API requests can be made via https://myserver.apiscp.com/d
 ```bash
 curl -q -H 'X-API-Key: SOMEKEY' https://myserver.apiscp.com/dns/api/v1/servers/localhost
 ```
+
+### Enabling webserver statistics
+
+A separate webserver is available for real-time statistics through a UI. Additional authentication is required with `webserver-password` as PowerDNS cannot see the connecting IP behind a proxy (cf. [powerdns/pdns#10332](https://github.com/PowerDNS/pdns/issues/10332)). 
+
+```bash
+cpcmd scope:set cp.bootstrapper powerdns_webserver_enable true
+upcp -sb software/powerdns
+```
+
+*Note:* statistics may also be retrieved using `pdns_control show "*"`
 
 #### Disabling brute-force throttling
 
