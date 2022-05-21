@@ -75,7 +75,7 @@ A master layout named "layout" is provided in `CP_ROOT/config/custom/resources/v
 
 Apps may be completely overridden or on a file-per-file basis (such as replacing `application.yml`). 
 
-To override the app entirely, copy it from `CP_ROOT/config/custom/apps/<name>` to `CP_ROOT/config/custom/apps/<name>`.  To override a specific file, create the corresponding directory structure in `CP_ROOT/config/custom/apps/<name>`, then copy the file over.
+To override the app entirely, copy it from `CP_ROOT/apps/<name>` to `CP_ROOT/config/custom/apps/<name>`.  To override a specific file, create the corresponding directory structure in `CP_ROOT/config/custom/apps/<name>`, then copy the file over.
 
 Role menus, i.e.  what is loaded when a corresponding user type logs in (admin, site, user) may be overridden as well. Menus are based on code under `lib/html/templateconfig-<role>.php`. Additional includes may be located under `CP_ROOT/config/custom/templates/<role>.php`. This is a sample extension for ApisCP when a billing module is configured to allow clients direct access to manage billing:
 
