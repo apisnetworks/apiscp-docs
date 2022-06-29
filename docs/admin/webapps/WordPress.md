@@ -104,3 +104,39 @@ For example, what if we're importing a WP install from another platform that doe
 ```bash
 cpcmd admin:update-webapps '[type:wordpress,assets:true]'
 ```
+
+## Mass WP-CLI usage
+**New in 3.2.33**
+
+`wordpress:cli()` applies a WP-CLI command against all or one registered WordPress sites on an account.
+
+`wordpress:cli(string $command, string|array $args = [], string $hostname = null, string $path = ''): array`
+
+When `$hostname` and `$path` are omitted the command is applied against all sites. `$args` may be formatted using positional markers (`%s`, `%(domain)s`, `%d`, `%1s`).
+
+```bash
+# Remove dolly from all WordPress sites
+cpcmd -d example.com wordpress:cli 'plugin uninstall %s' '[dolly]'
+# Verify core checksums against WordPress app installed under example.com/wp
+cpcmd -d example.com wordpress:cli 'core verify-checksums' '' 'example.com' 'wp'
+# Return all plugins formatted in JSON for each site
+cpcmd -d example.com wordpress:cli '--json plugin list'
+```
+
+When applied against all sites the results are keyed by the filesystem path. Each element contains *hostname* and *path* values to resolve the site from its path.
+
+```bash
+cpcmd -d mechanical.com wordpress:cli '--json plugin list'
+# /var/www/html:
+#   hostname: mechanical.com
+#   path: ''
+#   stdin: ''
+#   stdout: '[{"name":"akismet","status":"inactive","update":"available","version":"4.2.3"},{"name":"hello","status":"inactive","update":"none","version":"1.7.2"}]'
+#   stderr: ''
+#   output: '[{"name":"akismet","status":"inactive","update":"available","version":"4.2.3"},{"name":"hello","status":"inactive","update":"none","version":"1.7.2"}]'
+#   errno: 0
+#   return: 0
+#   error: ''
+#   success: true
+```
+

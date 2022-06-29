@@ -4,7 +4,7 @@ Notes on mass hosting, servers in excess of 500+ sites.
 
 ## Enabling data center mode
 
-Data center mode opens up a few additional features in ApisCP intended for mass hosting including per-file InnoDB tables, remote database access, mail server hostname in identification, and centralized postscreen usage.
+Data center mode opens up a few additional features in ApisCP intended for mass hosting including per-file InnoDB tables, remote database access, Postfix SMTP banner identification, and centralized postscreen usage.
 
 ```bash
 # Enable data center mode

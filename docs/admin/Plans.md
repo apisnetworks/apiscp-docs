@@ -182,7 +182,7 @@ Plans are covered later in this section. Note the behavior when changing plans i
 
 MySQL, PostgreSQL, and DNS permit disablement without removing database configuration (or zone databases) through a double-throw safety switch ("DTSS") feature. When `mysql`, `postgresql`, or `dns` services are disabled, DTSS restricts further usage of creating new databases or users while preserving existing data.
 
-To remove these databases from the account while preserving the account, the following DTSS conditions must be met at the same time. Likewise to preserve existing data, the following value must be set at deletion time.
+To remove these databases from the account while preserving the account, the following *DTSS conditions* must be met at the same time. Likewise to preserve existing data, the following value must be set at deletion time.
 
 | Service    | DTSS Condition              | Preservation Condition |
 | ---------- | --------------------------- | ---------------------- |

@@ -366,7 +366,7 @@ Create this customization file if it does not already exist.
 ## Postfix
 
 **⚠️ DO NOT TOUCH:** /etc/postfix/master.conf  
-**Customization file:** /etc/postfix/main.cf, /etc/postfix/master.d
+**Customization file:** /etc/postfix/main.cf, /etc/postfix/master.d, `postfix_custom_config` var
 
 Postfix does not provide a robust interface to extend its configuration. /etc/postfix/master.cf, which is the service definition for Postfix, may not be updated as it is replaced with [package updates](https://github.com/apisnetworks/postfix).
 
@@ -409,7 +409,21 @@ Then to merge changes for both examples, run `upcp -sb mail/configure-postfix`.
 ## PostgreSQL
 
 **⚠️ DO NOT TOUCH:** *n/a*  
-**Customization file:** /var/lib/pgsql/\<ver number>  
+**Customization file:** /var/lib/pgsql/\<ver number>/conf/postgresql.auto.conf, `pgsql_custom_config` var
+
+[Configuration variables](https://github.com/apisnetworks/apnscp-playbooks/blob/master/roles/pgsql/install/defaults/main.yml) in Bootstrapper allow for overrides in postgresql.conf. To override these variables, create a special variable named `pgsql_custom_config` in `/root/apnscp-vars-runtime.yml`. This is a dictionary that accepts any number of PostgreSQL directives that takes precedence.
+
+**Sample**
+
+```yaml
+pgsql_custom_config:
+  max_connections: 100
+  track_io_timing: on
+```
+
+Run `upcp -sb pgsql/install` after setting overrides to apply to postgresql.conf.
+
+[postgresql.auto.conf](https://www.postgresql.org/docs/current/config-setting.html) is modified by SQL queries such as `SET max_connections TO 100;`. Values within here take precedence over postgresql.conf directives and will not be overridden by Bootstrapper.
 
 ## PHP
 

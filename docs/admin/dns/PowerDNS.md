@@ -104,7 +104,7 @@ cpcmd scope:set cp.bootstrapper powerdns_api_uri 'https://master.domain.com/dns/
 env BSARGS="--extra-vars=force=yes" upcp -sb software/powerdns
 ```
 
-Lastly, on the **hosting nodes**, *assuming all DNS zone traffic is sent to the unpublished master master.domain.com (IP address 1.2.3.3) with the API key from `/etc/pdns/pdns.conf` of `abc1234`*, configure each to use the same API key and endpoint discussed below.
+Lastly, on the **hosting nodes**, *assuming all DNS zone traffic is sent to the hidden master master.domain.com (IP address 1.2.3.3) with the [API key](#local-powerdns) from the hidden master located in `/etc/pdns/pdns.conf` of `abc1234`*, configure each to use the same API key and endpoint discussed below.
 
 ```bash
 cpcmd scope:set cp.bootstrapper powerdns_api_uri 'https://master.domain.com/dns/api/v1'
@@ -119,6 +119,10 @@ Bootstrapper will avoid overwriting certain configurations unless explicitly ask
 :::
 
 Be sure to skip down to the [Remote API access](#remote-api-access) section to configure the hidden master endpoint.
+
+::: tip Notifying slaves
+After making changes on the master, slaves previously unprovisioned must receive a NOTIFY command to create zones. `pdns_control notify "*"` will send a NOTIFY command to all slaves for all domains on the master.
+:::
 
 #### Exposed master
 
@@ -150,7 +154,7 @@ cpcmd scope:set cp.bootstrapper powerdns_api_uri 'https://ns1.domain.com/dns/api
 env BSARGS="--extra-vars=force=yes" upcp -sb software/powerdns
 ```
 
-Lastly, on the **hosting nodes**, *assuming all DNS zone traffic is sent to primary nameserver at ns1.domain.com (IP address 1.2.3.4) with the API key from `/etc/pdns/pdns.conf` of `abc1234`*, configure each to use the same API key and endpoint discussed below.
+Lastly, on the **hosting nodes**, *assuming all DNS zone traffic is sent to the hidden master master.domain.com (IP address 1.2.3.3) with the [API key](#local-powerdns) from the hidden master located in `/etc/pdns/pdns.conf` of `abc1234`*, configure each to use the same API key and endpoint discussed below.
 
 ```bash
 cpcmd scope:set cp.bootstrapper powerdns_api_uri 'https://ns1.domain.com/dns/api/v1'
@@ -159,6 +163,10 @@ cpcmd scope:set cp.bootstrapper powerdns_api_key 'abc1234'
 cpcmd scope:set cp.bootstrapper powerdns_zone_type 'master'
 env BSARGS="--extra-vars=force=yes" upcp -sb software/powerdns
 ```
+
+::: tip Notifying slaves
+After making changes on the master, slaves previously unprovisioned must receive a NOTIFY command to create zones. `pdns_control notify "*"` will send a NOTIFY command to all slaves for all domains on the master.
+:::
 
 #### Updating NS records
 
