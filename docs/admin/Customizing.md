@@ -318,10 +318,10 @@ A few conflicting files in /etc/dovecot/conf.d are wiped as part of [Bootstrappe
 
 ## fail2ban
 
-**⚠️ DO NOT TOUCH:** /etc/fail2ban/*.conf   
-**Customization file:** /etc/fail2ban/*.local, /etc/fail2ban/jail.d
+**⚠️ DO NOT TOUCH:** /etc/fail2ban/\*.conf   
+**Customization file:** /etc/fail2ban/\*.local, /etc/fail2ban/jail.d
 
-Any file in fail2ban may be overridden with a corresponding `.local` file. It takes the same name as the source file, except it ends in `.local`.
+Any file in fail2ban may be overridden with a corresponding `.local` file. It takes the same name as the source file, except it ends in `.local` instead of `.conf`.
 
 *See also*
 - [MANUAL 0.8](https://www.fail2ban.org/wiki/index.php/MANUAL_0_8#Configuration) (fail2ban.org) - covers configuration/override in detail
