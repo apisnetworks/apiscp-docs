@@ -13,3 +13,6 @@ Multiple components of ApisCP are referenced with different markup.
 * *siteXX/path* (also *siteXX/fst/path*): refers to account root in /home/virtual/siteXX/fst/*path*
 * *siteXX/shadow/path*: similar to account root, but refers to data-only layer in /home/virtual/siteXX/shadow/*path*
 * *siteXX/info/path*: account metadata location, refers to /home/virtual/siteXX/info/*path*
+
+Code snippets omit leading markup for condensed . Shell scripts omit [shebang](https://linuxize.com/post/bash-shebang/) (`#!/bin/sh`). PHP scripts omit [opening tag](https://www.php.net/manual/en/language.basic-syntax.phptags.php), `<?php`. HTML snippets ignore formal [DOM structure](https://www.w3schools.com/html/html_intro.asp).
+

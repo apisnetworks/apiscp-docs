@@ -42,7 +42,7 @@ Pagespeed is disabled, which is known to cause interference with assets.
 ```
 <IfModule ssl_module>
         Listen 443        
-        <VirtualHost 66.42.83.159:443 127.0.0.1:443 [::1]:443 >                                
+        <VirtualHost 66.42.83.159:443 127.0.0.1:443 [::1]:443>
                 ServerName cp.mydomain.com
                 SSLEngine On
                 RewriteEngine On
@@ -90,9 +90,10 @@ cpcmd scope:set cp.config <SECTION> <NAME> <VALUE>
 
 | Section | Name                 | Description                                                  | Sample Value                                        |
 | ------- | -------------------- | ------------------------------------------------------------ | --------------------------------------------------- |
-| auth    | secret               | Must be the same across *all* instances. Used to encrypt trusted browsers. | ABCDEFGH                                            |
-| auth    | server_format        | Optional format that appends a domain to the result of *server_query*. is substituted with result from JSON query. | .mydomain.com                                       |
-| auth    | server_query         | API endpoint that returns a JSON object with the server name. | https://api.mydomain.com/lookup                     |
+| auth    | secret               | Must be the same across *all* instances. Used to encrypt cookies. | ABCDEFGH                                            |
+| auth    | server_format        | Optional format that appends a domain to the result of *server_query*. \<SERVER> is substituted with result from JSON query. | \<SERVER>.mydomain.com                               |
+| auth    | server_key           | Must be the same across *all* instances. Key for extended domain metadata. | ABC12345                                            |
+| auth    | server_query         | API location that cp-api resides on. | https://api.mydomain.com/                     |
 | core    | http_trusted_forward | [cp-proxy](https://github.com/apisnetworks/cp-proxy) service IP address. | 1.2.3.4                                             |
 | misc    | cp_proxy             | Control panel proxy endpoint that cp-proxy resides on.       | [https://cp.mydomain.com](https://cp.mydomain.com/) |
 | misc	| sys_status	| Optional Cachet location for system status	| https://demo.cachethq.io/  |
@@ -100,7 +101,7 @@ cpcmd scope:set cp.config <SECTION> <NAME> <VALUE>
 For the lazy scholars, these values can be easily imported from an existing machine:
 
 ```bash
-for i in auth,secret auth,server_format auth,server_query core,http_trusted_forward misc,cp_proxy, misc,sys_status ; do 
+for i in auth,secret auth,server_format auth,server_key auth,server_query core,http_trusted_forward misc,cp_proxy, misc,sys_status ; do
 	IFS=","
 	set -- $i
 	section=$1

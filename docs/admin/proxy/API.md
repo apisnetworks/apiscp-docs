@@ -52,14 +52,15 @@ The following quickstart assumes **cp-collect** stores domain information within
     cpcmd scope:set cp.config <SECTION> <NAME> <VALUE>
     ```
 
-    | Section | Name                 | Description                                                  | Sample Value                                        |
-    | ------- | -------------------- | ------------------------------------------------------------ | --------------------------------------------------- |
-    | auth    | secret               | Must be the same across *all* instances. Used to encrypt cookies. | ABCDEFGH                                            |
-    | auth    | server_format        | Optional format that appends a domain to the result of *server_query*. <SERVER> is substituted with result from JSON query. | <SERVER>.mydomain.com                               |
-    | auth    | server_key           | Must be the same across *all* instances. Key for extended domain metadata. | ABC12345                                            |
-    | auth    | server_query         | API endpoint that returns a JSON object with the server name. | https://api.mydomain.com/lookup                     |
-    | core    | http_trusted_forward | [cp-proxy](https://github.com/apisnetworks/cp-proxy) service IP address. | 1.2.3.4                                             |
-    | misc    | cp_proxy             | Control panel proxy endpoint that cp-proxy resides on.       | [https://cp.mydomain.com](https://cp.mydomain.com/) |
+| Section | Name                 | Description                                                  | Sample Value                                        |
+| ------- | -------------------- | ------------------------------------------------------------ | --------------------------------------------------- |
+| auth    | secret               | Must be the same across *all* instances. Used to encrypt cookies. | ABCDEFGH                                            |
+| auth    | server_format        | Optional format that appends a domain to the result of *server_query*. \<SERVER> is substituted with result from JSON query. | \<SERVER>.mydomain.com                               |
+| auth    | server_key           | Must be the same across *all* instances. Key for extended domain metadata. | ABC12345                                            |
+| auth    | server_query         | API location that cp-api resides on. | https://api.mydomain.com/                     |
+| core    | http_trusted_forward | [cp-proxy](https://github.com/apisnetworks/cp-proxy) service IP address. | 1.2.3.4                                             |
+| misc    | cp_proxy             | Control panel proxy endpoint that cp-proxy resides on.       | [https://cp.mydomain.com](https://cp.mydomain.com/) |
+| misc	| sys_status	| Optional Cachet location for system status	| https://demo.cachethq.io/  |
 
 Perform a quick test to validate setup works as intended.
 
