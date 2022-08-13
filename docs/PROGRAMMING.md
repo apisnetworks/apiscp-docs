@@ -480,6 +480,68 @@ Applications are privileged by role: admin, site, and user. Applications are con
     );
 ```
 
+### Dynamic namespaces
+**New in 3.2.34**
+
+Both views and routes support namespace usage beginning with `@` and delimited by `::`. These additional namespaces may be hooked into `config/custom/boot.conf`. `@app(APP-ID)` is pre-registered for access to [named routes](https://laravel.com/docs/6.x/routing#named-routes) and views.
+
+```php
+\Lararia\Routing\NamespacedRouteCollection::registerDynamicNamespace('@foo', static function (string $parameter) {
+    // return a value compatible with Route::group(...), "as" becomes name
+    return [
+        [
+            // If 'as' is not set it will default to the NAMESPACE-PREFIX(PARAMETER)
+            'as'        => "@foo($parameter)::",
+            'namespace' => (new \ReflectionClass(\Page_Container::kernelFromApp($parameter)))->getNamespaceName(),
+            'prefix'    => \Template_Engine::init()->getPathFromApp($app)
+        ],
+        \Page_Container::resolve($parameter, 'routes.php')
+    ];
+});
+```
+```php
+/** routes.php */
+Route::get('/', static function() { 
+	return "Hello World!";
+})->name('baz');
+```
+
+```php
+/** Sample view referencing route */
+{{ route(@foo(bar)::baz) }}
+```
+
+Dynamic views work similarly to dynamic routes.
+
+```php
+\Lararia\Routing\NamespacedViewFinder::registerDynamicNamespace('@foo', static function (string $parameter) {
+	// return a string used in view path resolution (see FileViewFinder::addNamespace())
+    // NB: config/custom/<PATH> is added before this path.
+    // "config/custom/addons/bar/views" in the below example
+    return config_path('addons/foo/views')
+})
+```
+
+Variables are not automatically shared with the view. Instantiate them, including `$Page`, which is a reference to the application kernel, on inclusion if referenced.
+
+```php
+@include('@foo(bar)::hello', ['link' => route('@foo(bar)::index'), 'Page' => \Page_Container::initApp('foo')])
+```
+
+And `config/custom/addons/foo/views/hello.blade.php`
+
+```php
+Current kernel: {{ get_class($Page) }}
+<a href="{{ $link }}">{{ $link }}</a>
+```
+
+
+
+:::warning Self-referential routes
+Route references within an app must not use the `@app(APP-ID)` markup as this will force unnamed routes to become disassociated.
+:::
+
+
 # Using Composer
 
 ApisCP ships with support for the PHP dependency/package manager, [Composer](https://getcomposer.org).

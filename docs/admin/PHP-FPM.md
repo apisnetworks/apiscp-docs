@@ -571,6 +571,8 @@ cd /usr/local/apnscp
 
 #### Solving dependencies
 
+`yum-post.php` includes a [dependency solver](Filesystem.md#solving-dependencies). 
+
 Install the ImageMagick extension from PECL, then attempt to load PHP-FPM from the account, it will fail:
 
 ```bash
@@ -587,7 +589,7 @@ Exit out of the shell, solve the dependencies, then try again:
 # Exit current su apis.com session
 exit
 rpm -qf /usr/lib64/libharfbuzz.so.0
-# Package is libharfbuzz...
+# Package is libharfbuzz. Install it plus all dependencies (-d)
 /usr/local/apnscp/bin/scripts/yum-post.php install -d libharfbuzz siteinfo
 su apis.com
 # Try loading PHP-FPM again... rinse and repeat until it works

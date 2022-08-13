@@ -53,6 +53,22 @@ su -c sl site1
 # Choo choo!
 ```
 
+#### Solving dependencies
+
+Packages encode dependency information in their [RPM spec](https://rpm-packaging-guide.github.io/) file. `yum-post.php` can optionally follow these requirements, recursively installing corresponding packages.
+
+```bash
+./bin/scripts/yum-post.php depends vips
+# WARNING : CLI\Yum\Synchronizer\Depends::run(): Package `vips' is not resolved. Install the following dependencies to resolve: ilmbase, OpenEXR-libs, ImageMagick6-libs, cfitsio, libexif, fftw-libs-double, gdk-pixbuf2, libgsf, hdf5, matio, openslide, orc, pango, poppler-glib, librsvg2, vips, libwebp7
+
+# Install vips into siteinfo. "-d" installs dependencies as well
+./bin/scripts/yum-post.php install -d vips siteinfo
+```
+
+::: tip Layer precedence
+*siteinfo* is available to all sites. *ssh* is another layer available only if the account has terminal access (ssh,enabled=1). To restrict a package and its dependencies to the *ssh* layer, which includes *siteinfo*, change the above argument `siteinfo` to `ssh`.
+:::
+
 ### Removing packages
 
 `scripts/yum-post.php remove PACKAGE` is used to remove an installed package from the FST. `--soft` may be specified to remove a file from the database while persisting in FST.
