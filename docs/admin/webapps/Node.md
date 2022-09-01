@@ -16,3 +16,16 @@ nvm ls-remote
 nvm install lts/boron
 ```
 
+## Troubleshooting
+
+### Memory allocation failure
+
+Complex pipeline builds may fail with out-of-memory errors, e.g. `RangeError: WebAssembly.Instance(): Out of memory: wasm memory` or `Fatal process out of memory: Failed to reserve virtual memory for process-wide V8 pointer compression cage`.
+
+This is related to a virtual allocation failure ([nodejs/node#25933](https://github.com/nodejs/node/issues/25933)) Removing the virtual memory limit, intended as a safety limit, resolves this issue.
+
+```bash
+ulimit -v unlimited
+# Run command again
+npm run build
+```

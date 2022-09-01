@@ -36,8 +36,7 @@ sudo -u cp /bin/bash -ic 'nvm install 10 ; cd /home/cp/proxy/ ; nvm exec npm ins
 systemctl enable --now cp-proxy
 ```
 
-Next connect Apache to it by modifying /etc/httpd/conf/httpd-custom.conf within the SSL VirtualHost container. 
-Pagespeed is disabled, which is known to cause interference with assets.
+Next connect Apache to it by creating a new VirtualHost container in `/etc/httpd/conf/virtual`. Name this file `/etc/httpd/conf/virtual/cp-proxy`. Pagespeed is disabled, which is known to cause interference with assets.
 
 ```
 <IfModule ssl_module>
@@ -75,6 +74,10 @@ env BSARGS="--extra-vars=force=yes" upcp -sb apnscp/bootstrap
 ```
 
 Run `htrebuild`, then visit [https://cp.mydomain.com](https://cp.mydomain.com/). You're done!
+
+::: tip Create a separate vhost container
+Modifying httpd-custom.conf directly will force an overwrite of the `ServerName` directive during monthly platform scrubs or when the hostname changes from net.hostname Scope usage.
+:::
 
 ---
 
