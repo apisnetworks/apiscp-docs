@@ -37,11 +37,11 @@ systemctl enable --now cp-proxy
 ```
 
 Next connect Apache to it by creating a new VirtualHost container in `/etc/httpd/conf/virtual`. Name this file `/etc/httpd/conf/virtual/cp-proxy`. Pagespeed is disabled, which is known to cause interference with assets.
+Replace `HTTP-IP-ADD-RESS` with the address in `/etc/httpd/conf/httpd-custom.conf`.
 
 ```
 <IfModule ssl_module>
-        Listen 443        
-        <VirtualHost 66.42.83.159:443 127.0.0.1:443 [::1]:443>
+        <VirtualHost HTTP-IP-ADD-RESS:443 127.0.0.1:443 [::1]:443>
                 ServerName cp.mydomain.com
                 SSLEngine On
                 RewriteEngine On
