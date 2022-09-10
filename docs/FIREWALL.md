@@ -81,6 +81,15 @@ ipset swap whitelist ignorelist
 systemctl restart apiscp
 ```
 
+### Speculative whitelisting
+**New in 3.2.34**
+
+Addresses that delist themselves from the [panel interface](#public-backdoor) (`rampart:unban` API command) are temporarily whitelisted. This speculative whitelisting expires after [rampart] => speculative_whitelisting seconds have passed (default: `300`). An additional window is granted to allow users to continue to update passwords on other machines while retaining connectivity to the server.
+
+Normal [filter rules](#components) apply during this window meaning it is still possible for a ban to escalate to a permanent all-port recidive ban if thresholds are met.
+
+Setting this value to 0 disables the feature.
+
 ## Blacklisting
 
 A blacklist exists to explicitly deny addresses that are not blocked by Rampart's adaptive firewall.
