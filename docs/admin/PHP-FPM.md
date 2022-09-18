@@ -355,11 +355,12 @@ mkdir -p /usr/local/apnscp/config/custom/resources/templates/apache/php/partials
 
 cat <<EOF >> /usr/local/apnscp/config/custom/resources/templates/apache/php/partials/fpm-config-custom.blade.php
 
-# Note, this is better serviced by cgroup,memory resource enforcement
+; Note, this is better serviced by cgroup,memory resource enforcement
 php_admin_value[memory_limit] = 384m
 php_value[upload_max_filesize] = 64m
 php_value[post_max_size] = 64m
-# Load redis.so from /usr/lib64/<ZENDAPIVERSION>
+; Load redis.so from /usr/lib64/<ZENDAPIVERSION>
+; When installing modules using Bootstrapper, this is done automatically
 php_value[extension] = redis
 EOF
 ```

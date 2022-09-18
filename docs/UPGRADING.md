@@ -66,6 +66,8 @@ systemctl restart apiscp
 | -n      | Skip migrations that automatically run after update          |
 | -b      | Run [Bootstrapper](https://github.com/apisnetworks/apnscp-bootstrapper) reporting only changes |
 | -s      | Skip updating code (e.g. upcp -sb, Bootstrap without updating panel) |
+| -v      | Verbose mode, up to 3 levels |
+| -f      | Force respective operation. Set `force=yes` in Ansible, call `upcp --reset` before updating code. |
 | -l      | List available Bootstrapper roles (*see below*) |
 | -a      | Run Bootstrapper if the latest release contains changes to playbook |
 | -w      | Wait for Bootstrapper to finish running. Exits 1 if Bootstrapper not running. 0 if waited. |
