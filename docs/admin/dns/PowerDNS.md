@@ -76,9 +76,21 @@ cpcmd scope:set cp.bootstrapper powerdns_recursive_ns '[1.1.1.1,1.0.0.1]'
 upcp -sb software/powerdns
 ```
 
-### AXFR-based clustering
+### Configuration tool
 
-PowerDNS expects a custom database cluster by default ([zone kind](https://doc.powerdns.com/authoritative/modes-of-operation.html): NATIVE). Using AXFR-based replication will allow provisioning of zones to slaves by supermaster, but AXFR/NOTIFY lacks support for automated zone removal. PowerDNS must be installed first and a suitable backend selected in as under "[Nameserver installation](#nameserver-installation)". In the following example, master is an unpublished nameserver.
+[powerdns.apiscp.com](https://powerdns.apiscp.com/) provides turnkey configration for hidden master and exposed master cluster types discussed below.
+
+### Cluster types
+
+Before configuring a cluster, PowerDNS server must be installed and a suitable backend selected. See "[Nameserver installation](#nameserver-installation)". 
+
+PowerDNS uses MySQL or PostgreSQL for record storage when [zone kind](https://doc.powerdns.com/authoritative/modes-of-operation.html) is "NATIVE". Using AXFR-based replication will allow provisioning of zones to slaves by supermaster but these zones cannot be removed from slaves. AXFR does not provide any means to achieve this in its protocol specification. Workarounds exist as noted in "[Zone removal](#zone-removal)".
+
+#### Hidden master
+
+A hidden master obfuscates which server has control of publishing DNS records. This provides a marginal security benefit by hiding the server from public view. 
+
+In the following example, master is an unpublished nameserver.
 
 ![AXFR cluster layout](./powerdns-axfr-cluster.svg)
 
@@ -168,6 +180,8 @@ env BSARGS="--extra-vars=force=yes" upcp -sb software/powerdns
 After making changes on the master, slaves previously unprovisioned must receive a NOTIFY command to create zones. `pdns_control notify "*"` will send a NOTIFY command to all slaves for all domains on the master.
 :::
 
+### Maintenance
+
 #### Updating NS records
 
 PowerDNS is configured by default to use "127.0.0.1" for its NS records. In a working environment this is never the right option, but helps bridge learning. [Bulk update](../DNS.md#bulk-record-management)  can be used to clear all NS records on the apex, then provision NS records as  set via `powerdns_nameservers`.
@@ -246,19 +260,19 @@ $handler->replace(new \Opcenter\Dns\Record('_dummy_zone.com', [
 
 More examples are available in [DNS.md](../DNS.md#bulk-record-management).
 
-#### Periodic maintenance
+#### Zone renotify
 
 Sometimes you may want to force a zone update - if changing public nameservers - or prune expired domains since AXFR-based clusters do not afford automated zone removals. These snippets come from [hopefully.online](https://hopefully.online/powerdns-master-slave-cluster):
 
-- **all zone renotify**
+```bash
+pdns_control list-zones --type master | sed '$d' | xargs -L1 pdns_control notify
+```
 
-    ```bash
-    pdns_control list-zones --type master | sed '$d' | xargs -L1 pdns_control notify
-    ```
+#### Zone removal
 
-- **zone cleanup**
+Zone removal should be run on slave servers. There is no need to run this on the master as zones are automatically removed upon deletion.
 
-    ```bash
+```bash
     pdns_control list-zones --type slave | sed '$d' | xargs -I {} sh -c "host -T -t SOA {} master.domain.com | tail -n1 | grep -q 'has no SOA record' | pdnsutil delete-zone {}"
     ```
 
@@ -268,7 +282,7 @@ delivery. Enable TCP mode with `-T` to guarantee the transmission was
 received by master.domain.com.
 :::
 
-## Remote API access
+## API access
 
 In the above example, only local requests may submit DNS modifications to the server. None of the below examples affect querying; DNS queries occur over 53/UDP typically (or 53/TCP if packet size exceeds UDP limits). Depending upon infrastructure, there are a few options to securely accept record submission, *all of which require an API key for submission*.
 
