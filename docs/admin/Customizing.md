@@ -306,9 +306,16 @@ Refer to [config.ini](https://gitlab.com/apisnetworks/apnscp/blob/master/config/
 
 All changes may be made to `CP_ROOT/config/httpd-custom.conf`. After changing, restart ApisCP, `systemctl restart apiscp`
 
+## ClamAV
+
+**⚠️ DO NOT TOUCH:** /etc/clamd.conf, /etc/clamd.d/scan.conf  
+**Customization file:** /etc/clamd.d/\*.conf  
+
+/etc/clamd.conf is the file sourced by clamd@scan service on boot. This file is a symlink to /etc/clamd.d/scan.conf. Files are sourced alphabetically. To override a directive in scan.conf, the file must have a higher lexicographic name such as Z-override.conf.
+
 ## Dovecot
 
-**⚠️ DO NOT TOUCH:** /etc/dovecot/conf.d//apnscp.conf  
+**⚠️ DO NOT TOUCH:** /etc/dovecot/conf.d/apnscp.conf  
 **Customization file:** /etc/dovecot/local.conf  
 
 A few conflicting files in /etc/dovecot/conf.d are wiped as part of [Bootstrapper](https://github.com/apisnetworks/apnscp-playbooks/blob/master/roles/mail/configure-dovecot/defaults/main.yml#L9). These files will always be removed if found:
