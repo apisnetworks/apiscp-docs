@@ -21,7 +21,7 @@ Passwords are sourced from siteXX/fst/etc/shadow as with all services. When SSL 
 Dovecot supports reading compressed mail by default. Dovecot can additionally be configured to compress mail it generates, such as sent messages by setting `dovecot_enable_zlib_storage=true`.
 
 ```bash
-cpcmd scope:set cp.bootstrapper dovecot_enable_zlib_storage=true
+cpcmd scope:set cp.bootstrapper dovecot_enable_zlib_storage true
 upcp -sb mail/configure-dovecot
 ```
 

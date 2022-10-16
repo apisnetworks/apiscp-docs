@@ -82,6 +82,25 @@ Additional arguments may be provided through the `BSARGS` environment variable,
 env BSARGS="--extra-vars=force=yes" upcp -sb apnscp/install-extensions
 ```
 
+### Update window
+
+ApisCP updates are delivered `@daily` according to systemd. This time is approximately midnight (00:00:00) with a randomized delay up to 10 minutes to stagger concurrent tasks. Updates may be shifted to occur at different times or even different days following systemd's [calendar definition](https://www.freedesktop.org/software/systemd/man/systemd.time.html#Calendar%20Events).
+
+```bash
+# Enable updates every night at 00:00:00
+cpcmd scope:set cp.nightly-updates true
+# Disable updates
+cpcmd scope:set cp.nightly-updates false
+# Run updates M-F at 11 PM. Skip weekends
+cpcmd scope:set cp.nightly-updates 'Mon..Fri 23:00'
+# Run updates first of every month at 02:00
+cpcmd scope:set cp.nightly-updates '*-*-01 02:00'
+```
+
+::: tip Emergency FLARE updates
+FLARE updates will always supersede preferred update times. Such updates are broadcasted sparingly to address either a zero day or critical hotfix.
+:::
+
 ### FLARE Updates
 
 FLARE is a separate update system for ApisCP that performs hourly checks for critical releases. FLARE is automatically enabled whenever nightly updates are enabled (`cpcmd scope:get cp.nightly-updates`). This feature is a crucial side-channel to allow emergency updates should the need arise (new OS update introduces volatile changes, zero day mitigation, etc). FLARE checks are handled via `apnscp-flare-check` timer and its eponymous oneshot service.
