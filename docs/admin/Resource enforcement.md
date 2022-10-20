@@ -395,6 +395,26 @@ cat /sys/fs/cgroup/memory/site1/memory.usage_in_bytes
 
 This can be confirmed by examining `memory.stat` in the cgroup home. Likewise memory reported by a process may be higher than memory reported by cgroup, this is because cgroup only accounts for memory uniquely reserved by the application. A fork shares its parent's memory pages and copies-on-write at which point the newly claimed memory is charged to the cgroup.
 
+## CloudLinux terminology
+
+Both ApisCP and CloudLinux utilize cgroups for resource enforcement. The table below summarizes the relationships between CloudLinux limit variables and ApisCP's equivalent settings.
+
+| CloudLinux                                                   | ApisCP                                                       | Remarks                                                      |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| [SPEED](https://docs.cloudlinux.com/limits/#speed-limit)     | [cgroup,cpuweight](#weighting-usage)                         |                                                              |
+| —                                                            | [cgroup,cpupin](#pinning)                                    | Assign work to logical CPU(s).                               |
+| —                                                            | [cgroup,cpu](#limiting-cumulative-usage)                     | 24 hour CPU limit (wall time, seconds). *Overage not presently enforced.* |
+| [PMEM](https://docs.cloudlinux.com/limits/#physical-memory-limit) | [cgroup,memory](#memory)                                     |                                                              |
+| [VMEM](https://docs.cloudlinux.com/limits/#virtual-memory-limit) | [limit_as_soft](https://gitlab.com/apisnetworks/apnscp/-/blob/master/resources/playbooks/roles/system/limits/templates/apnscp.conf.j2) | Does not affect active memory usage, results in undefined behavior in complex software such as [v8](https://github.com/nodejs/node/issues/25933). |
+| [IO](https://docs.cloudlinux.com/limits/#io)                 | [cgroup,writebw](#io) + [cgroup,readbw](#io)                 | Write/read bandwidth separated to facilitate resource tracking on limited endurance disks. |
+| [IOPS](https://docs.cloudlinux.com/limits/#iops)             | [cgroup,writeiops](#io) + [cgroup,readiops](#io)             | Write/read IOPS separated to facilitate resource tracking on limited endurance disks. |
+| —                                                            | [cgroup,ioweight](#io)                                       | Controls IO priority similar to CPU weight. Requires CFQ/BFQ IO elevator (auto-detection). |
+| [NPROC](https://docs.cloudlinux.com/limits/#number-of-processes) | [cgroup,proclimit](#process)                                 |                                                              |
+| [EP](https://docs.cloudlinux.com/limits/#entry-processes)    | [workers](PHP-FPM.md#policy-maps)                            | Requires policy map usage.                                   |
+| —                                                            | [cgroup:freeze](#freezer), cgroup:thaw                       | Immediately suspends all activity. Use cgroup:freeze, cgroup:thaw API commands. |
+
+
+
 ## See also
 
 - [Linux Performance Tools](https://www.brendangregg.com/Slides/Velocity2015_LinuxPerfTools.pdf) by Brendan Gregg
