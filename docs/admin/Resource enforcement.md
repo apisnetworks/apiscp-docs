@@ -395,7 +395,7 @@ cat /sys/fs/cgroup/memory/site1/memory.usage_in_bytes
 
 This can be confirmed by examining `memory.stat` in the cgroup home. Likewise memory reported by a process may be higher than memory reported by cgroup, this is because cgroup only accounts for memory uniquely reserved by the application. A fork shares its parent's memory pages and copies-on-write at which point the newly claimed memory is charged to the cgroup.
 
-## CloudLinux terminology
+## CloudLinux equivalences
 
 Both ApisCP and CloudLinux utilize cgroups for resource enforcement. The table below summarizes the relationships between CloudLinux limit variables and ApisCP's equivalent settings.
 

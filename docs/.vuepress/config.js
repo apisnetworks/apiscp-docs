@@ -242,6 +242,7 @@ module.exports = {
 			},
 			"admin/FTP",
 			"admin/Monitoring",
+			"admin/Limits",
 			"admin/Resource enforcement",
 			"admin/Metrics",
 			"admin/Kernel",
