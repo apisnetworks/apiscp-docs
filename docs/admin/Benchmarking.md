@@ -130,14 +130,16 @@ Let's take this one step further, configuring a WP Redis object cache. Use `redi
 ```bash
 # Create a new Redis instance for benchmark.test named "wp-test" listening on /tmp/redis.sock
 cpcmd -d benchmark.test crontab:toggle-status 1
-cpcmd -d benchmark.test redis:create wp-test '[unixsocket:/tmp/redis.sock]'
+# PHP-FPM uses a private /tmp mount, expose Redis to shared location
+# See PHP-FPM.md#privatetmp for more information
+cpcmd -d benchmark.test redis:create wp-test '[unixsocket:/var/www/redis.sock]'
 # Switch to benchmark.test account to configure plugin
 su benchmark.test
 cd /var/www/html
 # Install Redis object cache plugin
 wp-cli plugin install --activate redis-cache
 # Define Redis path
-wp-cli config set WP_REDIS_PATH /tmp/redis.sock
+wp-cli config set WP_REDIS_PATH /var/www/redis.sock
 ```
 
 ![Redis configuration](./images/wp-config-edit.png)

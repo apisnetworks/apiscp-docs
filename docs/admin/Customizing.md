@@ -308,10 +308,33 @@ All changes may be made to `CP_ROOT/config/httpd-custom.conf`. After changing, r
 
 ## ClamAV
 
-**⚠️ DO NOT TOUCH:** /etc/clamd.conf, /etc/clamd.d/scan.conf  
-**Customization file:** /etc/clamd.d/\*.conf  
+**⚠️ DO NOT TOUCH:** /etc/clamd.conf, /etc/clamd.d/scan.conf MANAGED BLOCK (#BEGIN/#END)  
+**Customization file:** /etc/clamd.d/scan.conf
 
-/etc/clamd.conf is the file sourced by clamd@scan service on boot. This file is a symlink to /etc/clamd.d/scan.conf. Files are sourced alphabetically. To override a directive in scan.conf, the file must have a higher lexicographic name such as Z-override.conf.
+In addition to writing directly to the configuration file, several configurations support custom blocks. All custom variables are named `clamav_VAR__custom` where *VAR*  corresponds to the following variables.
+
+| Variable                  | Overrides                                              |
+| ------------------------- | ------------------------------------------------------ |
+| clamd_config              | /etc/clamd.d/scan.conf                                 |
+| clamd_daemon_systemd      | /etc/systemd/system/clamd@scan.service.d/override.conf |
+| clamd_exclude_path        | "ExcludePath" directive in /etc/clamd.d/scan.conf      |
+| db_update_command_options | Additional argv to freshclam command                   |
+| freshclam_config          | /etc/freshclam.conf                                    |
+| scan_command_options      | Addtional argv to clamdscan command                    |
+
+For example, to disable `ConcurrentDatabaseReload` in clamd:
+
+```bash
+cpcmd scope:set cp.bootstrapper clamav_clamd_config__custom "ConcurrentDatabaseReload yes"
+# Update ClamAV
+upcp -sb clamav/setup
+```
+
+*Note* each directive must be delimited by a newline. One trick to do this is use `echo -e` to evaluate metacharacters, including the newline character \n.
+
+```bash
+cpcmd scope:set cp.bootstrapper clamav_clamd_config__custom "$(echo -e "ConcurrentDatabaseReload yes\nDirective2 yes")"
+```
 
 ## Dovecot
 
