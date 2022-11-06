@@ -17,7 +17,7 @@ Several services work together. The table and diagram provide a summary of these
 
 | Service                         | Role                                                        |
 | ------------------------------- | ----------------------------------------------------------- |
-| [Postfix](SMTP.md)              | Receives and sends mail                                     |
+| [Postfix](Smtp.md)              | Receives and sends mail                                     |
 | [Dovecot](Dovecot.md)           | IMAP/POP3                                                   |
 | [rspamd](rspamd.md)             | Spam filtering, outbound milter (policy, DKIM)              |
 | [SpamAssassin](SpamAssassin.md) | Spam filtering, *does not provide outbound milter services* |
