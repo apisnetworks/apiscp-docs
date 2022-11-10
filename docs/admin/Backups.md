@@ -2,7 +2,7 @@
 title: Backups
 ---
 
-ApisCP presently supports two backup clients as third-party addins, [Bacula](./backups/Bacula) and [Duplicity](./backups/Duplicity.md); [JetBackup](https://request.jetapps.com/topic/546-support-for-apiscp-control-panel) support is under consideration. 
+ApisCP presently supports two backup clients as third-party addins, [Bacula](./backups/Bacula.md) and [Duplicity](./backups/Duplicity.md); [JetBackup](https://request.jetapps.com/topic/546-support-for-apiscp-control-panel) support is under consideration. 
 
 Bacula supports full, differential, and incremental backups while Duplicity supports full and incremental. Relying solely on incremental and full backups requires replaying *all* preceding backups before a file may be restored. Differential allows skipping of incremental backups that exist in previous intervals prior to the *most recent* differential. On small servers this difference is negligible. On large servers consisting of millions of inodes, the effects are far more pronounced.
 
