@@ -71,6 +71,7 @@ systemctl restart apiscp
 | -l      | List available Bootstrapper roles (*see below*) |
 | -a      | Run Bootstrapper if the latest release contains changes to playbook |
 | -w      | Wait for Bootstrapper to finish running. Exits 1 if Bootstrapper not running. 0 if waited. |
+| --var=KEY=VALUE | Pass variable `KEY` with value `VALUE` to Bootstrapper. KEY may be plain-text or JSON without specifying =VALUE. |
 | --reset | Reset panel code, including all changes, to match Gitlab     |
 | --flare   | Check for FLARE signal. Exit status 0 if received, 1 if none available |
 
