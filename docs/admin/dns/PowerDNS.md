@@ -273,8 +273,8 @@ pdns_control list-zones --type master | sed '$d' | xargs -L1 pdns_control notify
 Zone removal should be run on slave servers. There is no need to run this on the master as zones are automatically removed upon deletion.
 
 ```bash
-    pdns_control list-zones --type slave | sed '$d' | xargs -I {} sh -c "host -T -t SOA {} master.domain.com | tail -n1 | grep -q 'has no SOA record' | pdnsutil delete-zone {}"
-    ```
+pdns_control list-zones --type slave | sed '$d' | xargs -I {} sh -c "host -T -t SOA {} master.domain.com | tail -n1 | grep -q 'has no SOA record' | pdnsutil delete-zone {}"
+```
 
 ::: tip TCP mode
 DNS uses UDP by default, which is a lossy protocol that does not guarantee
