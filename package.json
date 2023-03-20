@@ -4,7 +4,8 @@
     "docs:dev": "vuepress dev docs --port=${PORT:-8080} --temp .temp --debug",
     "dev": "npm run docs:dev",
     "docs:build": "vuepress build docs",
-    "docs:link-check": "rbenv exec ruby .circleci/dead-links.rb -p docs/admin"
+    "linkcheck": "linkcheck :${PORT:-8080} -e",
+    "docs:link-check": "npm run docs:build && start-server-and-test 'http-server ./docs/.vuepress/dist --silent -o http://localhost:${PORT:-8080}?' ${PORT:-8080} linkcheck"
   },
   "name": "apnscp-vuepress",
   "version": "1.0.0",
@@ -30,5 +31,10 @@
     "vuepress-plugin-disqus": "^0.2.0",
     "vuepress-plugin-reading-time": "^0.1.1",
     "yarn": "^1.22.17"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.0",
+    "linkcheck-bin": "^2.0.20",
+    "start-server-and-test": "^1.14.0"
   }
 }

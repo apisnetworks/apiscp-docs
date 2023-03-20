@@ -43,7 +43,7 @@ Grab the Redis password from the master:
 
 ```bash
 # Whitelist client machine
-cpcmd scope:set rampart:whitelist 5.6.7.8
+cpcmd rampart:whitelist 5.6.7.8
 # Get password
 cpcmd scope:get cp.bootstrapper rspamd_redis_password
 ```
