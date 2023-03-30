@@ -310,7 +310,7 @@ The following table summarizes inheritance behavior for PHP directives. All loca
 
 ### System-wide configuration
 
-System-wide changes may be made to `/home/virtual/FILESYSTEM/siteinfo/etc/php.ini`. In single-mount installations, this is linked directly to `/etc/php.ini`. Once edited, layer cache must be flushed upward.
+System-wide changes may be made to `/home/virtual/FILESYSTEMTEMPLATE/siteinfo/etc/php.ini`. In single-mount installations, this is linked directly to `/etc/php.ini`. Once edited, layer cache must be flushed upward.
 
 ```bash
 systemctl reload fsmount
@@ -676,7 +676,7 @@ SCL collection configuration is defined in /etc/scl/conf. Remi PHP versions are 
 ## Policy maps
 **New in 3.2.18**
 
-A policy map remembers what PHP version is assigned to a given pool or account as well as setting several important parameters. Each policy map is generated from a template and saved to the account under `siteXX/info/php-policy.yml`. When hand-editing a policy, run `EditDomain --reconfig siteXX` to regenerate its configuration. If a pool version change is desired, then run `cpcmd -d siteXX php:pool-restart` after `EditDomain`.
+A policy map remembers what PHP version is assigned to a given pool or account as well as setting several important parameters. Each policy map is generated from a template and saved to the account under `siteXX/info/php-policy.yml`. When hand-editing a policy, run `EditDomain --reconfig siteXX` to regenerate its configuration as well as restart PHP-FPM.
 
 ☝ See [master branch](https://gitlab.com/apisnetworks/apnscp/-/blob/master/resources/templates/apache/php/policy.blade.php) for latest policy template.
 
@@ -742,6 +742,49 @@ global:
 ```
 
 Note the additional spacing after each conditional statement. This is a formatting peculiarity of Blade that joins the following line on compilation.
+
+### Policy map API
+
+**New in v3.2.37**
+
+Policies may be viewed per-site but only managed administratively.
+
+```php
+php:pool_get_policy(string $var, string $pool = null, string $default = null)
+php:pool_set_policy(string $anything, string $var, $val, string $pool = null): bool
+```
+
+Working with the above example to get `memory_limit`, an administratively set value for the pool on `site1`, the following command is used:
+
+```bash
+cpcmd -d site1 php:pool-get-policy php_settings.memory_limit
+# Returns 384M
+```
+
+Values are determined by the union between local pool settings in `siteXX/info/php-policy.yml` and defaults in `resources/templates/apache/php/policy.blade.php` (*note:* resources follow config/custom/ override rules in [Customizing.md](Customizing.md#ApisCP)). Values in `php-policy.yml` always have precedence. Values named within the named **pools** group have precedence over the **global** section.
+
+Next, to change this value for all pools within site1, use `php:pool-set-policy`. EditDomain is automatically enqueued.
+
+```bash
+cpcmd php:pool-set-policy site1 php_settings.memory_limit 1G
+
+INFO   : PHP pool settings batched to background
+----------------------------------------
+MESSAGE SUMMARY
+Reporter level: OK
+INFO: PHP pool settings batched to background
+----------------------------------------
+```
+
+`$anything` may be a site, domain, or invoice to change a group of related domains.
+
+To change a specific pool, specify the pool parameter. This value takes precedence over `global` settings.
+
+```bash
+cpcmd php:pool-set-policy site1 php_settings.memory_limit 2G benchmark.test
+cpcmd php:pool-set-policy site1 php_settings.memory_limit 512M
+# Pool named "benchmark.test" has a 2G limit, all other named pools are 512 MB
+```
 
 ## Composer
 
