@@ -24,6 +24,22 @@ The following is a generalized checklist of prerequisites:
   *Set with:* `cpcmd scope:set net.hostname some.host.name`
   *Unless:* DNS for hostname pending setup (see below)
 
+### Issuing server certificate
+
+A SSL certificate may be manually issued for the server. This issuance affects shared resources outside the virtual filesystem in `/var/www/html` as well as panel access. Ensure the **[CONFIGURATION CHECKLIST](#Configuration checklist)** above is met.
+
+```bash
+# Issue a certificate named after the hostname derived from hostnamectl
+# Enable verbose output
+env DEBUG=1 cpcmd letsencrypt:request "$(cpcmd scope:get net.hostname)"
+```
+
+::: tip Server certificate is domain-only
+A server certificate acts as a fallback for any unhosted account on the server. It may only accept domain-validated certificates, which is to say it cannot perform DNS validation for wildcard SSL.
+
+Wildcard SSL - SSL that encompasses a variety of subdomains - is the domain of a hosted account in [Nexus](../INSTALL.md#Adding your first domain).
+:::
+
 ### Bootstrapping server SSL with a hosted domain
 
 Consider the scenario in which the server hostname is `svr1.mydomain.com` and DNS has not been configured yet. As a **prerequisite**, email has been set for the admin above and a default [DNS provider](DNS.md) has been configured for the server.
@@ -40,6 +56,26 @@ systemctl restart apiscp
 ```
 
 It may take up to 30 minutes for the negative cache TTL to expire due to a specification baked into SOA records (c.f. [RFC 2308](https://tools.ietf.org/html/rfc2308)).
+
+### Issuing account certificate
+
+Account certificates work similar to issuing a server certificate, except the API command binds to a [site context](CLI.md#cpcmd). 
+
+```bash
+# Issue a certificate for the primary domain and its wildcard
+env DEBUG=1 cpcmd -d example.com letsencrypt:request '[example.com,*.example.com]'
+```
+### Issuing for all hostname variants
+
+What if an account has 5 different domains and 20 subdomains? Manually unrolling each domain would be inefficient. `letsencrypt:bootstrap` enumerates this list.
+
+```bash
+env DEBUG=1 cpcmd -d example.com letsencrypt:bootstrap
+```
+
+Domains with managed DNS will consolidate multiple subdomains to a wildcard certificate. Transient DNS errors are retried over the next 72 hours until all domains attached to an account may be verified.
+
+This does not work when the domain's public IP address does not match the expected public IP, such as if the domain is behind [Cloudflare](dns/Cloudclare.md) proxy.
 
 ### Staging
 Issuance may be staged, that is to say authorization generated using `letsencrypt:challenges()`, then solved at a later time using `letsencrypt:solve()`. Once solved, the a certificate may be ordered for the hostname using `letsencrypt:request()` using the pre-solved challenges as a shibboleth. 
@@ -256,10 +292,10 @@ ApisCP provides an easy way to request SSL certificates from Let's Encrypt's sta
 To proceed, enable [letsencrypt] => debug in config.ini. Verbosity is increased that may help ferret out failures in reissuance. Let's assume the server is failing to issue; it can be easily extended on a per-site basis by adding `-d siteXX` or `-d domain.com` to cpcmd.
 
 ```bash
+# Issue invalid certificate with high error tolerance
 cpcmd scope:set cp.config letsencrypt debug true
-cpcmd scope:set cp.debug true
 systemctl restart apiscp
-cpcmd letsencrypt:request '[svr1.domain.com]'
+env DEBUG=1 cpcmd letsencrypt:request '[svr1.domain.com]'
 ```
 
 ::: details renew vs append
@@ -286,9 +322,8 @@ Once the root cause is corrected, reissue the certificate using Let's Encrypt in
 
 ```bash
 cpcmd scope:set cp.config letsencrypt debug false
-cpcmd scope:set cp.debug false
 systemctl restart apiscp
-# This is analogous to setting cp.debug true
+# This is a transient form of "cpcmd scope:set cp.debug true"
 env DEBUG=1 cpcmd letsencrypt:request '[svr1.domain.com]'
 ```
 
