@@ -84,6 +84,7 @@ All locations are within /var/log unless noted. siteXX is shorthand for /home/vi
 | crond                     | cron                       | Periodic services via Dev > Task Scheduler and /etc/cron.d   |
 | fail2ban (Rampart) | fail2ban.log | "Found" is log match. "Unban" automatic expiry. |
 | ApisCP frontend | CP_ROOT/storage/logs/error_log | Same logging as Apache |
+| ApisCP frontend | CP_ROOT/storage/logs/php-fpm.log | PHP errors generated in UI |
 | ApisCP backend | CP_ROOT/storage/logs/start.log | Errors originating from backend |
 | Passenger (launcher) | /.socket/passenger/logs | Launcher issues for Python, Ruby, and Node apps |
 | Passenger (app) | APPROOT/log | Per-application messages. APPROOT is one directory down from document root. |
