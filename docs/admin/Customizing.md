@@ -261,7 +261,7 @@ Constants may be overrode or added to global scope via `CP_ROOT/config/custom/co
 
 DNS is generated from a base template in `CP_ROOT/config/custom/resources/templates/dns`. Presently mail and dns templates are supported. For each template to override copy the respective template to `CP_ROOT/config/custom/resources/templates/dns/`. Validate DNS template consistency via `cpcmd dns:validate-template TEMPLATENAME`.
 
-## Themes
+### Themes
 
 New themes may be created and placed under `CP_ROOT/public/css/themes` and `CP_ROOT/public/images/themes`. The default theme may be changed with `cpcmd`:
 
@@ -271,7 +271,7 @@ cpcmd scope:set cp.config style theme newtheme
 
 Per theme layouts may be set following the [layout](#layout) override mentioned above.
 
-### Building themes
+#### Building themes
 
 Grunt is used to build themes from the [SDK](https://github.com/apisnetworks/apnscp-bootstrap-sdk). Some [Sass](https://sass-lang.com/) knowledge is recommended. [Bootstrap](https://getbootstrap.com/docs/4.0/getting-started/introduction/) is also helpful to know but simple enough to learn as you go along. ApisCP is presently based on Bootstrap 4.0.
 

@@ -140,6 +140,7 @@ cd /var/www/html
 wp-cli plugin install --activate redis-cache
 # Define Redis path
 wp-cli config set WP_REDIS_PATH /var/www/redis.sock
+wp-cli config set WP_REDIS_SCHEME unix
 ```
 
 ![Redis configuration](./images/wp-config-edit.png)
