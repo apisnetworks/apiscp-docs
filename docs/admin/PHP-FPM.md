@@ -62,11 +62,10 @@ cpcmd scope:set apache.php-version 7.4
 To install `imagick` off PECL for the system PHP build,
 
 ```bash
-cd /usr/local/apnscp/resources/playbooks
-ansible-playbook bootstrap.yml --tags=php/install-pecl-module --extra-vars=pecl_extensions=imagick
+upcp -sb --var="pecl_extensions=imagick" php/install-extensions
 ```
 ::: tip
-`--extra-vars=force_module_rebuild=true` may be specified to force a module update as well as module configuration in FST/siteinfo/etc/phpXX.d/.
+`--var=force_module_rebuild=true` may be specified to force a module update as well as module configuration in FST/siteinfo/etc/phpXX.d/.
 :::
 
 Modules may be set per version and permanently applied for all PHP builds by setting either `pecl_phpXX` or `pecl_extensions` variables.
@@ -75,7 +74,7 @@ Modules may be set per version and permanently applied for all PHP builds by set
 # Always build imagick + igbinary + redis extensions
 cpcmd scope:set cp.bootstrapper pecl_extensions '[imagick,igbinary,redis]'
 # Build all modules
-upcp -sb php/install-pecl-module
+upcp -sb php/install-extensions
 ```
 
 #### Non-PECL modules
@@ -83,7 +82,7 @@ git and archive sources are also supported. If we want to add mailparse (from PE
 
 ```bash
 cpcmd scope:set cp.bootstrapper pecl_extensions '["mailparse","https://github.com/php-memcached-dev/php-memcached.git","https://pecl.php.net/get/inotify-2.0.0.tgz"]'
-upcp -sb php/install-pecl-module
+upcp -sb php/install-extensions
 ```
 
 ::: danger
@@ -96,7 +95,7 @@ By convention ApisCP will use the basename up to the first character in the set 
 Not all extensions are named as you'd want them to be. ApisCP supports a dense format for extensions that explicitly defines the extension URL, name, and whether it's a Zend extension. An example of this is Xdebug that when installed from the latest GitHub release would be treated as "2.ini".
 
 ```bash
-ansible-playbook bootstrap.yml  --tags=php/install-pecl-module,apnscp/php-filesystem-template --extra-vars=pecl_extensions='{"name":"xdebug","zend":true,"extension":"https://github.com/xdebug/xdebug/archive/2.9.6.tar.gz"}'
+upcp -sb --var=pecl_extensions='{"name":"xdebug","zend":true,"extension":"https://github.com/xdebug/xdebug/archive/2.9.6.tar.gz"}' php/install-extensions apnscp/php-filesystem-template
 ```
 
 Dense mode accepts the following attributes:
@@ -522,16 +521,14 @@ Modules may be installed as one would normally expect with regular PHP-FPM. The 
 To install imagick off PECL for PHP 7.4,
 
 ```bash
-cd /usr/local/apnscp/resources/playbooks
-ansible-playbook bootstrap.yml  --tags=php/install-pecl-module --extra-vars=pecl_extensions=igbinary --extra-vars=php_version=7.4 --extra-vars=multiphp_build=true
+upcp -sb --var=igbinary --var=php_version=7.4 --var=multiphp_build=true php/install-extensions
 ```
 
 Likewise `pecl_php74` could be set as a list with `['igbinary']` to automatically build for PHP 7.4:
 
 ```bash
 cpcmd scope:set cp.bootstrapper pecl_php74 '[igbinary]'
-cd /usr/local/apnscp/resources/playbooks
-ansible-playbook bootstrap.yml --tags=php/install-pecl-module --extra-vars=php_version=7.4 --extra-vars=multiphp_build=true
+upcp -sb --var=php_version=7.4 --var=multiphp_build=true php/install-extensions
 ```
 
 ### Remi builds

@@ -79,9 +79,9 @@ Bootstrapper allows passing off variables to determine how a set of tasks (calle
 
 ```bash
 cd /usr/local/apnscp
-ansible-playbook --tags=php/install-pecl-module --extra-vars 'pecl_extensions="igbinary"' bootstrap.yml
+ansible-playbook --tags=php/install-extensions --extra-vars 'pecl_extensions="igbinary"' bootstrap.yml
 # Alternatively, more complex
-ansible-playbook --tags=php/install-pecl-module --extra-vars 'pecl_extensions=["mailparse","https://github.com/php-memcached-dev/php-memcached.git","https://pecl.php.net/get/inotify-2.0.0.tgz"]' bootstrap.yml
+ansible-playbook --tags=php/install-extensions --extra-vars 'pecl_extensions=["mailparse","https://github.com/php-memcached-dev/php-memcached.git","https://pecl.php.net/get/inotify-2.0.0.tgz"]' bootstrap.yml
 ```
 
 ## Injecting hooks
