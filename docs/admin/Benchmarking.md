@@ -132,7 +132,7 @@ Let's take this one step further, configuring a WP Redis object cache. Use `redi
 cpcmd -d benchmark.test crontab:toggle-status 1
 # PHP-FPM uses a private /tmp mount, expose Redis to shared location
 # See PHP-FPM.md#privatetmp for more information
-cpcmd -d benchmark.test redis:create wp-test '[unixsocket:/var/www/redis.sock]'
+cpcmd -d benchmark.test redis:create wp-test '[unixsocket:/var/www/redis.sock,unixsocketperm:0660]'
 # Switch to benchmark.test account to configure plugin
 su benchmark.test
 cd /var/www/html
