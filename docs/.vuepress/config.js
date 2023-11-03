@@ -297,6 +297,7 @@ module.exports = {
 				]
 			},
 			['https://api.ara.apiscp.com', 'Build log'],
+			['https://gitlab.com/apisnetworks/apnscp', 'Source code'],
 			"GLOSSARY"
 			]
 		}
