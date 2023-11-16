@@ -191,6 +191,9 @@ Manifests may define additional [Fortification](Fortification.md) roles as well 
 # optional base webapp to extend from
 # e.g. "wordpress" would give it all WordPress module features
 base:
+# optional depth count which the approot resides relative to docroot
+# a value of 0 means the docroot and approot are the same directory
+depth: 0
 # database configuration, used for snapshots
 database:
   # "mysql" or "pgsql"

@@ -11,7 +11,7 @@ ApisCP provides a variety of means to customize your environment. Each service i
 **⚠️ DO NOT TOUCH**: /etc/httpd/conf/httpd.conf  
 **Customization file**: /etc/httpd/conf/httpd-custom.conf  
 
-Additionally, module configuration may be inserted in `/etc/httpd/conf.d` to load or modify existing modules. Per-site configuration is located in `/etc/httpd/conf.d/siteXX` or `/etc/httpd/conf.d/siteXX.ssl` for SSL-specific context. By convention customizations are placed in a file named `custom` in these directories. To get the site ID of a domain use the [helper](CLI.md#get-site-id) command, `get_site_id`.
+Additionally, module configuration may be inserted in `/etc/httpd/conf.d` to load or modify existing modules. Per-site configuration is located in `/etc/httpd/conf/siteXX` or `/etc/httpd/conf/siteXX.ssl` for SSL-specific context. By convention customizations are placed in a file named `custom` in these directories. To get the site ID of a domain use the [helper](CLI.md#get-site-id) command, `get_site_id`.
 
 After making changes, `htrebuild` will compile Apache's modular configuration followed by `systemctl reload httpd` to reload the web server.
 
