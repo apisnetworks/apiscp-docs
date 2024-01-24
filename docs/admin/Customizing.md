@@ -21,7 +21,7 @@ A placeholder page is created whenever an account, addon domain, or subdomain is
 Copy `/usr/local/apnscp/resources/templates/apache/placeholder.blade.php` to `/usr/local/apnscp/config/custom/resources/templates/apache/placeholder.blade.php` creating parent directories as needed. index.html may not be updated once written.
 
 ### Suspension page
-All suspended accounts via [SuspendDomain](Plans#suspenddomain) redirect to `/var/www/html/suspend.html`. A suspension page is not provided by default in ApisCP but may be created by the admin. Suspension rules may be modified by adjusting the rewrite rules.
+All suspended accounts via [SuspendDomain](Plans#suspenddomain) redirect to `/var/www/html/suspended.html`. A suspension page is not provided by default in ApisCP but may be created by the admin. Suspension rules may be modified by adjusting the rewrite rules.
 
 Copy `/usr/local/apnscp/resources/templates/apache/suspend-rules.blade.php` to `/usr/local/apnscp/config/custom/resources/templates/apache/suspend-rules.blade.php` creating parent directories as needed.
 
