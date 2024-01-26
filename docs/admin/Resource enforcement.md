@@ -2,7 +2,11 @@
 
 Before discussing resource enforcement, a preface on **load average** is necessary, or more pedantically: *run-queue size* (both are used interchangeably). Run-queue size is the total amount of work parcels enqueued across all logical processors at any given instance. For example, if there are 4 logical processors bound to a server it means - assuming equal assignment - that each logical processor is processing 1 parcel of work and 3/4 have another parcel of work immediately behind it. Parcels compute on the microsecond scale, so momentary spikes - what's reported as a 1-minute load average - only indicate there's a spike and nothing more. A 15-minute load average paints a better picture of the typical server load, which can potentially hint at deeper issues such as insufficient hardware.
 
-Logical processors are the number of processes listed in `/proc/cpuinfo`. ApisCP precomputes this number on start and applies it to any CPU calculations (as well as user hz). 
+Logical processors are the number of processes listed in `/proc/cpuinfo`. ApisCP precomputes this number on start and applies it to any CPU calculations (as well as user hz).
+
+::: tip
+This section covers per-site aggregate resources. For per-process see [Process limits](Limits.md).
+:::
 
 ## Storage
 

@@ -2,7 +2,7 @@
 title: Filesystem
 ---
 
-All accounts are located in `/home/virtual`. Each account is assigned a unique numeric ID and the base path is */home/virtual/siteXX* where XX is the assigned ID. For convenience, a symlink to the system group name and primary domain are created.
+All accounts are located in a virtual filesystem located in `/home/virtual`. Each account is assigned a unique numeric ID and the base path is */home/virtual/siteXX* where XX is the assigned ID. For convenience, a symlink to the system group name and primary domain are created.
 
 Each account filesystem is synthesized through a variety of layers using BoxFS, a solution [developed in 2010](https://updates.hostineer.com/2010/08/introducing-apollo-our-next-generation-platform/) to make multi-tenant management easier. BoxFS uses OverlayFS, a union filesystem that takes multiple layers and synthesizes them into 1 single layer.
 
