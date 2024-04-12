@@ -2,17 +2,6 @@
 
 This is a drop-in provider for [ApisCP](https://apiscp.com) to enable DNS support using PowerDNS. This module may use PostgreSQL or MySQL as a backend driver.
 
-::: warning
-CentOS 8 is restricted to PowerDNS 4.3 from EPEL due to library dependencies when MySQL is used as a backend. Use PostgreSQL to avoid this restriction.
-
-```
-cpcmd scope:set cp.bootstrapper powerdns_driver pgsql
-upcp -sb software/powerdns
-```
-
-or at install time, `-s dns_default_provider='powerdns' -s powerdns_driver='pgsql'`
-:::
-
 ## Nameserver installation
 
 Installation can be chosen at install time or after setup. Installation is only necessary if you intend on running a PowerDNS instance on the server. This section covers *installation*; skip down to **ApisCP DNS provider setup** for information on configuring a server to use PowerDNS as a DNS provider.
@@ -82,13 +71,13 @@ upcp -sb software/powerdns
 
 ### Cluster types
 
-Before configuring a cluster, PowerDNS server must be installed and a suitable backend selected. See "[Nameserver installation](#nameserver-installation)". 
+Before configuring a cluster, PowerDNS server must be installed and a suitable backend selected. See "[Nameserver installation](#nameserver-installation)".
 
 PowerDNS uses MySQL or PostgreSQL for record storage when [zone kind](https://doc.powerdns.com/authoritative/modes-of-operation.html) is "NATIVE". Using AXFR-based replication will allow provisioning of zones to slaves by supermaster but these zones cannot be removed from slaves. AXFR does not provide any means to achieve this in its protocol specification. Workarounds exist as noted in "[Zone removal](#zone-removal)".
 
 #### Hidden master
 
-A hidden master obfuscates which server has control of publishing DNS records. This provides a marginal security benefit by hiding the server from public view. 
+A hidden master obfuscates which server has control of publishing DNS records. This provides a marginal security benefit by hiding the server from public view.
 
 In the following example, master is an unpublished nameserver.
 
@@ -101,7 +90,8 @@ cpcmd scope:set cp.bootstrapper powerdns_enabled true
 cpcmd scope:set cp.bootstrapper powerdns_zone_type master
 cpcmd scope:set cp.bootstrapper powerdns_custom_config '["allow-axfr-ips":"1.2.3.4,1.2.3.5","also-notify":"1.2.3.4,1.2.3.5","master":"yes"]'
 cpcmd scope:set cp.bootstrapper powerdns_nameservers '[ns1.domain.com,ns2.domain.com]'
-env BSARGS="--extra-vars=force=yes" upcp -sb software/powerdns
+cpcmd scope:set dns.default-provider powerdns
+upcp -sbf software/powerdns
 ```
 
 On the **slave(s)**, *assuming the master is 1.2.3.3 with the hostname master.domain.com*, add the following configuration:
@@ -112,8 +102,11 @@ cpcmd scope:set cp.bootstrapper powerdns_zone_type slave
 cpcmd scope:set cp.bootstrapper powerdns_custom_config '["allow-notify-from":"1.2.3.3","slave":"yes","superslave":"yes"]'
 cpcmd scope:set cp.bootstrapper powerdns_nameservers '[ns1.domain.com,ns2.domain.com]'
 cpcmd scope:set cp.bootstrapper powerdns_supermaster '[ip:1.2.3.3,nameserver:ns1.domain.com,account:master]'
-cpcmd scope:set cp.bootstrapper powerdns_api_uri 'https://master.domain.com/dns/api/v1'
-env BSARGS="--extra-vars=force=yes" upcp -sb software/powerdns
+cpcmd scope:set dns.default-provider powerdns
+# Uncomment this if the slave nameserver is also providing hosting services
+# cpcmd scope:set cp.bootstrapper powerdns_api_key 'abc1234'
+# cpcmd scope:set cp.bootstrapper powerdns_api_uri 'https://master.domain.com/dns/api/v1'
+upcp -sbf software/powerdns
 ```
 
 Lastly, on the **hosting nodes**, *assuming all DNS zone traffic is sent to the hidden master master.domain.com (IP address 1.2.3.3) with the [API key](#local-powerdns) from the hidden master located in `/etc/pdns/pdns.conf` of `abc1234`*, configure each to use the same API key and endpoint discussed below.
@@ -123,7 +116,8 @@ cpcmd scope:set cp.bootstrapper powerdns_api_uri 'https://master.domain.com/dns/
 cpcmd scope:set cp.bootstrapper powerdns_nameservers '[ns1.domain.com,ns2.domain.com]'
 cpcmd scope:set cp.bootstrapper powerdns_api_key 'abc1234'
 cpcmd scope:set cp.bootstrapper powerdns_zone_type 'master'
-env BSARGS="--extra-vars=force=yes" upcp -sb software/powerdns
+cpcmd scope:set dns.default-provider powerdns
+upcp -sbf software/powerdns
 ```
 
 ::: tip force=yes
@@ -150,7 +144,8 @@ cpcmd scope:set cp.bootstrapper powerdns_zone_type master
 cpcmd scope:set cp.bootstrapper powerdns_custom_config '["allow-axfr-ips":"1.2.3.5","also-notify":"1.2.3.5","master":"yes"]'
 cpcmd scope:set cp.bootstrapper powerdns_webserver_enable true
 cpcmd scope:set cp.bootstrapper powerdns_nameservers '[ns1.domain.com,ns2.domain.com]'
-env BSARGS="--extra-vars=force=yes" upcp -sb software/powerdns
+cpcmd scope:set dns.default-provider powerdns
+upcp -sfb software/powerdns
 ```
 
 On the **slave(s)**, *assuming the master is 1.2.3.4 with the hostname ns1.domain.com*, add the following configuration:
@@ -162,8 +157,11 @@ cpcmd scope:set cp.bootstrapper powerdns_custom_config '["allow-notify-from":"1.
 cpcmd scope:set cp.bootstrapper powerdns_webserver_enable false
 cpcmd scope:set cp.bootstrapper powerdns_nameservers '[ns1.domain.com,ns2.domain.com]'
 cpcmd scope:set cp.bootstrapper powerdns_supermaster '[ip:1.2.3.4,nameserver:ns1.domain.com,account:master]'
-cpcmd scope:set cp.bootstrapper powerdns_api_uri 'https://ns1.domain.com/dns/api/v1'
-env BSARGS="--extra-vars=force=yes" upcp -sb software/powerdns
+cpcmd scope:set dns.default-provider powerdns
+# Uncomment this if the slave nameserver is also providing hosting services
+# cpcmd scope:set cp.bootstrapper powerdns_api_key 'abc1234'
+# cpcmd scope:set cp.bootstrapper powerdns_api_uri 'https://ns1.domain.com/dns/api/v1'
+upcp -sfb software/powerdns
 ```
 
 Lastly, on the **hosting nodes**, *assuming all DNS zone traffic is sent to the hidden master master.domain.com (IP address 1.2.3.3) with the [API key](#local-powerdns) from the hidden master located in `/etc/pdns/pdns.conf` of `abc1234`*, configure each to use the same API key and endpoint discussed below.
@@ -173,7 +171,8 @@ cpcmd scope:set cp.bootstrapper powerdns_api_uri 'https://ns1.domain.com/dns/api
 cpcmd scope:set cp.bootstrapper powerdns_nameservers '[ns1.domain.com,ns2.domain.com]'
 cpcmd scope:set cp.bootstrapper powerdns_api_key 'abc1234'
 cpcmd scope:set cp.bootstrapper powerdns_zone_type 'master'
-env BSARGS="--extra-vars=force=yes" upcp -sb software/powerdns
+cpcmd scope:set dns.default-provider powerdns
+upcp -sfb software/powerdns
 ```
 
 ::: tip Notifying slaves
@@ -205,24 +204,24 @@ $handler = new \Opcenter\Dns\Bulk();
 // empty all NS records on the apex
 // "_dummy_zone.com" has no effect, but used for completeness with the API
 $handler->remove(new \Opcenter\Dns\Record('_dummy_zone.com', [
-    'name' => '', 
-    'rr' => 'NS', 
+    'name' => '',
+    'rr' => 'NS',
     'parameter' => ''
 ]), function (\apnscpFunctionInterceptor $afi, \Opcenter\Dns\Record $r) {
     return $afi->dns_get_provider() === 'powerdns';
 });
 
 $handler->add(new \Opcenter\Dns\Record('_dummy_zone.com', [
-    'name' => '', 
-    'rr' => 'NS', 
+    'name' => '',
+    'rr' => 'NS',
     'parameter' => 'ns1.yourserver.com'
 ]), function (\apnscpFunctionInterceptor $afi, \Opcenter\Dns\Record $r) {
     return $afi->dns_get_provider() === 'powerdns';
 });
 
 $handler->add(new \Opcenter\Dns\Record('_dummy_zone.com', [
-    'name' => '', 
-    'rr' => 'NS', 
+    'name' => '',
+    'rr' => 'NS',
     'parameter' => 'ns2.yourserver.com'
 ]), function (\apnscpFunctionInterceptor $afi, \Opcenter\Dns\Record $r) {
     return $afi->dns_get_provider() === 'powerdns';
@@ -252,7 +251,7 @@ $handler->replace(new \Opcenter\Dns\Record('_dummy_zone.com', [
     $r->setMeta('rname', 'ns1.foobar.com');
     // update negative cache TTL
     $r->setMeta('ttl', 300);
-    
+
     // return false to skip processing the record`
     return $afi->dns_get_provider() === 'powerdns';
 });
@@ -273,7 +272,7 @@ pdns_control list-zones --type master | sed '$d' | xargs -L1 pdns_control notify
 Zone removal should be run on slave servers. There is no need to run this on the master as zones are automatically removed upon deletion.
 
 ```bash
-pdns_control list-zones --type slave | sed '$d' | xargs -I {} sh -c "host -T -t SOA {} master.domain.com | tail -n1 | grep -q 'has no SOA record' | pdnsutil delete-zone {}"
+pdns_control list-zones --type slave | sed '$d' | xargs -I {} sh -c 'dig +short +tcp +norec @master.name.server SOA {} | grep -q ^ || pdnsutil delete-zone {}'
 ```
 
 ::: tip TCP mode
@@ -298,8 +297,8 @@ In this situation, the endpoint is https://myserver.apiscp.com/dns. Changes are 
 </Location>
 ```
 
-**Downsides**: minor SSL overhead. Dependent upon Apache.  
-**Upsides**: easy to setup. Protected by threat deterrence. PowerDNS accessible remotely via an easily controlled URI.  
+**Downsides**: minor SSL overhead. Dependent upon Apache.
+**Upsides**: easy to setup. Protected by threat deterrence. PowerDNS accessible remotely via an easily controlled URI.
 
 In the above example, API requests can be made via https://myserver.apiscp.com/dns, e.g.
 
@@ -309,7 +308,7 @@ curl -q -H 'X-API-Key: SOMEKEY' https://myserver.apiscp.com/dns/api/v1/servers/l
 
 ### Enabling webserver statistics
 
-A separate webserver is available for real-time statistics through a UI. Additional authentication is required with `webserver-password` as PowerDNS cannot see the connecting IP behind a proxy (cf. [powerdns/pdns#10332](https://github.com/PowerDNS/pdns/issues/10332)). 
+A separate webserver is available for real-time statistics through a UI. Additional authentication is required with `webserver-password` as PowerDNS cannot see the connecting IP behind a proxy (cf. [powerdns/pdns#10332](https://github.com/PowerDNS/pdns/issues/10332)).
 
 ```bash
 cpcmd scope:set cp.bootstrapper powerdns_webserver_enable true
@@ -352,8 +351,8 @@ cpcmd scope:set cp.bootstrapper powerdns_localonly false
 upcp -sb software/powerdns
 ```
 
-**Downsides**: requires whitelisting IP addresses for access to API server. Must run on port different than Apache.  
-**Upsides**: operates independently from Apache.  
+**Downsides**: requires whitelisting IP addresses for access to API server. Must run on port different than Apache.
+**Upsides**: operates independently from Apache.
 
 The server may be accessed once the source IP has been whitelisted,
 

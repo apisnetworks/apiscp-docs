@@ -41,7 +41,7 @@ As an example,  an authenticated user can easily get the provider key from ApisC
 Accounts may use a provider other than what is assigned globally. `dns`,`provider` and `dns`,`key` control these parameters.
 
 ::: danger
-Any configuration set in this manner may be viewed by the Site Administrator. Do not store sensitive keys. In fact, PowerDNS is strongly recommended in multi-tenant environments, which stores authentication in an inaccessible location.
+Any configuration set in this manner may be viewed by the Site Administrator. Always set the the provider key as a vaulted value, discussed below.
 :::
 
 ```bash
@@ -49,6 +49,18 @@ EditDomain -c dns,provider=null -D somesite.com
 ```
 
 Providers may also be configured within Nexus for the domain.
+
+## Keyring usage
+
+**New in 3.2.42**
+
+Users can read account metadata, which makes storing secret keys in dns,key impossible. [Keyring](../Authentication.md#Keyring) stores codes in `config/auth.yaml` as a reversible encryption. These codes, referenced by index, can be safely stored in account metadata as the reference and not encrypted value is referenced.
+
+```bash
+cpcmd keyring:set dns.hetzner 'mysecretkey123'
+EditDomain -c dns,provider=hetzner -c dns,key="keyring:dns.hetzner" mydomain.com
+```
+
 
 ## Registering custom providers
 

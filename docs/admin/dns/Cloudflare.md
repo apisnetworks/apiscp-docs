@@ -27,19 +27,26 @@ EditDomain -c dns,provider=cloudflare -c dns,key='WgBu1xfXP6wvR-ABcDe_ff' domain
 
 Cloudflare may be configured as the default provider for all sites using the `dns.default-provider` [Scope](https://gitlab.com/apisnetworks/apnscp/blob/master/docs/admin/Scopes.md). When adding a site in Nexus or [AddDomain](https://hq.apnscp.com/working-with-cli-helpers/#adddomain) the key will be replaced with "DEFAULT". This is substituted automatically on account creation.
 
+In a multi-user environment, [Keyring](../Authentication.md#Keyring) usage is necessary to protect users from accessing the password. When setting this value using the dns.default-provider-key in 3.2.42+, this value is automatically encoded as a Keyring value. Automatic wrapping as a Keyring object may be altered by changing **[auth]** => *keyring_provider_types*.
+
 ```bash
 cpcmd scope:set dns.default-provider cloudflare
+# Note, this method is insecure prior to 3.2.42, see below!
 cpcmd scope:set dns.default-provider-key '[key:abcdef0123456789,email:foo@bar.com,proxy:false]'
 ```
-::: danger
-Note that it is not safe to set this value as provider default in untrusted multiuser environments. A user with API access can retrieve your key `common_get_service_value dns key` or even using Javascript in the panel, `apnscp.cmd('common_get_service_value',['dns','key'], {async: false})`.
+
+::: warning 
+Note that it is not safe to set this value directly in config.ini as a server-wide default in untrusted multiuser environments. A user with panel access can retrieve your key `common_get_service_value dns key` or even using Javascript in the panel, `apnscp.cmd('common_get_service_value',['dns','key'], {async: false})`.
+
+Implicit [Keyring](../../Authentication.md#Keyring) encoding masks the actual value using a server secret. 
 :::
 
 ::: tip
-This module provides a safe location for a global key setting in `config/auth.yaml`. See the following section for details.
+This module provides another safe location for a global key setting in `config/auth.yaml`. See the following section for details.
 :::
 
 ### Safely setting global default
+
 Cloudflare settings may be located in `config/auth.yaml`, which is outside the visibility of site owners. Global settings will be used only if *dns*,*key* is set to null/None. All other values are broken out as separate fields, that is to say key must be scalar and may not be an inline complex type (*[key:val,key2:val2]*).
 
 ```yaml

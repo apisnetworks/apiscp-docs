@@ -150,7 +150,7 @@ module.exports = {
 				"admin/Migrations - server",
 				]
 			},
-
+			"admin/Authentication",
 			"admin/Filesystem",
 			{
 				title: "DNS",
