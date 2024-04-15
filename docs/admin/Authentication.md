@@ -20,9 +20,25 @@ cpcmd -d domain.com common:get-service-value dns key
 # reports "keyring:dns.hetzner"
 ```
 
+### Encoding
+
+`keyring:encode` will convert a mixed value into a Keyring type. These values may be used in lieu of keyring references.
+
+```bash
+cpcmd keyring:encode 'foobar'
+cpcmd keyring:encode '[key:foo,name:bar]'
+EditDomain -c dns,key="$(cpcmd keyring:encode my-special-key)" domain.com
+
+cpcmd -d domain.com common:get-service-value dns key
+# Reports encoded keyring
+```
+
+Data types are preserved when decoded internally.
+
 ### Decoding
 
 Keyring values are not intended to be decoded through API. Keys may be decoded internally using `Opcenter\Crypto\Keyring::decode()`.
+
 
 ### Transferring keyrings
 
@@ -48,5 +64,5 @@ cpcmd keyring:valid "$(cpcmd keyring:get my-secret)"
 # Returns 1
 ```
 ::: tip Changing secrets
-Changing a server secret will invalid all saved passwords as well as invalidate intraservice access within the UI. Server secrets should be the same across related servers for use with [cp-proxy](Panel%20proxy.md).
+Changing a server secret will invalidate all saved passwords as well as invalidate intraservice access within the UI. Server secrets should be the same across related servers for use with [cp-proxy](Panel%20proxy.md).
 :::
