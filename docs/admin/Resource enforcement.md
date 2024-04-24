@@ -383,6 +383,33 @@ Use `cgroup:freeze` to freeze a site and `cgroup:thaw` to unfreeze (thaw) the si
 
 ![Freezing and thawing a site](./images/cgroup-freezer.png)
 
+## Delegative authority
+**New in 3.2.42**
+
+Resources may be subdivided and reallocated infinitely using delegative authorities, which are sites or groups of resources assigned on a server. Delegative authorities are useful when a site needs to remain separate from its parent but its resource limits must remain accounted for.
+
+This feature is enabled by assigning *cgroup*,*delegator* to a child where the delegator is its parent. The child will inherit its parents resource limits as well as any ancestors that parent may inherit from. Resource utilization may never exceed the top-level limits. Likewise, resource counters for the parent will reflect children of all successive generations. 
+
+Consider 3 sites: site1, site2, and site3. **site1** has a memory limit of 1024 MB and read/write IOPS limit of 100/10; **site2** a limit of 512 MB and IOPS limit of 5/1; and **site3** a limit of 384 MB and IOPS limit of 100/10.
+
+- site1 may have 1024 MB - 512 MB - 384 MB = 128 MB allocated to itself if both site2 and site3 max out memory usage.
+- site2 may have 512 - 384 MB = 128 MB allocated to it if site3 maxes out memory usage.
+- site3 may never exceed 384 MB memory.
+- site1 IOPS may peak at 100/10, *[IOPS](#IO) are typically 4096 bytes each*.
+- site2 IOPS may peak at 5/1.
+- site3 - constrained by site2 - may never exceed 5/1 despite having a value of 100/10.
+
+Any tasks frozen in a delegative authority freezes any descendant groups within the tree.
+
+::: tip Circular resource groups
+When a site resource group becomes a parent, its direct utilization is relocated to `/sys/fs/cgroup/siteXX/self`. `siteXX` counters refer to the aggregate of the site and its descendants whereas `siteXX/self` refers to the resources utilized exclusively by the site.
+:::
+
+### See also
+
+- [Control Group v2](https://docs.kernel.org/admin-guide/cgroup-v2.html#) (kernel.org)
+
+
 ## Troubleshooting
 
 ### Memory reported is different than application memory
