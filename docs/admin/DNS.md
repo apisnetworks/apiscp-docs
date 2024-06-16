@@ -54,7 +54,7 @@ Providers may also be configured within Nexus for the domain.
 
 **New in 3.2.42**
 
-Users can read account metadata, which makes storing secret keys in dns,key impossible. [Keyring](../Authentication.md#Keyring) stores codes in `config/auth.yaml` as a reversible encryption. These codes, referenced by index, can be safely stored in account metadata as the reference and not encrypted value is referenced.
+Users can read account metadata, which makes storing secret keys in dns,key impossible. [Keyring](Authentication.md#Keyring) stores codes in `config/auth.yaml` as a reversible encryption. These codes, referenced by index, can be safely stored in account metadata as the reference and not encrypted value is referenced.
 
 ```bash
 cpcmd keyring:set dns.hetzner 'mysecretkey123'
