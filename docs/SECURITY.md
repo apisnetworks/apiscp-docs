@@ -198,6 +198,16 @@ htpasswd /var/www/.htpasswd someuser
 
 Now "someuser" has access to the DAV location in which the above .htaccess is placed.
 
+## SRS Replay
+
+**New in 3.2.44**
+
+[Sender rewriting scheme](admin/Smtp.md#srs) restamps forwarded email return-paths with a reversible address that is computed from a 128-bit HMAC hash using a 96-bit secret that yields a unique 48-bit digest for each address. An attacker would need to know the computed hash to send email to the target recipient. In order for this to happen either the attacker would require an email account configured on the server to forward to them, in order to discover the hash, or compromise another victim's machine to discover the hash.
+
+Once this hash is known, the attacker may send unlimited email to that known address. An attacker would be unable to send further emails to other addresses without knowing the computed hash.
+
+Rolling the server secret will generate a new HMAC key, which invalidates all undelivered messages: messages which are forwarded but the final MTA has not reported a 2xx status code indicating successful delivery. Periodic rolling is configured in `[mail]` => `srs_autoroll`. SRS secret may be rolled manually using [`email:roll-srs`](https://api.apiscp.com/Email_Module.html#_roll_srs).
+
 ## Client encryption
 
 SSLv2 and SSLv3 are disabled with all recent software releases in the last 5 years. TLS v1.0 and v1.1 have recently become deprecated with Mozilla removing TLSv1.0 and TLSv1.1 beginning March 30. TLSv1.2, released in 2008, is mature and well tolerated by many clients. Two notable exceptions: Internet Explorer did not adopt until v11 in 2013 and Android 5.0+ released in 2014. 

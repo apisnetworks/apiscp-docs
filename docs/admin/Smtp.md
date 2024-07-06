@@ -163,6 +163,10 @@ Without SRS a message from qux.com delivered to baz@bar.com that in turn forward
 
 At this time any message that arrives from a remote MTA will be rewritten with SRS. Any message originating from the server (excludes transitory forwards) will not be rewritten.
 
+::: warning SRS replay
+SRS is vulnerable to specialized replay attacks to single addresses. While the exploitability benefit is limited, the server may be configured to auto-roll the secret. See [SECURITY.md](../../SECURITY.md#srs-replay).
+:::
+
 ### SRS address appears in From: field
 
 Postfix employs a [cleanup](http://www.postfix.org/cleanup.8.html) daemon to insert missing headers into a message. *From:* is inferred from the *Return-Path:* header when absent, which is rewritten by SRS. A From: header may then come across as,
