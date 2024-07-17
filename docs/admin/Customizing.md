@@ -499,3 +499,18 @@ cpcmd config:set system.sshd-port '[58712,22]'
 cpcmd config:set system.sshd-pubkey-only true
 ```
 
+## vsftpd
+
+**⚠️ DO NOT TOUCH:** /etc/vsftpd/vsftpd.conf  
+**Customization file:**  `vsftpd_custom_config` var
+
+vsftpd does not provide a robust interface to extend its configuration. Configuration is written as part of [`vsftpd/configure`](https://gitlab.com/apisnetworks/apnscp/-/blob/master/resources/playbooks/roles/vsftpd/configure/defaults/main.yml) role in Bootstrapper. Boolean values are unconverted, so "NO" and "YES" must be specified as string literals by surrounding with quotes. Configuration may be located in `/root/apnscp-vars-runtime.yml`. Run `upcp -sb vsftpd/configure` to commit changes.
+
+**Sample**
+
+```yaml
+vsftpd_custom_config:
+  log_ftp_protocol: "YES"
+  pasv_address: "1.2.3.4"
+  hide_ids: "NO"
+```
