@@ -55,6 +55,26 @@ In either situation you're liable to run out of storage before inodes. On XFS sy
 
 *If you're on XFS, don't worry counting inodes.* 
 
+### Project quotas
+**New in 3.2.44**  
+
+XFS supports a third quota tier, project quotas, which combine multiple filesystem paths into a unified quota. Aggregate usage may not exceed the project quota, both in blocks and inodes, resulting in complete utilization of resources. Reseller-backed accounts implicitly create a project prefixed with `group` while accounts may be individually assigned to a project. 
+
+When an account is under a project quota, the available space is either the space remaining within the quota group or quota project, whichever is less. Quotas in such situations are reported as "dynamic" in [`site:get-account-quota`](https://api.apiscp.com/Site_Module.html#_get_account_quota).
+
+#### Assigning projects
+
+A project is created using `diskquota:project-create <NAME>`. Once a project is defined, sites may be assigned by modifying `diskquota`,`group`. Quotas are set, in KB, with `diskquota:project-set NAME BHARD IHARD` for blocks, inodes.
+
+```bash
+cpcmd diskquota:project-create devsites
+# Limit storage to 10 GB, 10000 inodes
+cpcmd diskquota:project-set devsites $((10*1024*1024)) 10000
+cpcmd diskquota:project-get devsites
+EditDomain -c diskquota,group=devsites wordpress.dev
+# Quota usage of wordpress.dev included within quota
+cpcmd diskquota:project-get devsites
+```
 
 ### XFS/Ext4 idiosyncrasies
 

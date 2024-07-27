@@ -359,3 +359,12 @@ A certificate is only valid for the expiration dates it is authorized to serve. 
 SANs are all hostnames bound to a certificate. -text generates significant data, so filter out the noise using `grep`:
 
 `openssl s_client -connect apiscp.com:993 -servername apiscp.com | openssl x509 -noout -text | grep 'DNS:'`
+
+## Common topics
+
+### Server vs account SSL
+A single hostname certificate secures *common, shared* services: panel access, redirected panel services (webmail, phpMyAdmin, phpPgAdmin), and remote database access. The common name for this certificate is the server hostname retrieved with `net.hostname` [scope](Scopes.md). Wildcards are not supported for server SSL; **it is single-homed**.
+
+Account certificates are configured after [creating an account](../INSTALL.md#adding-your-first-domain) in Nexus or with `AddDomain`. An account may host one or more domains that have a variety of subdomains (car.mydomain.com, house.mydomain.com, toilet.myrentalproperty.com, et cetera) that have different scopes. Accounts may be **multi-homed**. As such, accounts support wildcard certificates that allow multiple domains and subdomains.
+
+Wildcard issuance requires DNS to be actively managed by the panel.
