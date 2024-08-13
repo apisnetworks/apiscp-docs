@@ -217,6 +217,26 @@ Bootstrapper can run without any changes to `/root/apnscp-vars.yml`. The followi
 - **mysqld_per_account_innodb**: (true/false) places tables + data in an aggregate InnoDB pool for higher performance or per account for resource enforcement. An account over quota can cause a cyclic crash in MySQL/MariaDB 5.0+ on recovery. **You have been warned**. Ensure [Argos](https://hq.apiscp.com/monitoring-with-monit-argos/) is setup if enabled.
 - **data_center_mode**: (true/false) ensure all resources that ApisCP can account for are accounted. Also enables the pernicious bastard `mysqld_per_account_innodb`!
 
+### Specialized roles
+**New in 3.2.45**
+
+After installation, the platform may be reconfigured on-the-fly for a specialized role using [cp.role Scope](admin/Scopes.md). The table summarizes available modes of operation. All free licenses may be generated through [my.apiscp.com](https://my.apiscp.com).
+
+```bash
+# Assign platform as a development server
+cpcmd scope:set cp.role dev
+```
+
+| Role        | Remarks                                                      | Free |
+| ----------- | ------------------------------------------------------------ | :--: |
+| data-center | mod_pagespeed and database quotas enforced. Service cache pooling. [cp-proxy](admin/Panel%20proxy.md) recommended. [xfs filesystem](admin/Resource%20enforcement.md#project-quotas) highly recommended. |      |
+| default     | Single node. Caches unshared among additional machines.      |      |
+| dev         | May only host .test TLDs. Operationally same a revolving monthly Pro license. |  ✅   |
+| dns-only    | Cannot host domains. Intended for [PowerDNS](admin/dns/PowerDNS.md). |  ✅   |
+| low-memory  | Pared down experience for use on 1 GB machines.              |      |
+| proxy       | For use with [cp-proxy](admin/Panel%20proxy.md). Implies low-memory. Includes Nodejs support. |  ✅   |
+| supervisor  | Management framework. No UI, no auxiliary services (ftp, http, mail). |  ✅   |
+
 ### Setting FQDN for SSL/Email
 
 All servers should have a fully-qualified domain name ([FQDN](https://en.wikipedia.org/wiki/Fully_qualified_domain_name)). Failure to have one will cause email to fail, including the installation notice. Moreover, Let's Encrypt will fail issuance. A FQDN must at least contain 1 dot:
