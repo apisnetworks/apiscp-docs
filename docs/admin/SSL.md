@@ -279,6 +279,14 @@ A self-signed certificate is a certificate requested by and signed by the same a
 
 Self-signed certificates can be trusted by adding the certificate to `/etc/pki/ca-trust/source/anchors`, then running `update-ca-trust extract`, which in turn will update `/etc/pki/tls/certs/ca-bundle.crt`.
 
+**New in 3.2.45**
+`ssl:trust-endpoint $uri` will perform this process automatically. It is not intended to import the full chain, just the anchor certificate.
+
+```bash
+# Trust the self-signed certificate on 1.2.3.4
+cpcmd ssl:trust-endpoint https://1.2.3.4:2083/
+```
+
 ::: tip serverAuth key usage required
 `extendedKeyUsage=serverAuth` must be specified when generating the self-signed certificate for it to be included in ca-bundle.crt otherwise the certificate is included in `ca-bundle.trust.crt`, which is not the default CA location.
 
