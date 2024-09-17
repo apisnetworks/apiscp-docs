@@ -102,7 +102,23 @@ cpcmd scope:set cp.nightly-updates '*-*-01 02:00'
 FLARE updates will always supersede preferred update times. Such updates are broadcasted sparingly to address either a zero day or critical hotfix.
 :::
 
-### FLARE Updates
+### Staggered updates
+**New in 3.2.46**
+
+An offset may be set, in hours, to abstain from updates if another commit has occured within that window. This allows releases to "cure" as well as staggered deployment across servers. Servers in `edge-major`, a transitive update policy, will ignore stagger values.
+
+```bash
+# Require 48 hours without a release to deploy
+cpcmd scope:set cp.update-offset 48
+# Disable staggered deployment
+cpcmd scope:set cp.update-offset 0
+```
+
+::: tip
+This works in EDGE as well. In the above example, an update would remain postponed until master goes multiple days without an update.
+:::
+
+### FLARE updates
 
 FLARE is a separate update system for ApisCP that performs hourly checks for critical releases. FLARE is automatically enabled whenever nightly updates are enabled (`cpcmd scope:get cp.nightly-updates`). This feature is a crucial side-channel to allow emergency updates should the need arise (new OS update introduces volatile changes, zero day mitigation, etc). FLARE checks are handled via `apnscp-flare-check` timer and its eponymous oneshot service.
 

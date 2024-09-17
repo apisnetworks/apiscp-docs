@@ -66,6 +66,7 @@ module.exports = {
 		logo: 'https://apiscp.com/images/logo-inv.svg',
 	// lastUpdated: 'Last updated',
 	repo: 'https://github.com/apisnetworks/apnscp-docs',
+	codeRepo: 'https://gitlab.com/apisnetworks/apnscp',
 	docsDir: "docs",
 	editLinks: true,
 	editLinkText: 'Help us improve this article!',
