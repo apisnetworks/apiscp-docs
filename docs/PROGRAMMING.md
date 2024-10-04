@@ -281,6 +281,7 @@ Modules comprise a variety methods and require specific access rights to protect
 | --------------------- | ---------------------------------------- |
 | PRIVILEGE_NONE        | Revokes access to all roles and all scenarios |
 | PRIVILEGE_SERVER_EXEC | Method may only be accessed from backend by first calling `$this->query()` |
+| PRIVILEGE_EXTAUTH    | Method may only be accessed if signon occured using TOTP or explicitly granted with `auth:set-extended-auth-flag` |
 | PRIVILEGE_ADMIN       | Method accessible by appliance administrator |
 | PRIVILEGE_SITE        | Method accessible by site administrator  |
 | PRIVILEGE_USER        | Method accessible by secondary users     |
@@ -298,8 +299,9 @@ Likewise, once a module has been entered, permissions can optionally no longer a
 ```php
 class My_Module extends Module_Skeleton {
     public $exportedFunctions = [
-        'entry' => PRIVILEGE_SITE,
-        'blocked' => PRIVILEGE_SITE|PRIVILEGE_SERVER_EXEC
+        'entry'   => PRIVILEGE_SITE,
+        'blocked' => PRIVILEGE_SITE|PRIVILEGE_SERVER_EXEC,
+        'totp'    => PRIVILEGE_ALL|PRIVILEGE_EXTAUTH
     ];
 
     public function entry() {
@@ -316,6 +318,12 @@ class My_Module extends Module_Skeleton {
         echo "Accessible from ", IS_CLI ? 'CLI' : 'UI';
         echo "Caller: ", \Error_Reporter::get_caller();
         return "Hello from backend!";
+    }
+
+    public function totp() {
+        echo "User authenticated with TOTP or equivalent extended authentication";
+        // returns true
+        return $this->permission_level & PRIVILEGE_EXTAUTH;
     }
 }
 ```

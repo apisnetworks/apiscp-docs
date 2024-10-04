@@ -44,8 +44,35 @@ Anvil provides an exponential backoff algorithm as it approaches 20 attempts to 
 Other services, including FTP, SSH, and mail use fail2ban to restrict unauthorized access.
 
 ### Restricting authorization
+Multifactor authentication is implemented by time-based rolling passcodes (TOTP) and IP restrictions. TOTP only protects against unauthorized UI access. IP restrictions protect UI, API, and DAV access.
 
-A second factor of authentication can exist in the form of IP restrictions. IP restrictions may be set in **Account** > **Settings** > **Security** or programmatically using `auth:restrict-ip($ip, $gate = NULL)`. An authentication gate, if specified, applies IP restriction to a module of ApisCP. Possible gates include: `UI`, `SOAP`, `DAV`, and `CLI`. When no gate is specified restriction applies to all gates. `auth:remove-ip-restriction($ip, $gate = NULL)` can be used to remove such restrictions. `$ip` accepts either an IP address or CIDR.
+FTP, IMAP, POP3, and SMTP are unaffected by these restrictions as the protocols were never designed with a challenge factor in mind. SSH may operate with a challenge but it is presently unimplemented.
+
+#### TOTP
+**New in 3.2.46**
+
+TOTP conforms to [RFC 6238](https://datatracker.ietf.org/doc/html/rfc6238) with a 160-bit secret established in [RFC 4226](https://www.ietf.org/rfc/rfc4226.txt). This value is adjustable in *[auth]* => *totp_bits* and must be at least 128 bits. TOTP authentication may be enabled in the UI under **Account** > **Settings** > **Security** or programmatically. Synchronizing TOTP across accounts (or servers) requires API commands.
+
+The same TOTP secret may be set elsewhere programmatically using `auth:enable-totp($secret, $code)` where `$code` is the active passcode for the named `$secret`.
+
+```bash
+# Create a secret
+cpcmd -d site1 auth:totp-code
+# Enable TOTP on site1 using secret
+cpcmd -d site1 auth:totp-enable <SECRET> <CODE>
+# Enable TOTP on the Appliance Administrator using same secret as site1
+cpcmd auth:totp-enable <SECRET> <CODE>
+# Disable TOTP for site1
+cpcmd -d site1 auth:totp-disable
+```
+
+TOTP secrets require elevated privileges to read, stored in the trusted extended attribute segment of the user's preference file. A TOTP secret must never be readable by any API function. A TOTP secret is lost if the preference file is transferred (or written to) without extended attribute support.
+
+Any account impersonated from a TOTP account inherits TOTP privileges. Any impersonation without TOTP will not inherit this privilege flag. An active session may be elevated to TOTP status ([PRIVILEGE_EXTAUTH](PROGRAMMING.md#Permissions)) using the API from an elevated console.
+
+#### IP
+
+IP restrictions may be set in **Account** > **Settings** > **Security** or programmatically using `auth:restrict-ip($ip, $gate = NULL)`. An authentication gate, if specified, applies IP restriction to a module of ApisCP. Possible gates include: `UI`, `SOAP`, `DAV`, and `CLI`. When no gate is specified restriction applies to all gates. `auth:remove-ip-restriction($ip, $gate = NULL)` can be used to remove such restrictions. `$ip` accepts either an IP address or CIDR.
 
 A check occurs concomitant with password validation. An IP-based failure is treated the same way internally as a password failure.
 
