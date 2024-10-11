@@ -339,6 +339,8 @@ The following commands imply `./artisan opcenter:plan` is used.
 
 `PLAN --diff=COMPARE`: compare PLAN against COMPARE returning only the differences in PLAN that do not exist in COMPARE or are different.
 
+`PLAN --edit`:  edit named PLAN. Use with `-c|--config` to set service values.
+
 `PLAN --remove`: remove named PLAN.
 
 `PLAN --verify`: run internal verification against PLAN ensuring it can publish an account.
@@ -362,6 +364,20 @@ A plan applied to an account does not reset any service values changed beyond th
 
 This behavior may be altered by supplying `--reset` to EditDomain. See [EditDomain](#EditDomain) above for more information.
 
+## Editing plans
+
+`--edit` allows one-off edits for plans from the command-line. If `--config` is used, then the plans are edited directly. If omitted and no `--service` is specified, then all services are edited using the provided editor (`$EDITOR` environment variable).
+
+```bash
+# Disable separate PHP-FPM users for plan named "simple" using composite
+./artisan opcenter:plan --edit --config apache,webuser=None simple
+# Increase storage for plan "storage" using --service syntax
+# Verify plan correctness afterward
+./artisan opcenter:plan --edit --service diskquota --config quota=1 --config units=T --verify storage
+# Hand-edit ssh service for plan "interactive" using nano
+# note --verify does not work in editor mode
+./artisan opcenter:plan --edit --service ssh
+```
 
 ## Complex plan usage
 
