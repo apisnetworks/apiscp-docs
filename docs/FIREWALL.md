@@ -42,7 +42,7 @@ Single quotes are not compulsory, but help the shell (Bourne shell) discriminate
 
 ### Delegated Whitelisting
 
-Site Administrators can whitelist a limited number of IP addresses by through **Account** > **Whitelisting**. This value can be toggled per-site by adjusting *rampart*,*max*. If set to `DEFAULT` it inherits *rampart*,*max* service value. A few specific values for *rampart*,*max* imply specific meanings:
+Site Administrators can whitelist a limited number of IP addresses through **Account** > **Whitelisting**. This value can be toggled per-site by adjusting *rampart*,*max*. If set to `DEFAULT` it inherits *rampart*,*max* service value. A few specific values for *rampart*,*max* imply specific meanings:
 
 - `-1`: unlimited whitelisting entries (OS limit)
 - `0`: disable whitelisting
