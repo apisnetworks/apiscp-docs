@@ -15,7 +15,7 @@ As long as the account fits this checklist, you're golden! To initiate migration
 apnscp_php /usr/local/apnscp/bin/scripts/transfersite.php -s <newserver> <domain>
 ```
 
-Where is the destination server, a fully-qualified domain isn't necessary, and is the domain name, site identifier (siteXX), or invoice grouping to migrate. For example, if a server has 3 accounts run by Ted with the billing grouping "tedsite" via `billing`,`invoice`/`billing`,`parent_invoice` in its service definition, then the following will kickoff 3 migrations in serial for Ted's sites to the server with the hostname `newsvr.mydomain.com`:
+Where `<newserver>` is the destination server, a fully-qualified domain isn't necessary, and `<domain>` is the domain name, site identifier (siteXX), or invoice grouping to migrate. For example, if a server has 3 accounts run by Ted with the billing grouping "tedsite" via `billing`,`invoice`/`billing`,`parent_invoice` in its service definition, then the following will kickoff 3 migrations in serial for Ted's sites to the server with the hostname `newsvr.mydomain.com`:
 
 ```bash
 apnscp_php /usr/local/apnscp/bin/scripts/transfersite.php -s newsvr.mydomain.com tedsite
