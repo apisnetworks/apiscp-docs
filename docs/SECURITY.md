@@ -70,6 +70,10 @@ TOTP secrets require elevated privileges to read, stored in the trusted extended
 
 Any account impersonated from a TOTP account inherits TOTP privileges. Any impersonation without TOTP will not inherit this privilege flag. An active session may be elevated to TOTP status ([PRIVILEGE_EXTAUTH](PROGRAMMING.md#Permissions)) using the API from an elevated console.
 
+##### TOTP API Access
+
+TOTP may be optionally included in API requests. When supplied as a header named `X-Extended-Auth`, extended authentication is permitted on all API calls. TOTP may be bypassed if `auth:set-extended-auth-flag($session_id)` is set for the authenticated session. API server will return an additional `WWW-Authorization` header with `qop="auth-int"` (authentication integrity) if TOTP is requested but has failed validation.
+
 #### IP
 
 IP restrictions may be set in **Account** > **Settings** > **Security** or programmatically using `auth:restrict-ip($ip, $gate = NULL)`. An authentication gate, if specified, applies IP restriction to a module of ApisCP. Possible gates include: `UI`, `SOAP`, `DAV`, and `CLI`. When no gate is specified restriction applies to all gates. `auth:remove-ip-restriction($ip, $gate = NULL)` can be used to remove such restrictions. `$ip` accepts either an IP address or CIDR.
