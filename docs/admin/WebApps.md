@@ -176,10 +176,10 @@ ApisCP ships with a chromium driver for screenshot acquisition of all hosted web
 ```bash
 cpcmd scope:set cp.screenshots true
 # Wait until Bootstrapper finishes reconfiguring server ...
-cpcmd web:capture-inventory
+cpcmd web:inventory-capture
 ```
 
-chromium runs when screenshot updates are required. Setting a large TTL in *[screenshots]* => *ttl* allows these screenshots to remain cached for long periods of time until `web:capture-inventory()` is run.
+chromium runs when screenshot updates are required. Setting a large TTL in *[screenshots]* => *ttl* allows these screenshots to remain cached for long periods of time until `web:inventory-capture()` is run.
 
 ## Ad hoc apps
 
