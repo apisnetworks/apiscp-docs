@@ -23,14 +23,21 @@ ApisCP is an modern hosting panel + platform that began in 2002 as a panel for A
 ## Requirements
 
 - 2 GB RAM
-- [Forward-confirmed reverse DNS](https://en.wikipedia.org/wiki/Forward-confirmed_reverse_DNS), i.e. 64.22.68.1 <-> apnscp.com
+- 20 GB storage
+- 1 CPU
 - RHEL-based OS:
-  - RHEL 7.4+ (EOL) / 8.*
-  - CentOS 7.4+ (EOL) / 8.*
-  - CentOS Stream 8.*
-  - Rocky Linux 8.*
-  - AlmaLinux 8.*
-- Containers are **not supported** (Virtuozzo, OpenVZ, LDC, Docker)
+  - RHEL 7.4+ (EOL)
+  - RHEL 8.x
+  - CentOS 7.4+ (EOL)
+  - CentOS 8.x
+  - CentOS Stream 8.x
+  - Rocky Linux 8.x
+  - AlmaLinux 8.x
+- Bare-metal or virtualization (kvm, xen, VMWare, Hyper-V)
+- [Forward-confirmed reverse DNS](https://en.wikipedia.org/wiki/Forward-confirmed_reverse_DNS), i.e. 64.22.68.1 <-> apnscp.com
+
+> [!WARNING]  
+> Containers (Virtuozzo, OpenVZ, LXC, Docker) are **not supported**.
 
 ## Installation
 
