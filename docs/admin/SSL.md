@@ -78,7 +78,7 @@ Domains with managed DNS will consolidate multiple subdomains to a wildcard cert
 This does not work when the domain's public IP address does not match the expected public IP, such as if the domain is behind [Cloudflare](dns/Cloudclare.md) proxy.
 
 ### Staging
-Issuance may be staged, that is to say authorization generated using `letsencrypt:challenges()`, then solved at a later time using `letsencrypt:solve()`. Once solved, the a certificate may be ordered for the hostname using `letsencrypt:request()` using the pre-solved challenges as a shibboleth. 
+Issuance may be staged, that is to say authorization generated using `letsencrypt:challenges()`, then solved at a later time using `letsencrypt:solve()`. Once solved, a certificate may be ordered for the hostname using `letsencrypt:request()` using the pre-solved challenges as a shibboleth. 
 
 ```bash
 cpcmd -d site1 letsencrypt:challenges '[*.mydomain.com,mydomain.com]'

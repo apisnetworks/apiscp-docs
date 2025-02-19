@@ -516,19 +516,19 @@ The latest version of 5.6 and 7.2 would build as multiPHP releases. Any extensio
 
 #### Installing modules
 
-Modules may be installed as one would normally expect with regular PHP-FPM. The only difference is the presence of `multiphp_build=true` and `php_version` must be explicitly set to at least MAJOR.MINOR.
+Modules may be installed as one would normally expect with regular PHP-FPM. The only difference is the presence of `php_version` that must be explicitly set.
 
 To install imagick off PECL for PHP 7.4,
 
 ```bash
-upcp -sb --var=igbinary --var=php_version=7.4 --var=multiphp_build=true php/install-extensions
+upcp -sb --var=pecl_extensions=igbinary --var=php_version=7.4 php/install-extensions
 ```
 
 Likewise `pecl_php74` could be set as a list with `['igbinary']` to automatically build for PHP 7.4:
 
 ```bash
 cpcmd scope:set cp.bootstrapper pecl_php74 '[igbinary]'
-upcp -sb --var=php_version=7.4 --var=multiphp_build=true php/install-extensions
+upcp -sb --var=php_version=7.4 php/install-extensions
 ```
 
 ### Remi builds

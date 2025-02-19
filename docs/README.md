@@ -1,7 +1,7 @@
 ---
 home: true
-tagline: Managing an ApisCP platform 
-actionText: Get Started →
+tagline: Managing an ApisCP platform
+actionText: Get Started
 actionLink: /INSTALL/
 features:
 - title: Self-healing
@@ -34,8 +34,10 @@ ApisCP is an modern hosting panel + platform that began in 2002 as a panel for A
   - Rocky Linux 8.x
   - AlmaLinux 8.x
 - Bare-metal or virtualization (kvm, xen, VMWare, Hyper-V)
-- Containers (Virtuozzo, OpenVZ, LXC, Docker) are **not supported**
 - [Forward-confirmed reverse DNS](https://en.wikipedia.org/wiki/Forward-confirmed_reverse_DNS), i.e. 64.22.68.1 <-> apnscp.com
+
+> [!WARNING]  
+> Containers (Virtuozzo, OpenVZ, LXC, Docker) are **not supported**.
 
 ## Installation
 

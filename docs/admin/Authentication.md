@@ -66,3 +66,26 @@ cpcmd keyring:valid "$(cpcmd keyring:get my-secret)"
 ::: tip Changing secrets
 Changing a server secret will invalidate all saved passwords as well as invalidate intraservice access within the UI. Server secrets should be the same across related servers for use with [cp-proxy](Panel%20proxy.md).
 :::
+
+## Multi-factor authentication
+
+See "[Restricting Authorization](../SECURITY.md#Restricting%20authorization)" in SECURITY.md.
+
+
+## Session multipath
+
+**New in 3.2.46**
+
+Multiple concurrent sessions is supported when **[frontend]** => **multipath_length** is set to a value greater than 0. This represents the first *n* characters of the active session. All active requests will be prefixed with an "id_XXXX" marker; likewise cookies will be set within this path. [RFC 6265 § 5.4](https://datatracker.ietf.org/doc/html/rfc6265#section-5.4) provides a strong recommendation that these path marker cookies will take precedence over root-level cookies. 
+
+The feature may be enabled by specifying a multipath length greater than 0:
+
+```bash
+cpcmd scope:set cp.config frontend multipath_length 4
+```
+
+Sessions are uniformly distributed over a 62^32 space that provides adequate protection against brute-force attempts. In event of a collision, the most recent session would overwrite the prior. Longer multipaths have a greater tendency to occlude the location bar. [Birthday attack](https://en.wikipedia.org/wiki/Birthday_attack) formula can be used to approximate the likelihood of a collision.  An approximation of a 50% collision for a length *n* is calculated as:
+
+![multipath collision probability](./images/multipath-collision.png)
+
+*Or roughly: 4800 separate browser tab-sessions for a 50/50 chance of another tab getting logged out when n=4...*
