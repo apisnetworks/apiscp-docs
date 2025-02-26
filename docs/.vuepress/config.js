@@ -144,6 +144,7 @@ module.exports = {
 				"admin/Bootstrapper",
 				]
 			},
+			"admin/Cockpit",
 			{
 				title: "Migrations",
 				children: [

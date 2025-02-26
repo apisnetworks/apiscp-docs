@@ -69,7 +69,7 @@ Changing a server secret will invalidate all saved passwords as well as invalida
 
 ## Multi-factor authentication
 
-See "[Restricting Authorization](../SECURITY.md#Restricting%20authorization)" in SECURITY.md.
+See "[Restricting Authorization](../SECURITY.md#totp)" in SECURITY.md.
 
 
 ## Session multipath

@@ -71,6 +71,7 @@ All locations are within /var/log unless noted. siteXX is shorthand for /home/vi
 | Service                   | Location                   | Remarks                                                      |
 | ------------------------- | -------------------------- | ------------------------------------------------------------ |
 | Apache                    | httpd/error_log            | HTTP startup                                                 |
+| Apache per-site           | siteXX ... httpd/access_log | Per-site HTTP requests       
 | Apache per-site           | siteXX ... httpd/error_log | Per-site error logs, FPM connectivity                        |
 | PHP-FPM                   | siteXX ... php-fpm/POOL    | Per-site PHP errors, notices                                 |
 | HTTP malware | httpd/modsec_audit.log | See [malware scans](./admin/ModSecurity.md) |
