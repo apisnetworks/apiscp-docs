@@ -42,6 +42,8 @@ ImportDomain --format=cpanel /path/to/cpmove-backup.tar.gz
 Never run ImportDomain where the decompressed backup source is in the current working directory. `ImportDomain --format=cpanel ./` will force a terminal logout as it relocates the backup and closes are open file handles to prevent tampering during restore.
 :::
 
+A working example of this would be, you SCP the file to your /home/username and then mv the file to /root/migrations you can then run the ImportDomain from /home/username or /root as long as you are not in the /root/migrations folder. Once you've completed the migration remove the file from the /root/migrations the command would then be 'ImportDomain --format=cpanel /root/migrations/cpmove-backup.tar.gz'
+
 ## Account creation
 
 An import will faithfully restore whatever options were used in creation. Conflicts may arise and can be remedied by overriding creation options using `-c service,parameter=value`. For example to remove a domain limit imposed by `MAXADDON=` (*addon and parked domains are same to ApisCP*) and change the storage to 10 GB in a restore,
@@ -94,7 +96,9 @@ Each email account is delivered to a separate user account. Partitioning email i
 | merge      | foo@a.com      | foo@b.com         | foo                 |
 | namespaced | foo@a.com      | foo@b.com         | foo-b               |
 
-Conflict strategy may be specified with `--conflict=method`. The default method is *fail*.
+Conflict strategy may be specified with `--conflict=method`. The default method is *fail*. 
+
+With cpanel accounts that have multiple domains and email addresses namespaced will create seperate users for each one which will 'feel' similar to the way the customer has it now, it will also retain the data across multiple accounts. 
 
 #### Forwarded catch-alls
 
