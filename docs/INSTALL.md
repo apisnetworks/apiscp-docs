@@ -6,12 +6,16 @@
 - 20 GB storage
 - 1 CPU
 - RHEL-based OS:
-  - RHEL 7.4+ (EOL) / 8.*
-  - CentOS 7.4+ (EOL) / 8.*
-  - CentOS Stream 8.*
-  - Rocky Linux 8.*
-  - AlmaLinux 8.*
-- Containers are **not supported** (Virtuozzo, OpenVZ)
+  - RHEL 7.4+ (EOL)
+  - RHEL 8.x
+  - CentOS 7.4+ (EOL)
+  - CentOS 8.x
+  - CentOS Stream 8.x
+  - Rocky Linux 8.x
+  - AlmaLinux 8.x
+- Bare-metal or virtualization (kvm, xen, VMWare, Hyper-V)
+- Containers (Virtuozzo, OpenVZ, LXC, Docker) are **not supported**
+- [Forward-confirmed reverse DNS](https://en.wikipedia.org/wiki/Forward-confirmed_reverse_DNS), i.e. 64.22.68.1 <-> apnscp.com
 
 ## Bootstrapper
 [Bootstrapper](https://github.com/apisnetworks/apnscp-playbooks) is an idempotent tool to continuously update and correct your server. If things drift, Bootstrapper is designed to provide the **minimal set** of enforcing changes to make your server work. You will always have free rein of your server as long as it doesn't impede upon the responsibility of ApisCP. [Scopes](admin/Scopes.md) provide guarded management points that are jointly managed by Bootstrapper.
