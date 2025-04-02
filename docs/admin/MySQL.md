@@ -89,6 +89,36 @@ Remove the disk quota from the account temporarily to allow MySQL to repair the 
     EditDomain -c diskquota,quota=20000 -c diskquota,unit=MB site34 
     ```
 
+### Cyclic crash on query
+
+An alternative form can occur during query with little indication of which account is triggering the crash. In these situations, (1) look for all databases that contain the table and (2) perform the non-destructive `SELECT` query against it.
+
+```
+/usr/sbin/mysqld(_ZN7handler18ha_index_next_sameEPhPKhj+0x285)[0x561898860025]
+/usr/sbin/mysqld(_ZN7handler21multi_range_read_nextEPPv+0xb2)[0x561898764ee2]
+...
+/usr/sbin/mysqld(_Z11mysql_parseP3THDPcjP12Parser_statebb+0x245)[0x56189863ce55]
+/usr/sbin/mysqld(_Z16dispatch_command19enum_server_commandP3THDPcjbb+0x1a33)[0x56189863f843]
+/usr/sbin/mysqld(_Z10do_commandP3THD+0x107)[0x561898641737]
+...
+
+Trying to get some variables.
+Some pointers may be invalid and cause the dump to abort.
+Query (0x7f7928010710): SELECT post_modified_gmt FROM wp_posts WHERE post_status = 'publish' AND post_type IN ('post', 'page', 'attachment') ORDER BY post_modified_gmt DESC LIMIT 1
+```
+
+In the above, the look for a table named "wp_posts.ibd" or "wp_posts.MYI" (*NB: WordPress uses InnoDB, so the extension is .ibd*) then apply the query. When MariaDB disconnects, it's the culprit.
+
+```bash
+find -L /var/lib/mysql -mindepth 2 -type f -iregex '.*/wp_posts\.\(ibd\|myd\)' | cut -d/ -f5 | sed -e 's!@00!\\x!g' | xargs -0 echo -e | while read db ; do
+	echo $db
+	echo "SELECT post_modified_gmt FROM wp_posts WHERE post_status = 'publish' AND post_type IN ('post', 'page', 'attachment') ORDER BY post_modified_gmt DESC LIMIT 1" | mysql $db || break
+done
+```
+
+Table is corrupted. Restore from backup located within the user's home directory beneath `mysql_backups/`.
+
+
 ### Row size too large
 
 #### Background
