@@ -31,8 +31,11 @@ A site once suspended will compile these rules into `/etc/httpd/conf/siteXX/00-s
 yum install -y jq
 cpcmd -o json admin:collect '[]' '[active:false]' | jq -r 'keys[]' | while read -r SITE ; do SuspendDomain $SITE ; done
 ```
+### Additional VirtualHost contexts
+All *VirtualHost* containers should be managed directly by ApisCP within `/etc/httpd/conf/virtual` and backed by a real account. If additional VirtualHost containers are necessary, they may be located under `httpd-custom.conf` or `/etc/httpd/conf.d`. *VirtualHost* contexts located under `httpd-custom.conf` must match the *ServerName* value of the server hostname (net.hostname [Scope](Scopes.md)).
+
 ### Evasive
-**⚠️ DO NOT TOUCH**: n/aa  
+**⚠️ DO NOT TOUCH**: n/a  
 **Customization file**: /etc/httpd/conf.d/evasive.conf or httpd-custom.conf
 
 Alternatively consider the apache.evasive [Scope](Scopes.md), which provides error checking.
