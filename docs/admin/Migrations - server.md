@@ -86,6 +86,14 @@ apnscp_php bin/scripts/transfersite.php -c='dns,provider=linode' -c='dns,key=abc
 
 On the source server, mydomain.com may continue to use DigitalOcean as its [DNS provider](https://bitbucket.org/apisnetworks/apnscp/src/master/lib/Module/Provider/Dns/Digitalocean.php?at=master&fileviewer=file-view-default) while the on the target server mydomain.com will use Linode's [DNS provider](https://bitbucket.org/apisnetworks/apnscp/src/master/lib/Module/Provider/Dns/Linode.php?at=master&fileviewer=file-view-default). Once mydomain.com completes its initial stage (stage 0), be sure to update the nameservers for mydomain.com.
 
+## Keyring values
+
+[Keyring values](Authentication.md#keyring) are sensitive parameters on a server that are decoded internally when necessary. Keyring values (*dns*,*key* service parameter or any value prefixed with "keyring:") are transferred as-is. These values may not be decoded without the correct secret set on target server. To proceed with migration, one of three options exists:
+
+1. Set the [same secret](Authentication.md#transferring-keyrings) on destination server.
+2. Omit the value by overriding, e.g. `-c dns,key=None`
+3. Reset it to the destination server default by specifying `DEFAULT` as the service value, e.g. `- dns,key=DEFAULT`. This only works for default-nullable values. `AddDomain --help` annotates these values with an asterisk (\*).
+
 ## Notification templates
 
 A notification is sent at the end **stage 0** (warmup migration) and **stage 1** (final migration). Migrations are read from `resources/templates/migrations/` and may be overrode following [view/template](Customizing.md#ApisCP) override rules.

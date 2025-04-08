@@ -72,8 +72,9 @@ module.exports = {
 	editLinkText: 'Help us improve this article!',
 	smoothScroll: true,
 	algolia: {
-		apiKey: '40a665fc96b49b38dc8620bad6372c9a',
+		apiKey: 'e9c55447b26c9154e50775ecd4a1e5cc',
 		indexName: 'apiscp',
+		appId: 'MWBLB1RG0W'
 	},
 	nav: [
 	{
