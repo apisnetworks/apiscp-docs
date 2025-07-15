@@ -180,7 +180,7 @@ module.exports = {
 				children: [
 				"admin/Apache",
 				"admin/PHP-FPM",
-				"admin/Evasive",
+				"admin/Shield",
 				"admin/ModSecurity",
 				"admin/Fortification",
 				"admin/Audit"
