@@ -67,7 +67,7 @@ Above triggers protection if more than 300 requests are made within 2 seconds.
 
 ### Status penalties
 
-Scoring may be adjusted for any HTTP response code, such as a 304, 403, 404 or even a custom status like [418 I'm a teapot](https://en.wikipedia.org/wiki/Hyper_Text_Coffee_Pot_Control_Protocol) using `shield-status` (`DOSPageStatus STATUS SCORE|off`).. Status codes are evaluated from the *final* response in a processing pipeline.
+Scoring may be adjusted for any HTTP response code, such as a 304, 403, 404 or even a custom status like [418 I'm a teapot](https://en.wikipedia.org/wiki/Hyper_Text_Coffee_Pot_Control_Protocol) using `shield-status` (`DOSPageStatus STATUS SCORE|off`).. Status codes are evaluated from the *final* response in a processing pipeline. 
 
 ```bash
 # Add 50 points if HTTP status code is 418
@@ -83,6 +83,8 @@ cpcmd scope:set apache.shield-status false
 # Accepted for interoperability
 cpcmd scope:set apache.shield-status off
 ```
+
+For sites that are composed with best practices in mind, 404 and non-2xx status codes are rare; thus, default status penalties are optimal.
 
 ### Status handler
 
@@ -101,10 +103,15 @@ It may be activated with the following directives in `/etc/httpd/conf/httpd-cust
 
 ![Shield sample handler](./images/shield-handler.png)
 
+::: tip Whitelist 
+HTTP blocks occur early in the pipeline before any overrides or per-directory processing to reduce CPU strain. It's a good idea to also whitelist these IP addresses that are permitted to view the status overview in case *they too* get blocked.
 
-### Empirical estimates
+```bash
+# Never block any address between 1.2.3.1 and 1.2.3.255
+cpcmd scope:set apache.shield-whitelist 1.2.3.1/24
+```
 
-Running a site through webpagetest.org or using [DevTools](https://developers.google.com/web/tools/chrome-devtools) to see the average number of subrequests per page view can help you estimate a good baseline for your site. An ideal setting allows typical usage while disabling atypical extremes: bots don't adhere to netiquette when brute-forcing credentials. Some protection is necessary.
+:::
 
 ### Disabling per site
 
@@ -121,9 +128,14 @@ Then rebuild and reload, `htrebuild && systemctl reload httpd`.
 ```bash
 EditDomain -c shield,shield=0 domain.com
 ```
+### Empirical estimates
 
-## Status handler
+Running a site through webpagetest.org or using [DevTools](https://developers.google.com/web/tools/chrome-devtools) to see the average number of subrequests per page view can help you estimate a good baseline for your site. An ideal setting allows typical usage while disabling atypical extremes: bots don't adhere to netiquette when brute-forcing credentials. Some protection is necessary.
 
+
+### Block metadata
+
+Whenever a block occurs, a separate file is created in /tmp with the blocked address. File format is: `PID<NL>[site|page] GENERATION COUNT HOSTNAME ORIGIN-TIMESTAMP GROWTH-RATE<NL>URI`. `GROWTH-RATE` - points per second - is the scoring rate per second accumulated defined as *COUNT/(NOW - ORIGIN-TIMESTAMP)*.
 
 ## Filtering individual resources
 
@@ -192,7 +204,7 @@ RemoteIPHeader X-Client-IP
 RemoteIPTrustedProxy 4.4.4.4
 ```
 
-::: info Trusting internal network addresses
+::: tip Trusting internal network addresses
 `RemoteIPTrustedProxy` discards any internal network ranges (10/8, 172.16/12, 192.168/16, 169.254/16, 127/8 or outside IPv6 public 2000::/3 block). Specify [`RemoteIPInternalProxy`](https://httpd.apache.org/docs/2.4/mod/mod_remoteip.html#remoteipinternalproxy) instead if your network topology includes internal networks also subject to filtering. 
 :::
 
