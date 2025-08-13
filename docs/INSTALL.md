@@ -6,11 +6,9 @@
 - 20 GB storage
 - 1 CPU
 - RHEL-based OS:
-  - RHEL 7.4+ (EOL) / 8.*
-  - CentOS 7.4+ (EOL) / 8.*
-  - CentOS Stream 8.*
-  - Rocky Linux 8.*
-  - AlmaLinux 8.*
+  - Rocky Linux 8.x / 9.x / 10.x
+  - AlmaLinux 8.x / 9.x / 10.x
+  - RHEL 8.x / 9.x / 10.x
 - Containers are **not supported** (Virtuozzo, OpenVZ)
 
 ## Bootstrapper

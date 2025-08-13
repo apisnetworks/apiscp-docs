@@ -166,18 +166,18 @@ This is an extremely dangerous configuration that should be avoided at all costs
 Worker throughput may be examined via systemd. FPM workers are watchdog-aware, which means they automatically report health back to systemd within a deadline window to improve reliability, recovering as needed. Worker metrics may be examined via `systemctl status`,
 
 ```bash
-systemctl status php-fpm-site1-domain.com
+systemctl status php-fpm@site1-domain.com
 ```
 
-PHP-FPM workers are grouped *\<SITE>*-*\<MARKER>*. By default the *marker* is the primary domain on the account. *site* is the immutable siteXX designator of the domain.
+PHP-FPM workers are grouped *@\<SITE>*-*\<MARKER>*. By default the *marker* is the primary domain on the account. *site* is the immutable siteXX designator of the domain.
 
 ```bash
-systemctl status php-fpm-site1-domain.com
+systemctl status php-fpm@site1-domain.com
 
 #########################
 # Sample response follows
 #########################
-● php-fpm-site1-domain.com.service - PHP worker for site1 - domain.com
+● php-fpm@site1-domain.com.service - PHP worker for site1 - domain.com
    Loaded: loaded (/usr/local/apnscp/resources/templates/apache/php/fpm-service.blade.php; disabled; vendor preset: disabled)
    Active: active (running) since Fri 2019-08-30 17:35:01 EDT; 1min 25s ago
   Process: 17905 ExecStartPost=/bin/sh -c for i in /sys/fs/cgroup/*/site1/tasks ; do echo $MAINPID > $i ; done (code=exited, status=0/SUCCESS)
@@ -191,21 +191,21 @@ systemctl status php-fpm-site1-domain.com
 
 ```
 
-ApisCP manages pool groups, restarting as needed after the elision window expires. To restart or suspend the pool for a site, use the `php-fpm-siteXX` service wrapper.
+ApisCP manages pool groups, restarting as needed after the elision window expires. To restart or suspend the pool for a site, use the `php-fpm@siteXX` service wrapper.
 
 ```bash
 # Suspend all pools allocated to site1
 # Note: socket activation will start the worker on demand!
-systemctl stop php-fpm-site1
+systemctl stop php-fpm@site1
 # Restart all PHP-FPM pools, for example configuration updated
-systemctl restart php-fpm-site1
+systemctl restart php-fpm@site1
 ```
 
 Permanent suspension may be achieved by disabling the corresponding socket,
 
 ```bash
-systemctl mask php-fpm-site1-*.socket
-systemctl stop php-fpm-site1
+systemctl mask php-fpm@site1-*.socket
+systemctl stop php-fpm@site1
 ```
 
 However this is seldom useful as suspending the account achieves a similar result:
@@ -228,7 +228,7 @@ systemctl start php-fpm
 ### Service relationship
 Both *php-fpm* and *php-fpm-siteXX* represent one-way bindings to the respective pools. The full service name, *php-fpm-siteXX-domain* consists of 2 parts, a socket-activated service ending in *.socket* that spawns the PHP-FPM pool that shares the same name once activity arrives on that socket from Apache.
 
-Restarting *php-fpm.service* will restart all PHP-FPM pools previously running, however, will leave dormant pools inactive. Likewise the same treatment is applied to *php-fpm-siteXX.service* but only to pools belonging to that site. Restarting *php-fpm-siteXX-domain.socket* will restart the similarly named service if it was previously listening or re-enable the socket listener if previously deactivated via a `stop` command (`systemctl stop php-fpm`). Starting *php-fpm-siteXX-domain.service* will unconditionally start the PHP-FPM pool without waiting for activity from the named *.socket*.
+Restarting *php-fpm.service* will restart all PHP-FPM pools previously running, however, will leave dormant pools inactive. Likewise the same treatment is applied to *php-fpm-siteXX.service* but only to pools belonging to that site. Restarting *php-fpm-siteXX-domain.socket* will restart the similarly named service if it was previously listening or re-enable the socket listener if previously deactivated via a `stop` command (`systemctl stop php-fpm`). Starting *php-fpm@siteXX-domain.service* will unconditionally start the PHP-FPM pool without waiting for activity from the named *.socket*.
 
 ![Propagation relation between different services](./images/php-fpm-service-relationship.svg)
 
@@ -239,15 +239,15 @@ Overriding configuration follows systemd [convention](https://wiki.archlinux.org
 
 ```bash
 cd /etc/systemd/system
-mkdir php-fpm-site1-example.com.service.d/
-cd php-fpm-site1-example.com.service.d
+mkdir php-fpm@site1-example.com.service.d/
+cd php-fpm@site1-example.com.service.d
 cat <<EOF >>override.conf
 [Service]
 # Run the service at lowest priority
 LimitNICE=40
 EOF
 systemctl daemon-reload
-systemctl restart php-fpm-site1-example.com
+systemctl restart php-fpm@site1-example.com
 ```
 
 ## Resource enforcement
@@ -339,7 +339,7 @@ php_value[upload_max_filesize] = 64m
 php_value[post_max_size] = 64m
 ```
 
-Then restart the pool, `systemctl restart php-fpm-siteXX` 
+Then restart the pool, `systemctl restart php-fpm@siteXX` 
 
 ::: tip php_admin immutability
 Any value marked as `php_admin_value` or `php_admin_flag` may not be reset or changed once set. Use fpm-config-custom.blade.php below to update.
@@ -390,7 +390,7 @@ Configuration in PHP-FPM is assignment-based, similar to php.ini, rather than di
 
 PHP-FPM caches per-directory `.user.ini` files. By default the duration is 300 seconds (5 minutes). This can be altered by adding a FPM configuration to /etc/php-fpm.d/*file*.conf or by overriding the PHP-FPM template in templates/apache/php/.
 
-Then restart the affected pool, `systemctl restart php-fpm-siteXX` where siteXX is the site marker or do an en masse restart with `systemctl restart php-fpm`.
+Then restart the affected pool, `systemctl restart php-fpm@siteXX` where siteXX is the site marker or do an en masse restart with `systemctl restart php-fpm`.
 
 Since v3.1.38, directives are migrated automatically for all known domain/subdomain parent document roots when a site is switched between jail/non-jail mode. `php:migrate-directives(string $host, string $path = '', string $from)` provides a migration interface for directives behind a subdirectory.
 
@@ -413,7 +413,7 @@ Next override [security.limit_extensions](https://www.php.net/manual/en/install.
 security.limit_extensions=.php .phar .html .htm
 ```
 
-Then restart the affected pool, `systemctl restart php-fpm-siteXX` where siteXX is the site marker or do an en masse restart with `systemctl restart php-fpm`.
+Then restart the affected pool, `systemctl restart php-fpm@siteXX` where siteXX is the site marker or do an en masse restart with `systemctl restart php-fpm`.
 
 ### /tmp location
 
@@ -622,9 +622,9 @@ Manually setting PHP versions takes precedence over the API. This may be useful 
 
 ##### Native
 
-In /etc/systemd/system, create a directory named after the pool and suffixed with ".d". Pools are named php-fpm-siteXX-NAME. For example, to override pool named apis.com on site1, create a directory named *php-fpm-site1-apis.com.d/* and a file named "override.conf".
+In /etc/systemd/system, create a directory named after the pool and suffixed with ".d". Pools are named php-fpm@siteXX-NAME. For example, to override pool named apis.com on site1, create a directory named *php-fpm@site1-apis.com.d/* and a file named "override.conf".
 
-`systemctl edit php-fpm-site1-apis.com` is equivalent to the above operation.
+`systemctl edit php-fpm@site1-apis.com` is equivalent to the above operation.
 
 ```
 [Service]
@@ -637,14 +637,14 @@ ExecStart=/.socket/php/multiphp/native/7.4/sbin/php-fpm --nodaemonize --fpm-conf
 Then restart the service,
 
 ```bash
-systemctl restart php-fpm-site1-apis.com
+systemctl restart php-fpm@site1-apis.com
 ```
 
 ##### Remi
 
-In /etc/systemd/system, create a directory named after the pool and suffixed with ".d". Pools are named php-fpm-siteXX-NAME. For example, to override pool named apis.com on site1, create a directory named *php-fpm-site1-apis.com.d/* and a file named "override.conf".
+In /etc/systemd/system, create a directory named after the pool and suffixed with ".d". Pools are named php-fpm@siteXX-NAME. For example, to override pool named apis.com on site1, create a directory named *php-fpm\@site1-apis.com.d/* and a file named "override.conf".
 
-`systemctl edit php-fpm-site1-apis.com` is equivalent to the above operation.
+`systemctl edit php-fpm@site1-apis.com` is equivalent to the above operation.
 
 ```
 [Service]
@@ -657,7 +657,7 @@ ExecStart=/usr/bin/scl enable php74 -- php-fpm --daemonize --fpm-config=/etc/php
 Then restart the service,
 
 ```bash
-systemctl restart php-fpm-site1-apis.com
+systemctl restart php-fpm@site1-apis.com
 ```
 
 This is very similar to **native** with a few key differences:
@@ -830,3 +830,7 @@ PHP-FPM will attempt to restart 3 times logging each failure. Because of this be
 `systemctl list-sockets --state=failed php-fpm* ` displays all failed sockets, which can be due to the PHP-FPM service failing to start or socket failing to start.
 
 `journalctl -n20 -u php-fpm-siteXX-NAME.service` from the **ACTIVATES** column will give more information up to the last 20 lines as noted above in "[Pool fails to start](#pool-fails-to-start)".
+
+## Version history
+
+**3.2.49**: Changed php-fpm-siteXX scheme to php-fpm@siteXX to allow group instantiation with service templates. 
