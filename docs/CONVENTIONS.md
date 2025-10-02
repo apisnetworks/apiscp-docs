@@ -5,7 +5,7 @@ Multiple components of ApisCP are referenced with different markup.
 * *[section]* => *option*: config.ini settings
 * *Class\Subclass*: typically in changelogs, provides visibility of at least two levels corresponding to class
 * *group*.*name*: configuration [scopes](docs/Scopes.md)
-* *service*,*value*: service configuration (e.g. siteinfo,email)
+* *service*,*parameter*=*value*: service configuration (e.g. siteinfo,email)
 * *role*/*subrole*: [Bootstrapper](https://github.com/apisnetworks/apnscp-playbooks) tasks, correspond to `roles/` directory
 * *module*: typically in changelogs (italicized outside), module name (`lib/modules`)
 * *Word Word*: applications within ApisCP's front-end (`apps/`, see `lib/Template/` for name => directory mapping)
