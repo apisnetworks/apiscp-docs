@@ -100,6 +100,21 @@ cpcmd scope:set cp.config core bug_report email+bugs@domain.com
 
 Given the volume generated, plus-address notation or a separate email address is recommended to facilitate mail filtering by your SMTP provider.
 
+## Event IDs
+**New in 3.2.49**
+
+Unhandled exceptions and [`fatal()`](PROGRAMMING.md#er-message-buffer-macros) macros generate an Event ID within the UI. These are context-specific, deterministic IDs with full backtraces stored in the [frontend logfile](#log-locations).
+
+![Event ID example](./images/debugging-event-id.png)
+
+Given the following Event ID, its corresponding backtrace may be filtered using the following command:
+
+```bash
+awk '/0c515558-38a2-59be-82c6-1d810b1195e2/,/^$/' /usr/local/apnscp/storage/logs/php-fpm.log
+```
+
+All matching events are returned, which is user-specific.
+
 ## Backend
 
 You can start the backend broker from the command-line in the foreground. It handles elevation requests from the frontend via the [query()](PROGRAMMING.md#invocation-flow) function in the API.
