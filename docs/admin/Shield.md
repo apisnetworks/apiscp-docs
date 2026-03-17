@@ -126,7 +126,7 @@ Then rebuild and reload, `htrebuild && systemctl reload httpd`.
 
 #### Indirect
 ```bash
-EditDomain -c shield,shield=0 domain.com
+EditDomain -c shield,enabled=0 domain.com
 ```
 ### Empirical estimates
 

@@ -252,6 +252,10 @@ A posixsem mutex is used to serialize accept() requests. This has been determine
 
 Log buffering is enabled to reduce the amount of I/O requests. [Buffered logs](http://httpd.apache.org/docs/current/mod/mod_log_config.html#bufferedlogs) will enqueue full records up to the in-memory limit, 4 KB. If a record exceeds the buffer length, the buffer is flushed prior to recording the new entry. Buffering may be disabled using the `apache.buffered-logs` [Scope](Scopes.md).
 
+### systemd integration
+
+mod_systemd is used to report periodic health updates to its [internal data collection](./Metrics.md) subsystem. Enablement implies `ExtendedStatus on`, which on a normal platform results in a ~4.5% performance reduction (roughly less than 1 microsecond per request). Exceptions do exist, [like EC2](https://blog.packagecloud.io/system-calls-are-much-slower-on-ec2/), if modern vDSO wrappers are restricted in a paravirtualized environment such as xen. While this may not be ideal if the intention is to serve over 50,000 rps on a single machine - it may be individually disabled by setting `ExtendedStatus off` in [httpd-custom.conf](Customizing.md#Apache).
+
 ## Tuning
 
 In Event MPM, a single child process can handle multiple requests concurrently. By default, a very conservative number of threads (20) is created per process. At most a child process can handle 20 concurrent connections. Active requests beyond this threshold spawn a new child process.
@@ -290,6 +294,17 @@ grep 'Segmentation' /var/log/httpd/error_log{,.1}
 ### PHP tuning
 
 See [PHP-FPM.md](PHP-FPM.md).
+
+### Benchmarking
+
+A baseline benchmark is provided as `httpd-thin.conf`. This configuration removes all virtualhosting support as well as all protection. Its utility is to deliver a "best-case" system performance using Apache.
+
+```bash
+mv /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd-orig.conf
+mv /etc/httpd/conf/httpd-thin.conf /etc/httpd/conf/httpd.conf
+systemctl restart httpd
+# Do benchmark stuff here
+```
 
 ## Troubleshooting
 
