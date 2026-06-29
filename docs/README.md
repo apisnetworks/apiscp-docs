@@ -25,11 +25,9 @@ ApisCP is an modern hosting panel + platform that began in 2002 as a panel for A
 - 2 GB RAM
 - [Forward-confirmed reverse DNS](https://en.wikipedia.org/wiki/Forward-confirmed_reverse_DNS), i.e. 64.22.68.1 <-> apnscp.com
 - RHEL-based OS:
-  - RHEL 7.4+ (EOL) / 8.*
-  - CentOS 7.4+ (EOL) / 8.*
-  - CentOS Stream 8.*
-  - Rocky Linux 8.*
-  - AlmaLinux 8.*
+  - Rocky Linux 8.x / 9.x / 10.x
+  - AlmaLinux 8.x / 9.x / 10.x
+  - RHEL 8.x / 9.x / 10.x
 - Containers are **not supported** (Virtuozzo, OpenVZ, LDC, Docker)
 
 ## Installation
