@@ -310,6 +310,8 @@ systemctl restart httpd
 
 ### Stacking domains and subdomains as separate accounts
 
+Note: this is automatically negotiated as of v3.2.20. This section is retained for reference. See also: [An In-Depth Discussion of Virtual Host Matching](https://httpd.apache.org/docs/current/vhosts/details.html).
+
 Given *domain.com* and *sub.domain.com* as 2 separate accounts with *domain.com* assigned site10 and *sub.domain.com* assigned site12, when configuration is compiled into a single file, `/etc/httpd/conf/virtual-httpd-built`, the domain/subdomain configuration for *domain.com* will take precedence as it is lexicographically lower.
 
 Configuration for site12 will not show as the [ServerAlias](https://httpd.apache.org/docs/2.4/vhosts/name-based.html) setting, \*.domain.com matches first. A quick fix is to relocate `site12` configuration to higher priority by renaming such that it is ordered before `site10`.
