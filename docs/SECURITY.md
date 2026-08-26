@@ -265,6 +265,19 @@ cpcmd scope:set cp.bootstrapper haproxy_insecure_ssl true
 upcp -sb mail/configure-postfix mail/configure-dovecot software/haproxy
 ```
 
+## io_uring support
+
+EL10+ platforms include support for io_uring, an asynchronous kernel ring buffer that reduces syscalls/context switching by leveraging zero-copy DMA addressing. io_uring was introduced in Linux 5.1 with significant performance improvements over aio in both MariaDB 10.6+ and PostgreSQL 18+.
+
+Given the recency and accessibility of this feature, it has also been analyzed exhaustively as a potent multi-vector chain with new vulernabilities appearing as late as mid 2026. io_uring carries risks along with benefits, which requires careful restriction of its usage. Any task within the `io_uring` supplementary group may use its syscalls. Only [PostgreSQL](admin/PostgreSQL.md#io-uring) and [MariaDB](admin/MySQL.md#io-uring) have support enabled for this feature at this time.
+
+It may be disabled server-wide by setting `has_io_uring` to false.
+
+```bash
+cpcmd scope:set cp.bootstrapper has_io_uring false
+upcp -sb system/sysctl
+```
+
 ## Previous disclosures
 
 - [AP-01/AP-07](https://hq.apiscp.com/ap-01-ap-07-security-vulnerability-update/) disclosures (July 2019; courtesy Rack911 Labs)

@@ -19,6 +19,18 @@ When a prefix is changed, all authentication details must be updated to referenc
 
 `data_center_mode` is a [Bootstrapper](Bootstrapper.md) setting that opens remote access to PostgreSQL. Once opened, PostgreSQL is protected by [Rampart](Rampart.md). `data_center_mode` opens up remote PostgreSQL access in addition to a slew of other features. If you'd like to just open PostgreSQL, use the **pgsql.remote-access** [Scope](Scopes.md).
 
+## io_uring
+**New in 3.2.49**
+
+Beginning in PostgreSQL 18, asynchronous IO can be dispatched directly to the kernel as zero-copy DMA addressing to reduce syscall/context switching in userland. This feature is automatically enabled on EL10+ distributions. 
+
+It may be disabled by disabling `has_io_uring` feature.
+
+```bash
+cpcmd scope:set cp.bootstrapper has_io_uring false
+upcp -sb pgsql/install
+```
+
 ## Troubleshooting
 
 ### Depopulating databases
