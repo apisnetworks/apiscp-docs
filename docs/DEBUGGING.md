@@ -129,6 +129,46 @@ env DEBUG=1 ./apnscpd -f restart
 
 When debugging is active, the following tasks are disabled: cron, housekeeping, jobs. Setting *[cron]* => *no_debug* to false allows backend tasks to resume as normal; however, this state is unstable for production environments.
 
+## phpdbg
+
+**New in 3.2.49**
+
+`Edit[Domain|Reseller]`, `Add[Domain|Reseller]`, `Delete[Domain|Reseller]`,  `[Import|Export]Domain` and `cpcmd` support launch through PHP's native debugger, [phpdbg](https://www.php.net/manual/en/book.phpdbg.php). Run any of the above binaries with `-x` or `--debug` to enable the feature. `-xx` enables step-through eval (equivalent to `phpdbg -E`) whereas `-xxx` also enables oplog output (equivalent to `phpdbg -Ev`). 
+
+Breakpoints are introduced as environment variables.
+
+| Environment Var | Role                                                         | Example (ex)                                                 |
+| --------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| DEBUG_FUNC      | Attach bp at user-defined function                           | DEBUG_FUNC=defer ([latch onto defer()](https://gitlab.com/apisnetworks/apnscp/-/blob/2069f2ec6631decabde3f031c2263f05d93140b4/lib/helpers.php#L94)) |
+| DEBUG_LINE      | Attach bp at file, line number                               | DEBUG_LINE=helpers:94 (latch onto [defer() invocation](https://gitlab.com/apisnetworks/apnscp/-/blob/2069f2ec6631decabde3f031c2263f05d93140b4/lib/helpers.php#L94); .php ext implied if omitted) |
+| DEBUG_METHOD    | Attach bp at fully-qualified method                          | DEBUG_METHOD="Common_Module::whoami" (latch onto [common:whoami](https://gitlab.com/apisnetworks/apnscp/-/blob/2069f2ec6631decabde3f031c2263f05d93140b4/lib/modules/common.php#L464) command) |
+| DEBUG_MASK      | Attach bp at message that matches bitwise-mask or error type | DEBUG_MSG=e_warning (latch onto any PHP-generated warning [E_WARNING)](https://www.php.net/manual/en/errorfunc.constants.php)<br />DEBUG_MSG=warn (latch onto any platform-generated warnings via [warn()](PROGRAMMING.md#er-message-buffer-macros)) |
+| DEBUG_MSG       | Attach bp at message string, loose string or PCRE expression | DEBUG_MSG="/command \`.*' does not exist/` (latch onto [any commands](https://gitlab.com/apisnetworks/apnscp/-/blob/2069f2ec6631decabde3f031c2263f05d93140b4/lib/apnscpfunction.php#L1036) not present in context ns) |
+
+```bash
+# DEBUG_MSG="/command `.*' does not exist/" cpcmd -x common:doesnotexist
+[Breakpoint #0 added at #140284935481536]
+[Breakpoint #0 in #140284935481536 at /usr/local/apnscp/lib/Error/Reporter/Debugger.php:116, hits: 1]
+>00116:                                 }
+ 00117:                         });
+ 00118:                 }
+prompt> t
+frame #0: Error_Reporter\MessageCallbackInterface@anonymous->display(16, "command `common_doesnotexist' does no"+, "/usr/local/apnscp/lib/log_wrapper.php", 72, array(6)) at /usr/local/apnscp/lib/Error/Reporter/Debugger.php:116
+frame #1: Error_Reporter::append_msg(message="command `common_doesnotexist' does no"+, fmt=array(1), class=16, bt=null) at /usr/local/apnscp/lib/error_reporter.php:695
+frame #2: Error_Reporter::add_error(message="command `%(target)s' does not exist. "+, fmt=array(1)) at /usr/local/apnscp/lib/error_reporter.php:632
+frame #3: error(msg="command `%(target)s' does not exist. "+, array(2)) at /usr/local/apnscp/lib/log_wrapper.php:72
+frame #4: apnscpFunctionInterceptor->check_permissions(module="common", function="doesnotexist") at /usr/local/apnscp/lib/apnscpfunction.php:1036
+frame #5: apnscpFunctionInterceptor->call(cmd="common_doesnotexist", args=array(0)) at /usr/local/apnscp/lib/apnscpfunction.php:959
+frame #6: CLI\__call(cmd="common_doesnotexist", args=array(0)) at /usr/local/apnscp/lib/CLI/cmd.php:55
+frame #7: CLI\main() at /usr/local/apnscp/lib/CLI/cmd.php:587
+frame #8: {main} at /usr/local/apnscp/bin/cmd:7
+prompt> f 4
+[Switched to frame #4: apnscpFunctionInterceptor::check_permissions(module="common", function="doesnotexist") at /usr/local/apnscp/lib/apnscpfunction.php:1036]
+>01036:                                         return error("command `%(target)s' does not exist. Did you mean `%(suggest)s'?", [
+ 01037:                                                 'target'  => $cmd,
+ 01038:                                                 'suggest' => $module . '_' . $suggest[1]
+```
+
 ## PHP-FPM status
 
 FPM pools are grouped by site ID identifier and name. By default, one pool is created named after the primary domain. `php:pools()` lists active pools for a site.
