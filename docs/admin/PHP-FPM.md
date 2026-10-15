@@ -427,6 +427,24 @@ Making this change will also grant the PHP-FPM process access to view files with
 
 This setting may be altered globally in [config.ini](Tuneables.md) under *[httpd]* => *fpm_privatetmp*. Default value is true, to enable PrivateTmp usage.
 
+### Disabling PHP-FPM usage per-directory
+
+PHP-FPM handling is performed by a [combination](https://github.com/apisnetworks/httpd-apache/blob/6e1fca7b82e36cab5ae77f6748f857c83cda3298/SOURCES/httpd.conf#L404-L410) of \<Files> and SetHandler directives. Nested rule parsing prohibits unsetting the inherited handler, however, access may be denied by use of the following directives in .htaccess.
+
+```
+<Files "*.php">
+	Require all denied
+</Files>
+```
+
+.htaccess rules are inherited by child directories. To unset this behavior in a descendent, the following complement is used.
+
+```
+<Files "*.php">
+	Require all granted
+</Files>
+```
+
 ## HTTP configuration
 
 ### PHP-FPM timeout
